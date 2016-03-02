@@ -7,6 +7,25 @@ MYSQL_PORT=${MYSQL_PORT:-""}
 MYSQL_USER=${MYSQL_USER:-"root"}
 MYSQL_PASS=${MYSQL_PASS:-""}
 
+if [ -z ${MYSQL_HOST} ]
+then
+  echo " [E] no '${MYSQL_HOST}' ..."
+  exit 1
+fi
+
+mysql_opts="--host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} --port=${MYSQL_PORT}"
+
+# wait for needed database
+while ! nc -z ${MYSQL_HOST} ${MYSQL_PORT}
+do
+  sleep 3s
+done
+
+# must start initdb and do other jobs well
+sleep 10s
+
+# -------------------------------------------------------------------------------------------------
+
 env | grep BLUEPRINT  > /etc/env.vars
 env | grep HOST_     >> /etc/env.vars
 
@@ -17,14 +36,6 @@ chmod 2770 /etc/icingaweb2
 chown -R www-data:icingaweb2 /etc/icingaweb2/*
 find /etc/icingaweb2 -type f -name "*.ini" -exec chmod 660 {} \;
 find /etc/icingaweb2 -type d -exec chmod 2770 {} \;
-
-if [ -z ${MYSQL_HOST} ]
-then
-  echo " [E] no '${MYSQL_HOST}' ..."
-  exit 1
-fi
-
-mysql_opts="--host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} --port=${MYSQL_PORT}"
 
 if [ ! -f "${initfile}" ]
 then
@@ -47,10 +58,6 @@ then
     echo "quit"
   ) | mysql ${mysql_opts}
 
-#   sed -i 's/password \= \".*\"/password \= \"'${IDO_PASSWORD}'\"/g' /etc/icinga2/features-available/ido-mysql.conf
-#   sed -i 's/user =\ \".*\"/user =\ \"icinga2-ido-mysq\"/g'          /etc/icinga2/features-available/ido-mysql.conf
-#   sed -i 's/database =\ \".*\"/database =\ \"icinga2\"/g'           /etc/icinga2/features-available/ido-mysql.conf
-
   mkdir -vp /etc/icingaweb2/enabledModules
 
   ln -s /usr/share/icingaweb2/modules/* /etc/icingaweb2/enabledModules/
@@ -61,31 +68,6 @@ then
   done
 
   chown -R www-data:icingaweb2 /etc/icingaweb2/*
-  
-
-#   if [[ -L /etc/icingaweb2/enabledModules/monitoring ]]
-#   then
-#     echo "Symlink for /etc/icingaweb2/enabledModules/monitoring exists already...skipping"
-#   else
-#     ln -s /etc/icingaweb2/modules/monitoring /etc/icingaweb2/enabledModules/monitoring
-# #    ln -s ${icinga_modules}/monitoring /etc/icingaweb2/modules/monitoring
-#   fi
-#
-#   if [[ -L /etc/icingaweb2/enabledModules/doc ]]
-#   then
-#     echo "Symlink for /etc/icingaweb2/enabledModules/doc exists already...skipping"
-#   else
-#     ln -s /etc/icingaweb2/modules/doc /etc/icingaweb2/enabledModules/doc
-# #    ln -s ${icinga_modules}/doc /etc/icingaweb2/modules/doc
-#   fi
-#
-#   if [[ -L /etc/icingaweb2/enabledModules/setup ]]
-#   then
-#     echo "Symlink for /etc/icingaweb2/enabledModules/setup exists already...skipping"
-#   else
-#     ln -s /etc/icingaweb2/modules/setup /etc/icingaweb2/enabledModules/setup
-#   fi
-
 
   sed -i 's,icingaweb2_changeme,'${ICINGAWEB2_PASSWORD}',g' /etc/icingaweb2/resources.ini
   sed -i 's,icinga2-ido-mysq_changeme,'${IDO_PASSWORD}',g'  /etc/icingaweb2/resources.ini
