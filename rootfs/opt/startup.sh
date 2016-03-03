@@ -7,6 +7,9 @@ MYSQL_PORT=${MYSQL_PORT:-""}
 MYSQL_USER=${MYSQL_USER:-"root"}
 MYSQL_PASS=${MYSQL_PASS:-""}
 
+LIVESTATUS_HOST=${LIVESTATUS_HOST:-localhost}
+LIVESTATUS_PORT=${LIVESTATUS_PORT:-6666}
+
 if [ -z ${MYSQL_HOST} ]
 then
   echo " [E] no '${MYSQL_HOST}' ..."
@@ -72,6 +75,9 @@ then
   sed -i 's,icingaweb2_changeme,'${ICINGAWEB2_PASSWORD}',g' /etc/icingaweb2/resources.ini
   sed -i 's,icinga2-ido-mysq_changeme,'${IDO_PASSWORD}',g'  /etc/icingaweb2/resources.ini
   sed -i 's,dba-host_changeme,'${MYSQL_HOST}',g'            /etc/icingaweb2/resources.ini
+
+  sed -i 's,%LIVESTATUS_HOST%,'${LIVESTATUS_HOST}',g'       /etc/icingaweb2/resources.ini
+  sed -i 's,%LIVESTATUS_PORT%,'${LIVESTATUS_PORT}',g'       /etc/icingaweb2/resources.ini
 
   sed -i 's,icingaadmin_changeme,'${ICINGAADMIN_USER}',g'   /etc/icingaweb2/roles.ini
 
