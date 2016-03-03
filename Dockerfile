@@ -26,6 +26,7 @@ RUN apt-get -qq update && \
     supervisor \
     pwgen \
     nano \
+    netcat \
     nginx \
     mysql-client \
     icingaweb2 \
