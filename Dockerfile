@@ -3,7 +3,7 @@ FROM alpine:edge
 
 MAINTAINER Bodo Schulz <bodo@boone-schulz.de>
 
-LABEL version="1.0.0"
+LABEL version="1.0.1"
 
 ENV TERM xterm
 
@@ -12,9 +12,17 @@ EXPOSE 80
 # ---------------------------------------------------------------------------------------
 
 RUN \
-  echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >>  /etc/apk/repositories && \
+  echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >>  /etc/apk/repositories
+
+RUN \
   apk --quiet update && \
-  apk --quiet upgrade && \
+  apk --quiet upgrade
+
+RUN \
+  rm -Rf /var/run && \
+  ln -s /run /var/run
+
+RUN \
   apk --quiet add \
     bash \
     curl \
