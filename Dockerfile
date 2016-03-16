@@ -37,6 +37,7 @@ RUN \
     php-mysqli \
     php-json \
     nginx \
+    mysql-client \
     shadow@testing \
     icingaweb2@testing &&\
   rm -rf /var/cache/apk/*
