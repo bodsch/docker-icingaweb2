@@ -12,17 +12,11 @@ EXPOSE 80
 # ---------------------------------------------------------------------------------------
 
 RUN \
-  echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >>  /etc/apk/repositories
-
-RUN \
-  apk --quiet update && \
-  apk --quiet upgrade
+  apk --quiet update
 
 RUN \
   apk --quiet add \
     bash \
-    curl \
-    supervisor \
     pwgen \
     netcat-openbsd \
     php-fpm \
