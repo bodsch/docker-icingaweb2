@@ -1,5 +1,5 @@
 
-FROM alpine:edge
+FROM docker-alpine-base:latest
 
 MAINTAINER Bodo Schulz <bodo@boone-schulz.de>
 
@@ -17,10 +17,6 @@ RUN \
 RUN \
   apk --quiet update && \
   apk --quiet upgrade
-
-RUN \
-  rm -Rf /var/run && \
-  ln -s /run /var/run
 
 RUN \
   apk --quiet add \
