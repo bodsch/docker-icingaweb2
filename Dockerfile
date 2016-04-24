@@ -29,7 +29,7 @@ RUN \
     nginx \
     mysql-client \
     shadow@testing \
-    icingaweb2@testing &&\
+    icingaweb2 &&\
   rm -rf /var/cache/apk/*
 
 RUN \
