@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 initfile=/opt/run.init
 
 MYSQL_HOST=${MYSQL_HOST:-""}
@@ -29,14 +31,12 @@ sleep 10s
 
 # -------------------------------------------------------------------------------------------------
 
-#env | grep BLUEPRINT  > /etc/env.vars
-#env | grep HOST_     >> /etc/env.vars
-
 chmod 1777 /tmp
 
 chown root:nginx   /etc/icingaweb2
 chmod 2770 /etc/icingaweb2
 chown -R nginx:nginx /etc/icingaweb2/*
+
 find /etc/icingaweb2 -type f -name "*.ini" -exec chmod 660 {} \;
 find /etc/icingaweb2 -type d -exec chmod 2770 {} \;
 
@@ -53,22 +53,15 @@ then
     echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON icingaweb2.* TO 'icingaweb2'@'%' IDENTIFIED BY '${ICINGAWEB2_PASSWORD}';"
   ) | mysql ${mysql_opts}
 
-  mysql ${mysql_opts} --force  icingaweb2      < /usr/share/icingaweb2/mysql.schema.sql               >> /opt/icingaweb2-schema.log 2>&1
+  SCHEMA_FILE="/usr/share/webapps/icingaweb2/etc/schema/mysql.schema.sql"
+
+  mysql ${mysql_opts} --force  icingaweb2      < ${SCHEMA_FILE}               >> /opt/icingaweb2-schema.log 2>&1
 
   (
     echo "USE icingaweb2;"
     echo "INSERT IGNORE INTO icingaweb_user (name, active, password_hash) VALUES ('${ICINGAADMIN_USER}', 1, '${ICINGAADMIN_PASS}');"
     echo "quit"
   ) | mysql ${mysql_opts}
-
-  mkdir -vp /etc/icingaweb2/enabledModules
-
-  ln -s /usr/share/webapps/icingaweb2/modules/* /etc/icingaweb2/enabledModules/
-
-  for m in monitoring setup
-  do
-    /usr/bin/icingacli module enable ${m}
-  done
 
   chown -R nginx:nginx /etc/icingaweb2/*
 
@@ -81,7 +74,6 @@ then
 
   sed -i 's,icingaadmin_changeme,'${ICINGAADMIN_USER}',g'   /etc/icingaweb2/roles.ini
 
-  mkdir -p /var/log/icingaweb2
   chown nginx:nginx /var/log/icingaweb2
 
   touch ${initfile}
@@ -95,7 +87,7 @@ then
 
 fi
 
-echo -e "\n Starting Supervisor.\n  You can safely CTRL-C and the container will continue to run with or without the -d (daemon) option\n\n"
+echo -e "\n Starting Supervisor.\n\n"
 
 if [ -f /etc/supervisord.conf ]
 then
