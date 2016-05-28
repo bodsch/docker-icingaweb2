@@ -49,7 +49,7 @@ then
   ICINGAADMIN_PASS=$(openssl passwd -1 "icinga")
 
   (
-    echo "CREATE DATABASE IF NOT EXISTS icingaweb2;"
+    echo "CREATE DATABASE IF NOT EXISTS icingaweb2 DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE utf8_general_ci;"
     echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON icingaweb2.* TO 'icingaweb2'@'%' IDENTIFIED BY '${ICINGAWEB2_PASSWORD}';"
   ) | mysql ${mysql_opts}
 
@@ -62,6 +62,19 @@ then
     echo "INSERT IGNORE INTO icingaweb_user (name, active, password_hash) VALUES ('${ICINGAADMIN_USER}', 1, '${ICINGAADMIN_PASS}');"
     echo "quit"
   ) | mysql ${mysql_opts}
+
+  # icingaweb director
+  (
+    echo "CREATE DATABASE IF NOT EXISTS director DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE utf8_general_ci;"
+    echo "GRANT ALL ON director.* TO 'director'@'%' IDENTIFIED BY '${ICINGAWEB2_PASSWORD}';"
+    echo "quit"
+  ) | mysql ${mysql_opts}
+
+  SCHEMA_FILE="/usr/share/webapps/icingaweb2/modules/director/schema/mysql.sql"
+
+  mysql ${mysql_opts} --force  director < ${SCHEMA_FILE}               >> /opt/icingaweb2-director.log 2>&1
+
+
 
   chown -R nginx:nginx /etc/icingaweb2/*
 

@@ -21,6 +21,7 @@ RUN \
 RUN \
   apk --quiet add \
     bash \
+    git \
     pwgen \
     netcat-openbsd \
     php5-fpm \
@@ -35,7 +36,13 @@ RUN \
     shadow \
     openssl 
 
+RUN \ 
+  cd /usr/share/webapps/icingaweb2/modules && \
+  git clone https://github.com/Icinga/icingaweb2-module-director.git director
+
 RUN \
+  apk del --purge \
+    git && \
   rm -rf /var/cache/apk/*
 
 RUN \
@@ -51,7 +58,8 @@ RUN \
   /usr/bin/icingacli module enable monitoring && \
   /usr/bin/icingacli module enable setup && \
   /usr/bin/icingacli module enable translation && \
-  /usr/bin/icingacli module enable doc
+  /usr/bin/icingacli module enable doc && \
+  /usr/bin/icingacli module enable director
 
 ADD rootfs/ /
 
