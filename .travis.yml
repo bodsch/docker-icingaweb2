@@ -1,0 +1,12 @@
+sudo: required
+
+services:
+  - docker
+
+install:
+  - docker build --tag bodsch/docker-icingaweb2 .
+  - docker run --detach --name icingaweb2 bodsch/docker-icingaweb2
+
+script:
+  - docker ps | grep -q icingaweb2
+
