@@ -20,9 +20,6 @@ MYSQL_ROOT_PASS=${MYSQL_ROOT_PASS:-""}
 ICINGAWEB_ADMIN_USER=${ICINGAWEB_ADMIN_USER:-"icinga"}
 ICINGAWEB_ADMIN_PASS=${ICINGAWEB_ADMIN_PASS:-"icinga"}
 
-# LIVESTATUS_HOST=${LIVESTATUS_HOST:-localhost}
-# LIVESTATUS_PORT=${LIVESTATUS_PORT:-6666}
-
 if [ -z ${MYSQL_HOST} ]
 then
   echo " [E] no MYSQL_HOST var set ..."
@@ -56,20 +53,13 @@ prepare() {
   [ -f /etc/icingaweb2/resources.ini ] && rm -f /etc/icingaweb2/resources.ini
 
   touch /etc/icingaweb2/resources.ini
-
-    # Passwords...
-#     IDO_PASSWORD=${IDO_PASSWORD:-$(pwgen -s 15 1)}
-#     ICINGAWEB2_PASSWORD=${ICINGAWEB2_PASSWORD:-$(pwgen -s 15 1)}
-#     ICINGAADMIN_USER=${ICINGAADMIN_USER:-"icinga"}
-
-
 }
 
 configureIcingaWeb() {
 
   local status="${WORK_DIR}/mysql-schema.import"
 
-  if [ ! -f "${initfile}" ]
+  if [ ! -f "${status}" ]
   then
 
     (
@@ -113,8 +103,9 @@ configureIcingaWeb() {
         echo " [E] can't create the icingaweb User"
         exit 1
       fi
+    fi
 
-      cat << EOF >> /etc/icingaweb2/resources.ini
+    cat << EOF >> /etc/icingaweb2/resources.ini
 
 [icingaweb_db]
 type                = "db"
@@ -128,10 +119,10 @@ prefix              = "icingaweb_"
 
 EOF
 
-      if [ ! -z ${IDO_PASSWORD} ]
-      then
+    if [ ! -z ${IDO_PASSWORD} ]
+    then
 
-        cat << EOF >> /etc/icingaweb2/resources.ini
+      cat << EOF >> /etc/icingaweb2/resources.ini
 
 [icinga_ido]
 type                = "db"
@@ -143,19 +134,16 @@ username            = "icinga2"
 password            = "${IDO_PASSWORD}"
 
 EOF
-      else
-        echo " [i] IDO_PASSWORD isn't set."
-        echo " [i] disable IDO Access for Icingaweb"
+    else
+      echo " [i] IDO_PASSWORD isn't set."
+      echo " [i] disable IDO Access for Icingaweb"
 
-      fi
-
-
-      sed -i \
-        's,%ICINGAWEB_ADMIN_USER%,'${ICINGAWEB_ADMIN_USER}',g' \
-        /etc/icingaweb2/roles.ini
-
-      touch ${initfile}
     fi
+
+
+    sed -i \
+      's,%ICINGAWEB_ADMIN_USER%,'${ICINGAWEB_ADMIN_USER}',g' \
+      /etc/icingaweb2/roles.ini
   fi
 
 }
