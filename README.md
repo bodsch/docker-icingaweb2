@@ -15,18 +15,21 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 # supported Environment Vars
 
 for MySQL Support:
-  - MYSQL_HOST
-  - MYSQL_PORT
-  - MYSQL_ROOT_USER
-  - MYSQL_ROOT_PASS
-  - IDO_PASSWORD
+
+- ```MYSQL_HOST```
+- ```MYSQL_PORT``` (default: ```3306```)
+- ```MYSQL_ROOT_USER```
+- ```MYSQL_ROOT_PASS```
+- ```IDO_PASSWORD```
 
 Authentication
-  - ICINGAWEB_ADMIN_USER
-  - ICINGAWEB_ADMIN_PASS
+
+- ```ICINGAWEB_ADMIN_USER``` (default: ```icinga```)
+- ```ICINGAWEB_ADMIN_PASS``` (default: ```icinga```)
 
 for Livestatus Support:
-  - LIVESTATUS_HOST
-  - LIVESTATUS_PORT
+
+- ```LIVESTATUS_HOST``` (optional)
+- ```LIVESTATUS_PORT``` (optional)
 
 
