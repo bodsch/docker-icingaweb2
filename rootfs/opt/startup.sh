@@ -119,7 +119,7 @@ password            = "${MYSQL_ICINGAWEB2_PASSWORD}"
 prefix              = "icingaweb_"
 
 EOF
-    then
+    fi
 
     if [ $(grep -c "icinga_ido]" /etc/icingaweb2/resources.ini) -eq 0 ]
     then
@@ -195,8 +195,8 @@ configureIcingaLivestatus() {
     echo " [i] enable Live status for Host '${LIVESTATUS_HOST}'"
 
     if [ $(grep -c "livestatus-tcp]" /etc/icingaweb2/resources.ini) -eq 0 ]
-      then
-        cat << EOF >> /etc/icingaweb2/resources.ini
+    then
+      cat << EOF >> /etc/icingaweb2/resources.ini
 
 [livestatus-tcp]
 type                = "livestatus"
