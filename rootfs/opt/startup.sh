@@ -50,9 +50,8 @@ prepare() {
   MYSQL_ICINGAWEB2_PASSWORD=$(pwgen -s 15 1)
   ICINGAWEB_ADMIN_PASSWORD=$(openssl passwd -1 ${ICINGAWEB_ADMIN_PASS})
 
-  [ -f /etc/icingaweb2/resources.ini ] && rm -f /etc/icingaweb2/resources.ini
-
-  touch /etc/icingaweb2/resources.ini
+#  [ -f /etc/icingaweb2/resources.ini ] && rm -f /etc/icingaweb2/resources.ini
+#  touch /etc/icingaweb2/resources.ini
 }
 
 configureIcingaWeb() {
@@ -105,7 +104,9 @@ configureIcingaWeb() {
       fi
     fi
 
-    cat << EOF >> /etc/icingaweb2/resources.ini
+    if [ $(grep -c "icingaweb_db]" /etc/icingaweb2/resources.ini) -eq 0 ]
+    then
+      cat << EOF >> /etc/icingaweb2/resources.ini
 
 [icingaweb_db]
 type                = "db"
@@ -118,11 +119,14 @@ password            = "${MYSQL_ICINGAWEB2_PASSWORD}"
 prefix              = "icingaweb_"
 
 EOF
-
-    if [ ! -z ${IDO_PASSWORD} ]
     then
 
-      cat << EOF >> /etc/icingaweb2/resources.ini
+    if [ $(grep -c "icinga_ido]" /etc/icingaweb2/resources.ini) -eq 0 ]
+    then
+      if [ ! -z ${IDO_PASSWORD} ]
+      then
+
+        cat << EOF >> /etc/icingaweb2/resources.ini
 
 [icinga_ido]
 type                = "db"
@@ -134,10 +138,10 @@ username            = "icinga2"
 password            = "${IDO_PASSWORD}"
 
 EOF
-    else
-      echo " [i] IDO_PASSWORD isn't set."
-      echo " [i] disable IDO Access for Icingaweb"
-
+      else
+        echo " [i] IDO_PASSWORD isn't set."
+        echo " [i] disable IDO Access for Icingaweb"
+      fi
     fi
 
 
@@ -165,7 +169,9 @@ configureIcingaDirector() {
     then
       mysql ${mysql_opts} --force  director < ${SCHEMA_FILE} >> ${WORK_DIR}/icingaweb2-director.log 2>&1
 
-      cat << EOF >> /etc/icingaweb2/resources.ini
+      if [ $(grep -c "director]" /etc/icingaweb2/resources.ini) -eq 0 ]
+      then
+        cat << EOF >> /etc/icingaweb2/resources.ini
 
 [director]
 type                = "db"
@@ -177,6 +183,7 @@ username            = "director"
 password            = "${MYSQL_ICINGAWEB2_PASSWORD}"
 
 EOF
+      fi
     fi
   fi
 }
@@ -187,14 +194,16 @@ configureIcingaLivestatus() {
   then
     echo " [i] enable Live status for Host '${LIVESTATUS_HOST}'"
 
-    cat << EOF >> /etc/icingaweb2/resources.ini
+    if [ $(grep -c "livestatus-tcp]" /etc/icingaweb2/resources.ini) -eq 0 ]
+      then
+        cat << EOF >> /etc/icingaweb2/resources.ini
 
 [livestatus-tcp]
 type                = "livestatus"
 socket              = "tcp://${LIVESTATUS_HOST}:${LIVESTATUS_PORT}"
 
 EOF
-
+    fi
   fi
 
 }
