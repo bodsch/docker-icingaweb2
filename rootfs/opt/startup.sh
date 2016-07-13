@@ -51,7 +51,8 @@ prepare() {
   ICINGAWEB_ADMIN_PASSWORD=$(openssl passwd -1 ${ICINGAWEB_ADMIN_PASS})
 
 #  [ -f /etc/icingaweb2/resources.ini ] && rm -f /etc/icingaweb2/resources.ini
-#  touch /etc/icingaweb2/resources.ini
+  touch /etc/icingaweb2/resources.ini
+  touch /etc/icingaweb2/roles.ini
 }
 
 configureIcingaWeb() {
@@ -103,6 +104,7 @@ configureIcingaWeb() {
         exit 1
       fi
     fi
+  fi
 
     if [ $(grep -c "icingaweb_db]" /etc/icingaweb2/resources.ini) -eq 0 ]
     then
@@ -144,12 +146,15 @@ EOF
       fi
     fi
 
+    if [ $(grep -c "admins]" /etc/icingaweb2/roles.ini) -eq 0 ]
+    then
+      cat << EOF > /etc/icingaweb2/roles.ini
+[admins]
+users               = "${ICINGAWEB_ADMIN_USER}"
+permissions         = "*"
 
-    sed -i \
-      's,%ICINGAWEB_ADMIN_USER%,'${ICINGAWEB_ADMIN_USER}',g' \
-      /etc/icingaweb2/roles.ini
-  fi
-
+EOF
+    fi
 }
 
 configureIcingaDirector() {
