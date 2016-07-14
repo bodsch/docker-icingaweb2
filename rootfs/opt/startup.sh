@@ -47,7 +47,7 @@ prepare() {
 
   [ -d ${WORK_DIR} ] || mkdir -p ${WORK_DIR}
 
-  MYSQL_ICINGAWEB2_PASSWORD=$(pwgen -s 15 1)
+  MYSQL_ICINGAWEB2_PASSWORD=icingaweb2 # $(pwgen -s 15 1)
   ICINGAWEB_ADMIN_PASSWORD=$(openssl passwd -1 ${ICINGAWEB_ADMIN_PASS})
 
 #  [ -f /etc/icingaweb2/resources.ini ] && rm -f /etc/icingaweb2/resources.ini
