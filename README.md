@@ -21,6 +21,7 @@ for MySQL Support:
 - ```MYSQL_ROOT_USER```
 - ```MYSQL_ROOT_PASS```
 - ```IDO_PASSWORD```
+- ```IDO_DATABASE_NAME``` (default: ```icinga2```)
 
 Authentication
 

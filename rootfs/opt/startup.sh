@@ -20,6 +20,8 @@ MYSQL_ROOT_PASS=${MYSQL_ROOT_PASS:-""}
 ICINGAWEB_ADMIN_USER=${ICINGAWEB_ADMIN_USER:-"icinga"}
 ICINGAWEB_ADMIN_PASS=${ICINGAWEB_ADMIN_PASS:-"icinga"}
 
+IDO_DATABASE_NAME=${IDO_DATABASE_NAME:-"icinga2"}
+
 if [ -z ${MYSQL_HOST} ]
 then
   echo " [E] no MYSQL_HOST var set ..."
@@ -125,7 +127,7 @@ EOF
 
     if [ $(grep -c "icinga_ido]" /etc/icingaweb2/resources.ini) -eq 0 ]
     then
-      if [ ! -z ${IDO_PASSWORD} ]
+      if ( [ ! -z ${IDO_PASSWORD} ] || [ ! -z ${IDO_DATABASE_NAME} ] )
       then
 
         cat << EOF >> /etc/icingaweb2/resources.ini
@@ -135,7 +137,7 @@ type                = "db"
 db                  = "mysql"
 host                = "${MYSQL_HOST}"
 port                = "3306"
-dbname              = "icinga2"
+dbname              = "${IDO_DATABASE_NAME}"
 username            = "icinga2"
 password            = "${IDO_PASSWORD}"
 
