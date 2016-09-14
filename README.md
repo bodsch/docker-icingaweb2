@@ -8,6 +8,14 @@ Docker Container for icingaweb2 based on alpine-linux.
 
 # Build
 
+# Modules
+
+ - director
+ - graphite
+ - genericTTS
+ - businessprocess
+ - elasticsearch
+
 # Docker Hub
 
 You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/docker-icingaweb2/)
