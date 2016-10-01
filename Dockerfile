@@ -1,8 +1,9 @@
-FROM bodsch/docker-alpine-base:1609-01
+
+FROM bodsch/docker-alpine-base:1610-01
 
 MAINTAINER Bodo Schulz <bodo@boone-schulz.de>
 
-LABEL version="1.1.2"
+LABEL version="1.2.0"
 
 ENV TERM xterm
 
@@ -56,7 +57,7 @@ RUN \
     git && \
   rm -rf /var/cache/apk/*
 
-ADD rootfs/ /
+COPY rootfs/ /
 
 VOLUME  ["/etc/icingaweb2" ]
 
