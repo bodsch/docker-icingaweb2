@@ -61,6 +61,6 @@ COPY rootfs/ /
 
 VOLUME [ "/etc/icingaweb2" ]
 
-CMD /opt/startup.sh"
+CMD /opt/startup.sh
 
 # ---------------------------------------------------------------------------------------
