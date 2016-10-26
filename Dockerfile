@@ -1,9 +1,9 @@
 
-FROM bodsch/docker-alpine-base:1610-01
+FROM bodsch/docker-alpine-base:1610-02
 
 MAINTAINER Bodo Schulz <bodo@boone-schulz.de>
 
-LABEL version="1.2.0"
+LABEL version="1.2.1"
 
 ENV TERM xterm
 
@@ -12,9 +12,9 @@ EXPOSE 80
 # ---------------------------------------------------------------------------------------
 
 RUN \
-  apk --quiet --no-cache update && \
-  apk --quiet --no-cache upgrade && \
-  apk --quiet --no-cache add \
+  apk --no-cache update && \
+  apk --no-cache upgrade && \
+  apk --no-cache add \
     bash \
     git \
     pwgen \
@@ -59,8 +59,8 @@ RUN \
 
 COPY rootfs/ /
 
-VOLUME  ["/etc/icingaweb2" ]
+VOLUME [ "/etc/icingaweb2" ]
 
-ENTRYPOINT [ "/opt/startup.sh" ]
+CMD /opt/startup.sh"
 
 # ---------------------------------------------------------------------------------------
