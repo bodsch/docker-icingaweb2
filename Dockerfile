@@ -1,9 +1,9 @@
 
-FROM bodsch/docker-alpine-base:1610-02
+FROM bodsch/docker-alpine-base:alpine-3.5
 
 MAINTAINER Bodo Schulz <bodo@boone-schulz.de>
 
-LABEL version="1.2.2"
+LABEL version="1.3.0"
 
 ENV TERM xterm
 
@@ -15,7 +15,6 @@ RUN \
   apk --no-cache update && \
   apk --no-cache upgrade && \
   apk --no-cache add \
-    bash \
     git \
     pwgen \
     netcat-openbsd \
@@ -37,6 +36,7 @@ RUN \
   git clone https://github.com/Icinga/icingaweb2-module-generictts.git generictts && \
   git clone https://github.com/Icinga/icingaweb2-module-businessprocess.git businessprocess && \
   git clone https://github.com/Icinga/icingaweb2-module-elasticsearch.git elasticsearch && \
+  git clone https://github.com/Icinga/icingaweb2-module-cube cube && \
   usermod --append --groups icinga,icingacmd nginx && \
   mkdir /run/nginx && \
   mkdir /var/log/php-fpm && \
@@ -45,16 +45,18 @@ RUN \
   mkdir /etc/icingaweb2/modules/generictts && \
   mkdir /etc/icingaweb2/modules/businessprocess && \
   mkdir /etc/icingaweb2/enabledModules && \
-#  /usr/bin/icingacli module disable director && \
+  /usr/bin/icingacli module enable director && \
 #  /usr/bin/icingacli module disable generictts && \
-#  /usr/bin/icingacli module disable businessprocess && \
+  /usr/bin/icingacli module enable businessprocess && \
   /usr/bin/icingacli module enable monitoring && \
   /usr/bin/icingacli module enable setup && \
   /usr/bin/icingacli module enable translation && \
   /usr/bin/icingacli module enable doc && \
   /usr/bin/icingacli module enable graphite && \
+  /usr/bin/icingacli module enable cube && \
   apk del --purge \
-    git && \
+    git \
+    shadow && \
   rm -rf /var/cache/apk/*
 
 COPY rootfs/ /
