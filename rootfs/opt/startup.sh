@@ -220,6 +220,21 @@ EOF
 
 }
 
+configureIcingaGraphite() {
+
+  if [ ! -d /etc/icingaweb2/modules/graphite/templates ]
+  then
+    cp -arv /usr/share/webapps/icingaweb2/modules/graphite/sample-config/icinga2/* /etc/icingaweb2/modules/graphite/
+  fi
+
+  if [ -f /etc/icingaweb2/modules/graphite/config.ini ]
+  then
+    sed -i \
+      -e 's|my.graphite.web|graphite:8080|g' \
+      /etc/icingaweb2/modules/graphite/config.ini
+  fi
+}
+
 
 correctRights() {
 
@@ -258,6 +273,7 @@ run() {
     configureIcingaWeb
     configureIcingaDirector
     configureIcingaLivestatus
+    configureIcingaGraphite
 
     correctRights
 
