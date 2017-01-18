@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 #
 
@@ -277,12 +277,12 @@ run() {
 
     correctRights
 
-    echo -e "\n"
-    echo " ==================================================================="
-    echo " MySQL user 'icingaweb2' password set to '${MYSQL_ICINGAWEB2_PASSWORD}'"
-    echo " IcingaWeb2 Adminuser '${ICINGAWEB_ADMIN_USER}' password set to '${ICINGAWEB_ADMIN_PASS}'"
-    echo " ==================================================================="
-    echo ""
+#     echo -e "\n"
+#     echo " ==================================================================="
+#     echo " MySQL user 'icingaweb2' password set to '${MYSQL_ICINGAWEB2_PASSWORD}'"
+#     echo " IcingaWeb2 Adminuser '${ICINGAWEB_ADMIN_USER}' password set to '${ICINGAWEB_ADMIN_PASS}'"
+#     echo " ==================================================================="
+#     echo ""
   fi
 
   startSupervisor
