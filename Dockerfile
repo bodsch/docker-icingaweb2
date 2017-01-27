@@ -1,5 +1,5 @@
 
-FROM bodsch/docker-alpine-base:1701-02
+FROM bodsch/docker-alpine-base:1701-04
 
 MAINTAINER Bodo Schulz <bodo@boone-schulz.de>
 
@@ -44,6 +44,7 @@ RUN \
   mkdir /etc/icingaweb2/modules/graphite && \
   mkdir /etc/icingaweb2/modules/generictts && \
   mkdir /etc/icingaweb2/modules/businessprocess && \
+  mkdir /etc/icingaweb2/modules/cube && \
   mkdir /etc/icingaweb2/enabledModules && \
   /usr/bin/icingacli module enable director && \
   /usr/bin/icingacli module enable businessprocess && \

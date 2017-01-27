@@ -170,7 +170,7 @@ configureIcingaDirector() {
   if [ -d /usr/share/webapps/icingaweb2/modules/director ]
   then
     (
-      echo "CREATE DATABASE IF NOT EXISTS director DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE utf8_general_ci;"
+      echo "CREATE DATABASE IF NOT EXISTS director DEFAULT CHARACTER SET 'utf8';"
       echo "GRANT ALL ON director.* TO 'director'@'%' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
       echo "quit"
     ) | mysql ${mysql_opts}
