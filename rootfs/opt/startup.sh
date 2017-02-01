@@ -188,6 +188,7 @@ configureIcingaDirector() {
 [director]
 type                = "db"
 db                  = "mysql"
+charset             = "utf8"
 host                = "${MYSQL_HOST}"
 port                = "3306"
 dbname              = "director"
