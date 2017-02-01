@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 #
 
@@ -170,7 +170,7 @@ configureIcingaDirector() {
   if [ -d /usr/share/webapps/icingaweb2/modules/director ]
   then
     (
-      echo "CREATE DATABASE IF NOT EXISTS director DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE utf8_general_ci;"
+      echo "CREATE DATABASE IF NOT EXISTS director DEFAULT CHARACTER SET 'utf8';"
       echo "GRANT ALL ON director.* TO 'director'@'%' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
       echo "quit"
     ) | mysql ${mysql_opts}
@@ -188,6 +188,7 @@ configureIcingaDirector() {
 [director]
 type                = "db"
 db                  = "mysql"
+charset             = "utf8"
 host                = "${MYSQL_HOST}"
 port                = "3306"
 dbname              = "director"
@@ -277,12 +278,12 @@ run() {
 
     correctRights
 
-    echo -e "\n"
-    echo " ==================================================================="
-    echo " MySQL user 'icingaweb2' password set to '${MYSQL_ICINGAWEB2_PASSWORD}'"
-    echo " IcingaWeb2 Adminuser '${ICINGAWEB_ADMIN_USER}' password set to '${ICINGAWEB_ADMIN_PASS}'"
-    echo " ==================================================================="
-    echo ""
+#     echo -e "\n"
+#     echo " ==================================================================="
+#     echo " MySQL user 'icingaweb2' password set to '${MYSQL_ICINGAWEB2_PASSWORD}'"
+#     echo " IcingaWeb2 Adminuser '${ICINGAWEB_ADMIN_USER}' password set to '${ICINGAWEB_ADMIN_PASS}'"
+#     echo " ==================================================================="
+#     echo ""
   fi
 
   startSupervisor

@@ -1,9 +1,9 @@
 
-FROM bodsch/docker-alpine-base:1612-01
+FROM bodsch/docker-alpine-base:1701-04
 
 MAINTAINER Bodo Schulz <bodo@boone-schulz.de>
 
-LABEL version="1.3.1"
+LABEL version="1702-01"
 
 ENV TERM xterm
 
@@ -45,9 +45,9 @@ RUN \
   mkdir /etc/icingaweb2/modules/graphite && \
   mkdir /etc/icingaweb2/modules/generictts && \
   mkdir /etc/icingaweb2/modules/businessprocess && \
+  mkdir /etc/icingaweb2/modules/cube && \
   mkdir /etc/icingaweb2/enabledModules && \
   /usr/bin/icingacli module enable director && \
-#  /usr/bin/icingacli module disable generictts && \
   /usr/bin/icingacli module enable businessprocess && \
   /usr/bin/icingacli module enable monitoring && \
   /usr/bin/icingacli module enable setup && \
@@ -56,6 +56,8 @@ RUN \
   /usr/bin/icingacli module enable graphite && \
   /usr/bin/icingacli module enable cube && \
   apk del --purge \
+    bash \
+    curl \
     git \
     shadow && \
   rm -rf /var/cache/apk/*
@@ -64,6 +66,6 @@ COPY rootfs/ /
 
 VOLUME [ "/etc/icingaweb2" ]
 
-CMD /opt/startup.sh
+CMD [ "/opt/startup.sh" ]
 
 # ---------------------------------------------------------------------------------------
