@@ -26,6 +26,7 @@ RUN \
     php5-dom \
     php5-mysqli \
     php5-json \
+    php5-curl \
     nginx \
     mysql-client \
     shadow \
