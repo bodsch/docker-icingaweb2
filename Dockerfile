@@ -3,7 +3,7 @@ FROM bodsch/docker-alpine-base:1701-04
 
 MAINTAINER Bodo Schulz <bodo@boone-schulz.de>
 
-LABEL version="1702-01"
+LABEL version="1702-02"
 
 ENV TERM xterm
 
