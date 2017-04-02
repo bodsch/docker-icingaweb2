@@ -7,6 +7,9 @@ DATA_DIR   := /tmp/docker-data
 build:
 	docker \
 		build \
+		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
+		--build-arg VCS_REF=${GIT_SHA1} \
+		--build-arg ICINGAWEB_VERSION="2.4.1" \
 		--rm --tag=$(IMAGE_NAME) .
 	@echo Image tag: ${IMAGE_NAME}
 

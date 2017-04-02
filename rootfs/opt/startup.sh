@@ -20,6 +20,10 @@ MYSQL_ROOT_PASS=${MYSQL_ROOT_PASS:-""}
 ICINGAWEB_ADMIN_USER=${ICINGAWEB_ADMIN_USER:-"icinga"}
 ICINGAWEB_ADMIN_PASS=${ICINGAWEB_ADMIN_PASS:-"icinga"}
 
+ICINGA2_HOST=${ICINGA2_HOST:-"icinga2-master"}
+ICINGA2_CMD_API_USER=${ICINGA2_CMD_API_USER:-"command-api-user"}
+ICINGA2_CMD_API_PASS=${ICINGA2_CMD_API_PASS:-"command-api-pass"}
+
 IDO_DATABASE_NAME=${IDO_DATABASE_NAME:-"icinga2"}
 
 if [ -z ${MYSQL_HOST} ]
@@ -164,6 +168,23 @@ EOF
     fi
 }
 
+configureIcingaCommand() {
+
+  cfg_file="/etc/icingaweb2/modules/commandtransport.ini"
+
+  cat << EOF > /etc/icingaweb2/modules/commandtransport.ini
+
+[icinga]
+transport = "api"
+host      = "${ICINGA2_HOST}"
+port      = "5665"
+username  = "${ICINGA2_CMD_API_USER}"
+password  = "${ICINGA2_CMD_API_PASS}"
+
+EOF
+
+}
+
 configureIcingaDirector() {
 
   # icingaweb director
@@ -272,6 +293,7 @@ run() {
     waitForDatabase
     prepare
     configureIcingaWeb
+    configureIcingaCommand
     configureIcingaDirector
     configureIcingaLivestatus
     configureIcingaGraphite
