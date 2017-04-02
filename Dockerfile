@@ -9,6 +9,8 @@ ENV \
   ALPINE_MIRROR="dl-cdn.alpinelinux.org" \
   ALPINE_VERSION="edge" \
   TERM=xterm \
+  BUILD_DATE="2017-04-02" \
+  ICINGAWEB_VERSION="2.4.1" \
   APK_ADD="ca-certificates curl git mysql-client nginx netcat-openbsd openssl php7 php7-fpm php7-pdo_mysql php7-openssl php7-intl php7-ldap php7-gettext php7-json php7-mbstring php7-curl php7-iconv php7-xml php7-dom pwgen shadow" \
   APK_DEL="ca-certificates curl git shadow"
 
@@ -18,15 +20,14 @@ ENV TERM xterm
 EXPOSE 80
 
 # Build-time metadata as defined at http://label-schema.org
-ARG BUILD_DATE
-ARG VCS_REF
-ARG ICINGAWEB_VERSION
+#ARG BUILD_DATE
+#ARG VCS_REF
+#ARG ICINGAWEB_VERSION
 
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="IcingaWeb2 Docker Image" \
       org.label-schema.description="Inofficial IcingaWeb2 Docker Image" \
       org.label-schema.url="https://www.icinga.org/" \
-      org.label-schema.vcs-ref=${VCS_REF} \
       org.label-schema.vcs-url="https://github.com/bodsch/docker-icingaweb2" \
       org.label-schema.vendor="Bodo Schulz" \
       org.label-schema.version=${ICINGAWEB_VERSION} \
