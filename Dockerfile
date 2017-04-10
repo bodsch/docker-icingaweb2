@@ -7,7 +7,7 @@ ENV \
   ALPINE_MIRROR="dl-cdn.alpinelinux.org" \
   ALPINE_VERSION="edge" \
   TERM=xterm \
-  BUILD_DATE="2017-04-02" \
+  BUILD_DATE="2017-04-10" \
   ICINGAWEB_VERSION="2.4.1" \
   APK_ADD="ca-certificates curl git mysql-client nginx netcat-openbsd openssl php7 php7-fpm php7-pdo_mysql php7-openssl php7-intl php7-ldap php7-gettext php7-json php7-mbstring php7-curl php7-iconv php7-xml php7-dom pwgen shadow" \
   APK_DEL="ca-certificates curl git shadow"
@@ -15,10 +15,6 @@ ENV \
 EXPOSE 80
 
 # Build-time metadata as defined at http://label-schema.org
-#ARG BUILD_DATE
-#ARG VCS_REF
-#ARG ICINGAWEB_VERSION
-
 LABEL org.label-schema.build-date=${BUILD_DATE} \
       org.label-schema.name="IcingaWeb2 Docker Image" \
       org.label-schema.description="Inofficial IcingaWeb2 Docker Image" \
@@ -42,9 +38,7 @@ RUN \
     apk --quiet --no-cache add ${apk} ; \
   done && \
   ln -s /usr/bin/php7 /usr/bin/php && \
-  [ -d /opt ] || mkdir /opt
-
-RUN \
+  [ -d /opt ] || mkdir /opt && \
   #
   echo "fetch: Icingaweb2 ${ICINGAWEB_VERSION}" && \
   curl \
@@ -56,9 +50,8 @@ RUN \
     | gunzip \
     | tar x -C / && \
   ln -s /icingaweb2-${ICINGAWEB_VERSION} /icingaweb2 && \
-  ln -s /icingaweb2/bin/icingacli /usr/bin/icingacli
-
-RUN \
+  ln -s /icingaweb2/bin/icingacli /usr/bin/icingacli && \
+  #
   cd /icingaweb2/modules && \
   git clone https://github.com/Icinga/icingaweb2-module-director.git        --single-branch director && \
   git clone https://github.com/Icinga/icingaweb2-module-graphite.git        --single-branch graphite && \
@@ -66,9 +59,7 @@ RUN \
   git clone https://github.com/Icinga/icingaweb2-module-businessprocess.git --single-branch businessprocess && \
   git clone https://github.com/Icinga/icingaweb2-module-elasticsearch.git   --single-branch elasticsearch && \
   git clone https://github.com/Icinga/icingaweb2-module-cube                --single-branch cube && \
-  rm -rf  /icingaweb2/modules/*/.git*
-
-RUN \
+  rm -rf  /icingaweb2/modules/*/.git* && \
   #
   mkdir -p /var/log/icingaweb2 && \
   mkdir -p /etc/icingaweb2/modules && \
@@ -85,9 +76,7 @@ RUN \
   /usr/bin/icingacli module enable translation && \
   /usr/bin/icingacli module enable doc && \
   /usr/bin/icingacli module enable graphite && \
-  /usr/bin/icingacli module enable cube
-
-RUN \
+  /usr/bin/icingacli module enable cube && \
   mkdir /run/nginx && \
   mkdir /var/log/php-fpm && \
   for apk in ${APK_DEL} ; \
@@ -100,13 +89,6 @@ RUN \
 
 COPY rootfs/ /
 
-CMD [ "/bin/sh" ]
-
-
-#COPY rootfs/ /
-#
-#VOLUME [ "/etc/icingaweb2" ]
-#
-#CMD [ "/opt/startup.sh" ]
+CMD [ "/init/run.sh" ]
 
 # ---------------------------------------------------------------------------------------
