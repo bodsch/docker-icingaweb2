@@ -9,7 +9,7 @@ ENV \
   TERM=xterm \
   BUILD_DATE="2017-04-10" \
   ICINGAWEB_VERSION="2.4.1" \
-  APK_ADD="ca-certificates curl git mysql-client nginx netcat-openbsd openssl php7 php7-fpm php7-pdo_mysql php7-openssl php7-intl php7-ldap php7-gettext php7-json php7-mbstring php7-curl php7-iconv php7-xml php7-dom pwgen shadow" \
+  APK_ADD="ca-certificates curl git mysql-client nginx netcat-openbsd openssl php7 php7-fpm php7-pdo_mysql php7-openssl php7-intl php7-ldap php7-gettext php7-json php7-mbstring php7-curl php7-iconv php7-xml php7-dom pwgen shadow supervisor" \
   APK_DEL="ca-certificates curl git shadow"
 
 EXPOSE 80
