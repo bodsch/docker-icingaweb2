@@ -3,8 +3,6 @@ FROM alpine:latest
 
 MAINTAINER Bodo Schulz <bodo@boone-schulz.de>
 
-LABEL version="dev"
-
 ENV \
   ALPINE_MIRROR="dl-cdn.alpinelinux.org" \
   ALPINE_VERSION="edge" \
@@ -13,9 +11,6 @@ ENV \
   ICINGAWEB_VERSION="2.4.1" \
   APK_ADD="ca-certificates curl git mysql-client nginx netcat-openbsd openssl php7 php7-fpm php7-pdo_mysql php7-openssl php7-intl php7-ldap php7-gettext php7-json php7-mbstring php7-curl php7-iconv php7-xml php7-dom pwgen shadow" \
   APK_DEL="ca-certificates curl git shadow"
-
-
-ENV TERM xterm
 
 EXPOSE 80
 
