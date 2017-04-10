@@ -1,6 +1,6 @@
 
 
-if [ -z ${MYSQL_OPTS} ]
+if [ -z "${MYSQL_OPTS}" ]
 then
   return
 fi
@@ -14,29 +14,45 @@ configureIcingaDirector() {
   if [ -d ${director} ]
   then
 
-    echo " [i] configure Icingaweb2 Director"
+    # check if database already created ...
+    #
+    query="SELECT TABLE_SCHEMA FROM information_schema.tables WHERE table_schema = 'director' limit 1;"
 
-    (
-      echo "CREATE DATABASE IF NOT EXISTS director DEFAULT CHARACTER SET 'utf8';"
-      echo "GRANT ALL ON director.* TO 'director'@'%' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
-      echo "quit"
-    ) | mysql ${MYSQL_OPTS}
+    director_status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | wc -w )
 
-    SCHEMA_FILE="${director}/schema/mysql.sql"
-
-    if [ -f ${SCHEMA_FILE} ]
+    if [ ${director_status} -eq 0 ]
     then
-      mysql ${MYSQL_OPTS} --force  director < ${SCHEMA_FILE}
+      # Database isn't created
+      # well, i do my job ...
+      #
+      echo " [i] Initializing databases and director configurations."
 
-      if [ $? -gt 0 ]
+      (
+        echo "CREATE DATABASE IF NOT EXISTS director DEFAULT CHARACTER SET 'utf8';"
+        echo "GRANT ALL ON director.* TO 'director'@'%' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
+        echo "quit"
+      ) | mysql ${MYSQL_OPTS}
+
+      SCHEMA_FILE="${director}/schema/mysql.sql"
+
+      if [ -f ${SCHEMA_FILE} ]
       then
-        echo " [E] can't insert the director Database Schema"
-        exit 1
+        mysql ${MYSQL_OPTS} --force  director < ${SCHEMA_FILE}
+
+        if [ $? -gt 0 ]
+        then
+          echo " [E] can't insert the director Database Schema"
+          exit 1
+        fi
       fi
 
-      if [ $(grep -c "director]" /etc/icingaweb2/resources.ini) -eq 0 ]
-      then
-        cat << EOF >> /etc/icingaweb2/resources.ini
+    fi
+
+    echo " [i] configure Icingaweb2 Director"
+
+    if [ $(grep -c "director]" /etc/icingaweb2/resources.ini) -eq 0 ]
+    then
+      cat << EOF >> /etc/icingaweb2/resources.ini
 
 [director]
 type                = "db"
@@ -49,9 +65,9 @@ username            = "director"
 password            = "${MYSQL_ICINGAWEB2_PASSWORD}"
 
 EOF
-      fi
     fi
   fi
+
 }
 
 configureIcingaDirector

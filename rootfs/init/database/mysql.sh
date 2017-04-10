@@ -9,7 +9,7 @@ WEB_DATABASE_NAME=${WEB_DATABASE_NAME:-"icingaweb2"}
 
 # -------------------------------------------------------------------------------------------------
 
-if [ -z ${MYSQL_OPTS} ]
+if [ -z "${MYSQL_OPTS}" ]
 then
   return
 fi
@@ -62,14 +62,14 @@ configureDatabase() {
   #
   query="SELECT TABLE_SCHEMA FROM information_schema.tables WHERE table_schema = \"${WEB_DATABASE_NAME}\" limit 1;"
 
-  ido_status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}")
+  web_status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | wc -w)
 
-  if [ $(echo "${ido_status}" | wc -w) -eq 0 ]
+  if [ ${web_status} -eq 0 ]
   then
     # Database isn't created
     # well, i do my job ...
     #
-    echo " [i] Initializing databases and icinga2 configurations."
+    echo " [i] Initializing databases and icingaweb2 configurations."
 
     (
       echo "--- create user '${WEB_DATABASE_NAME}'@'%' IDENTIFIED BY '${IDO_PASSWORD}';"
