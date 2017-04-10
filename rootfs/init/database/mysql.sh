@@ -9,7 +9,10 @@ WEB_DATABASE_NAME=${WEB_DATABASE_NAME:-"icingaweb2"}
 
 # -------------------------------------------------------------------------------------------------
 
-[ ! -z {MYSQL_OPTS} ] && return
+if [ -z ${MYSQL_OPTS} ]
+then
+  return
+fi
 
 waitForDatabase() {
 

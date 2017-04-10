@@ -1,7 +1,7 @@
 
 configureIcingaGraphite() {
 
-  echo " [i] - currently disabled"
+  echo " [i] graphite Support currently disabled"
 
   return
 

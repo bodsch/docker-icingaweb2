@@ -1,6 +1,9 @@
 
 
-[ -z {MYSQL_OPTS} ] && return
+if [ -z ${MYSQL_OPTS} ]
+then
+  return
+fi
 
 configureIcingaDirector() {
 

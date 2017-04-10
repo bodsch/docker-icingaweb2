@@ -9,8 +9,8 @@ ENV \
   TERM=xterm \
   BUILD_DATE="2017-04-10" \
   ICINGAWEB_VERSION="2.4.1" \
-  APK_ADD="ca-certificates curl git mysql-client nginx netcat-openbsd openssl php7 php7-fpm php7-pdo_mysql php7-openssl php7-intl php7-ldap php7-gettext php7-json php7-mbstring php7-curl php7-iconv php7-xml php7-dom pwgen shadow supervisor" \
-  APK_DEL="ca-certificates curl git shadow"
+  APK_ADD="ca-certificates curl git mysql-client nginx netcat-openbsd openssl php7 php7-ctype php7-fpm php7-pdo_mysql php7-openssl php7-intl php7-ldap php7-gettext php7-json php7-mbstring php7-curl php7-iconv php7-session php7-xml php7-dom pwgen shadow supervisor" \
+  APK_DEL="curl git shadow"
 
 EXPOSE 80
 
@@ -37,9 +37,11 @@ RUN \
   do \
     apk --quiet --no-cache add ${apk} ; \
   done && \
-  ln -s /usr/bin/php7 /usr/bin/php && \
+  ln -s /usr/bin/php7      /usr/bin/php && \
+  ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
   [ -d /opt ] || mkdir /opt && \
   #
+  mkdir /usr/share/webapps && \
   echo "fetch: Icingaweb2 ${ICINGAWEB_VERSION}" && \
   curl \
     --silent \
@@ -48,18 +50,18 @@ RUN \
     --cacert /etc/ssl/certs/ca-certificates.crt \
     "https://github.com/Icinga/icingaweb2/archive/v${ICINGAWEB_VERSION}.tar.gz" \
     | gunzip \
-    | tar x -C / && \
-  ln -s /icingaweb2-${ICINGAWEB_VERSION} /icingaweb2 && \
-  ln -s /icingaweb2/bin/icingacli /usr/bin/icingacli && \
+    | tar x -C /usr/share/webapps/ && \
+  ln -s /usr/share/webapps/icingaweb2-${ICINGAWEB_VERSION} /usr/share/webapps/icingaweb2 && \
+  ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
   #
-  cd /icingaweb2/modules && \
+  cd /usr/share/webapps/icingaweb2/modules && \
   git clone https://github.com/Icinga/icingaweb2-module-director.git        --single-branch director && \
   git clone https://github.com/Icinga/icingaweb2-module-graphite.git        --single-branch graphite && \
   git clone https://github.com/Icinga/icingaweb2-module-generictts.git      --single-branch generictts && \
   git clone https://github.com/Icinga/icingaweb2-module-businessprocess.git --single-branch businessprocess && \
   git clone https://github.com/Icinga/icingaweb2-module-elasticsearch.git   --single-branch elasticsearch && \
   git clone https://github.com/Icinga/icingaweb2-module-cube                --single-branch cube && \
-  rm -rf  /icingaweb2/modules/*/.git* && \
+  rm -rf /usr/share/webapps/icingaweb2/modules/*/.git* && \
   #
   mkdir -p /var/log/icingaweb2 && \
   mkdir -p /etc/icingaweb2/modules && \
