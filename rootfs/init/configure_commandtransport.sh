@@ -19,7 +19,7 @@ configureIcingaCommand() {
 
   echo " [i] configure Command Transport over API"
 
-  cat << EOF > /etc/icingaweb2/modules/commandtransport.ini
+  cat << EOF > /etc/icingaweb2/modules/monitoring/commandtransport.ini
 
 [icinga]
 transport = "api"
