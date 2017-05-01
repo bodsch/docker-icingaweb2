@@ -78,7 +78,7 @@ run() {
   . /init/database/mysql.sh
   . /init/configure_director.sh
   . /init/configure_commandtransport.sh
-  . /init/configure_livestatus.sh
+#  . /init/configure_livestatus.sh
   . /init/configure_graphite.sh
 
   correctRights

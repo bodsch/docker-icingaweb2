@@ -3,11 +3,13 @@ docker-icingaweb2
 
 Docker Container for icingaweb2 based on alpine-linux.
 
+Now with PHP7 Support and many installed modules (see below)
+
 # Status
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/bodsch/docker-icingaweb2.svg?branch=1704-01)][hub]
-[![Image Size](https://images.microbadger.com/badges/image/bodsch/docker-icingaweb2.svg?branch=1704-01)][microbadger]
-[![Build Status](https://travis-ci.org/bodsch/docker-icingaweb2.svg?branch=1704-01)][travis]
+[![Docker Pulls](https://img.shields.io/docker/pulls/bodsch/docker-icingaweb2.svg?branch=1705-01)][hub]
+[![Image Size](https://images.microbadger.com/badges/image/bodsch/docker-icingaweb2.svg?branch=1705-01)][microbadger]
+[![Build Status](https://travis-ci.org/bodsch/docker-icingaweb2.svg?branch=1705-01)][travis]
 
 [hub]: https://hub.docker.com/r/bodsch/docker-icingaweb2/
 [microbadger]: https://microbadger.com/images/bodsch/docker-icingaweb2
@@ -62,14 +64,22 @@ for MySQL Support:
 - `IDO_PASSWORD`
 - `IDO_DATABASE_NAME` (default: `icinga2`)
 
+Graphite Support:
+
+- `GRAPHITE_HOST`
+- `GRAPHITE_PORT`
+
+Command Transport (now over API)
+
+- `ICINGA2_HOST` (default: `icinga2-master`
+- `ICINGA2_PORT` (default: `5665`
+
+- `ICINGA2_CMD_API_USER`
+- `ICINGA2_CMD_API_PASS`
+
+
 Authentication
 
 - `ICINGAWEB_ADMIN_USER` (default: `icinga`)
 - `ICINGAWEB_ADMIN_PASS` (default: `icinga`)
-
-for Livestatus Support:
-
-- `LIVESTATUS_HOST` (optional)
-- `LIVESTATUS_PORT` (optional)
-
 
