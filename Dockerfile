@@ -7,7 +7,7 @@ ENV \
   ALPINE_MIRROR="dl-cdn.alpinelinux.org" \
   ALPINE_VERSION="edge" \
   TERM=xterm \
-  BUILD_DATE="2017-05-01" \
+  BUILD_DATE="2017-05-10" \
   ICINGAWEB_VERSION="2.4.1" \
   APK_ADD="ca-certificates curl git mysql-client nginx netcat-openbsd openssl php7 php7-ctype php7-fpm php7-pdo_mysql php7-openssl php7-intl php7-ldap php7-gettext php7-json php7-mbstring php7-curl php7-iconv php7-session php7-xml php7-dom pwgen shadow supervisor" \
   APK_DEL="curl git shadow"
@@ -37,8 +37,8 @@ RUN \
   do \
     apk --quiet --no-cache add ${apk} ; \
   done && \
-  ln -s /usr/bin/php7      /usr/bin/php && \
-  ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
+  [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
+  [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
   [ -d /opt ] || mkdir /opt && \
   #
   mkdir /usr/share/webapps && \
@@ -61,6 +61,7 @@ RUN \
   git clone https://github.com/Icinga/icingaweb2-module-businessprocess.git --single-branch businessprocess && \
   git clone https://github.com/Icinga/icingaweb2-module-elasticsearch.git   --single-branch elasticsearch && \
   git clone https://github.com/Icinga/icingaweb2-module-cube                --single-branch cube && \
+  git clone https://github.com/Mikesch-mp/icingaweb2-module-grafana.git     --single-branch grafana && \
   rm -rf /usr/share/webapps/icingaweb2/modules/*/.git* && \
   #
   mkdir -p /var/log/icingaweb2 && \
@@ -69,6 +70,7 @@ RUN \
   mkdir /etc/icingaweb2/modules/generictts && \
   mkdir /etc/icingaweb2/modules/businessprocess && \
   mkdir /etc/icingaweb2/modules/cube && \
+  mkdir /etc/icingaweb2/modules/grafana && \
   mkdir /etc/icingaweb2/enabledModules && \
   #
   /usr/bin/icingacli module enable director && \
@@ -79,6 +81,7 @@ RUN \
   /usr/bin/icingacli module enable doc && \
   /usr/bin/icingacli module enable graphite && \
   /usr/bin/icingacli module enable cube && \
+  /usr/bin/icingacli module enable grafana && \
   mkdir /run/nginx && \
   mkdir /var/log/php-fpm && \
   for apk in ${APK_DEL} ; \
