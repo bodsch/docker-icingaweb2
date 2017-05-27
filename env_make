@@ -1,0 +1,9 @@
+PORTS = \
+  --publish 80:80
+
+VOLUMES = \
+  --volume /var/log/docker:/var/log \
+  --volume /tmp/docker-data:/srv
+
+ENV = \
+  --env URL_PATH="/"
