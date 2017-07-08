@@ -5,6 +5,8 @@ Docker Container for icingaweb2 based on alpine-linux.
 
 Now with PHP7 Support and many installed modules (see below)
 
+Integrates also the grafana Modue from [Mikesch-mp](https://github.com/Mikesch-mp/icingaweb2-module-grafana.git)
+
 # Status
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/bodsch/docker-icingaweb2.svg?branch=1705-01)][hub]
@@ -47,6 +49,7 @@ Remove the *docker-compose* images: `make compose-down`
  - businessprocess
  - elasticsearch
  - cube
+ - grafana
 
 
 # Docker Hub
