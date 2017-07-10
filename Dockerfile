@@ -83,7 +83,7 @@ RUN \
   /usr/bin/icingacli module enable grafana && \
   mkdir /run/nginx && \
   mkdir /var/log/php-fpm && \
-  apk del --purge ${APK_ADD} && \
+  apk del --purge ${APK_DEL} && \
   rm -rf \
     /tmp/* \
     /var/cache/apk/*
