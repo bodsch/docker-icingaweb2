@@ -58,21 +58,15 @@ waitForDatabase() {
 
 configureDatabase() {
 
-  # check if database already created ...
-  #
-  query="SELECT TABLE_SCHEMA FROM information_schema.tables WHERE table_schema = \"${WEB_DATABASE_NAME}\" limit 1;"
+  # create user - when they NOT exists
+  query="select host, user, password from mysql.user where user = '${WEB_DATABASE_NAME}';"
+  status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | wc -w)
 
-  web_status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | wc -w)
-
-  if [ ${web_status} -eq 0 ]
+  if [ ${status} -eq 0 ]
   then
-    # Database isn't created
-    # well, i do my job ...
-    #
-    echo " [i] Initializing databases and icingaweb2 configurations."
-
+    echo " [i] create database '${WEB_DATABASE_NAME}' with user and grants for 'icingaweb2'"
     (
-      echo "--- create user '${WEB_DATABASE_NAME}'@'%' IDENTIFIED BY '${IDO_PASSWORD}';"
+      echo "--- create user 'icingaweb2'@'%' IDENTIFIED BY '${IDO_PASSWORD}';"
       echo "CREATE DATABASE IF NOT EXISTS ${WEB_DATABASE_NAME} DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE utf8_general_ci;"
       echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${WEB_DATABASE_NAME}.* TO 'icingaweb2'@'%' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
       echo "FLUSH PRIVILEGES;"
@@ -80,22 +74,37 @@ configureDatabase() {
 
     if [ $? -eq 1 ]
     then
-      echo " [E] can't create Database '${WEB_DATABASE_NAME}'"
+      echo " [E] can't create database '${WEB_DATABASE_NAME}'"
       exit 1
     fi
+  fi
+
+  # check if database already created ...
+  #
+  query="SELECT TABLE_SCHEMA FROM information_schema.tables WHERE table_schema = \"${WEB_DATABASE_NAME}\";"
+  status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | wc -w)
+
+  if [ ${status} -lt 4 ]
+  then
+    # Database isn't created
+    # well, i do my job ...
+    #
+    query="drop database ${WEB_DATABASE_NAME};"
+    status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | wc -w)
 
     # create the web schema
     #
+    echo " [i] create database schema"
+
     mysql ${MYSQL_OPTS} --force ${WEB_DATABASE_NAME}  < /usr/share/webapps/icingaweb2/etc/schema/mysql.schema.sql
 
     if [ $? -gt 0 ]
     then
-      echo " [E] can't insert the icingaweb2 Database Schema"
+      echo " [E] can't insert the icingaweb2 database schema"
       exit 1
     fi
 
     # insert default icingauser
-
     (
       echo "USE ${WEB_DATABASE_NAME};"
       echo "INSERT IGNORE INTO icingaweb_user (name, active, password_hash) VALUES ('${ICINGAWEB_ADMIN_USER}', 1, '${ICINGAWEB_ADMIN_PASSWORD}');"
@@ -104,7 +113,7 @@ configureDatabase() {
 
     if [ $? -gt 0 ]
     then
-      echo " [E] can't create the icingaweb User"
+      echo " [E] can't create the icingaweb user"
       exit 1
     fi
 
