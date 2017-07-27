@@ -86,3 +86,7 @@ Authentication
 - `ICINGAWEB_ADMIN_USER` (default: `icinga`)
 - `ICINGAWEB_ADMIN_PASS` (default: `icinga`)
 
+- `ICINGAWEB2_USERS` (default: `icinga:icinga`)
+
+
+
