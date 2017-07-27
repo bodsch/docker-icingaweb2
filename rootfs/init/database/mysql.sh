@@ -104,18 +104,18 @@ configureDatabase() {
       exit 1
     fi
 
-    # insert default icingauser
-    (
-      echo "USE ${WEB_DATABASE_NAME};"
-      echo "INSERT IGNORE INTO icingaweb_user (name, active, password_hash) VALUES ('${ICINGAWEB_ADMIN_USER}', 1, '${ICINGAWEB_ADMIN_PASSWORD}');"
-      echo "quit"
-    ) | mysql ${MYSQL_OPTS}
-
-    if [ $? -gt 0 ]
-    then
-      echo " [E] can't create the icingaweb user"
-      exit 1
-    fi
+#     # insert default icingauser
+#     (
+#       echo "USE ${WEB_DATABASE_NAME};"
+#       echo "INSERT IGNORE INTO icingaweb_user (name, active, password_hash) VALUES ('${ICINGAWEB_ADMIN_USER}', 1, '${ICINGAWEB_ADMIN_PASSWORD}');"
+#       echo "quit"
+#     ) | mysql ${MYSQL_OPTS}
+#
+#     if [ $? -gt 0 ]
+#     then
+#       echo " [E] can't create the icingaweb user"
+#       exit 1
+#     fi
 
   fi
 
@@ -164,15 +164,15 @@ EOF
     fi
   fi
 
-  if [ $(grep -c "admins]" /etc/icingaweb2/roles.ini) -eq 0 ]
-  then
-    cat << EOF > /etc/icingaweb2/roles.ini
-[admins]
-users               = "${ICINGAWEB_ADMIN_USER}"
-permissions         = "*"
-
-EOF
-  fi
+#   if [ $(grep -c "admins]" /etc/icingaweb2/roles.ini) -eq 0 ]
+#   then
+#     cat << EOF > /etc/icingaweb2/roles.ini
+# [admins]
+# users               = "${ICINGAWEB_ADMIN_USER}"
+# permissions         = "*"
+#
+# EOF
+#   fi
 
 }
 

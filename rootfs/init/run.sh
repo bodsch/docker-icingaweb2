@@ -24,7 +24,7 @@ if [ -z ${MYSQL_HOST} ]
 then
   echo " [i] no MYSQL_HOST set ..."
 else
-  MYSQL_OPTS="--host=${MYSQL_HOST} --user=${MYSQL_ROOT_USER} --password=${MYSQL_ROOT_PASS} --port=${MYSQL_PORT}"
+  export MYSQL_OPTS="--host=${MYSQL_HOST} --user=${MYSQL_ROOT_USER} --password=${MYSQL_ROOT_PASS} --port=${MYSQL_PORT}"
 fi
 
 # -------------------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ prepare() {
   [ -d ${WORK_DIR} ] || mkdir -p ${WORK_DIR}
 
   MYSQL_ICINGAWEB2_PASSWORD=icingaweb2 # $(pwgen -s 15 1)
-  ICINGAWEB_ADMIN_PASSWORD=$(openssl passwd -1 ${ICINGAWEB_ADMIN_PASS})
+#   ICINGAWEB_ADMIN_PASSWORD=$(openssl passwd -1 ${ICINGAWEB_ADMIN_PASS})
 
 #  [ -f /etc/icingaweb2/resources.ini ] && rm -f /etc/icingaweb2/resources.ini
   touch /etc/icingaweb2/resources.ini
@@ -80,6 +80,7 @@ run() {
   . /init/configure_commandtransport.sh
 #  . /init/configure_livestatus.sh
   . /init/configure_graphite.sh
+  . /init/users.sh
 
   correctRights
 
