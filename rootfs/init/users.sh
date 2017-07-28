@@ -53,7 +53,7 @@ EOF
 }
 
 
-createLoginUser() {
+create_login_user() {
 
   local users=
   local users_list=()
@@ -66,7 +66,7 @@ createLoginUser() {
   if [ -z "${users}" ]
   then
 
-    echo " [i] no User found, create default 'admin' user"
+    echo " [i] no user found, create default 'admin' user"
 
     insert_user_into_database ${ICINGAWEB_ADMIN_USER} ${ICINGAWEB_ADMIN_PASSWORD}
   else
@@ -98,7 +98,7 @@ createLoginUser() {
 }
 
 
-createLoginUser
+create_login_user
 
 # EOF
 

@@ -4,7 +4,7 @@ MYSQL_PORT=${MYSQL_PORT:-"3306"}
 MYSQL_ROOT_USER=${MYSQL_ROOT_USER:-"root"}
 MYSQL_ROOT_PASS=${MYSQL_ROOT_PASS:-""}
 
-IDO_DATABASE_NAME=${IDO_DATABASE_NAME:-"icinga2"}
+IDO_DATABASE_NAME=${IDO_DATABASE_NAME:-"icinga2core"}
 WEB_DATABASE_NAME=${WEB_DATABASE_NAME:-"icingaweb2"}
 
 # -------------------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ then
   return
 fi
 
-waitForDatabase() {
+wait_for_database() {
 
   RETRY=15
 
@@ -55,8 +55,7 @@ waitForDatabase() {
 
 }
 
-
-configureDatabase() {
+create_database() {
 
   # create user - when they NOT exists
   query="select host, user, password from mysql.user where user = '${WEB_DATABASE_NAME}';"
@@ -79,50 +78,64 @@ configureDatabase() {
     fi
   fi
 
-  # check if database already created ...
+  # check user
   #
+  # query="select host, user, password from mysql.user where user = '${WEB_DATABASE_NAME}';"
   query="SELECT TABLE_SCHEMA FROM information_schema.tables WHERE table_schema = \"${WEB_DATABASE_NAME}\";"
-  status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | wc -w)
+  status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | grep -v host | wc -l)
 
-  if [ ${status} -lt 4 ]
+  return ${status}
+}
+
+
+create_database_schema() {
+
+  echo " [i] create database schema"
+
+  mysql ${MYSQL_OPTS} --force ${WEB_DATABASE_NAME}  < /usr/share/webapps/icingaweb2/etc/schema/mysql.schema.sql
+
+  if [ $? -gt 0 ]
   then
-    # Database isn't created
-    # well, i do my job ...
-    #
-    query="drop database ${WEB_DATABASE_NAME};"
-    status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | wc -w)
-
-    # create the web schema
-    #
-    echo " [i] create database schema"
-
-    mysql ${MYSQL_OPTS} --force ${WEB_DATABASE_NAME}  < /usr/share/webapps/icingaweb2/etc/schema/mysql.schema.sql
-
-    if [ $? -gt 0 ]
-    then
-      echo " [E] can't insert the icingaweb2 database schema"
-      exit 1
-    fi
-
-#     # insert default icingauser
-#     (
-#       echo "USE ${WEB_DATABASE_NAME};"
-#       echo "INSERT IGNORE INTO icingaweb_user (name, active, password_hash) VALUES ('${ICINGAWEB_ADMIN_USER}', 1, '${ICINGAWEB_ADMIN_PASSWORD}');"
-#       echo "quit"
-#     ) | mysql ${MYSQL_OPTS}
-#
-#     if [ $? -gt 0 ]
-#     then
-#       echo " [E] can't create the icingaweb user"
-#       exit 1
-#     fi
-
+    echo " [E] can't insert the icingaweb2 database schema"
+    exit 1
   fi
+}
+
+
+drop_database_schema() {
+
+  query="drop database ${WEB_DATABASE_NAME};"
+  status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | wc -w)
 
 }
 
 
-createResources() {
+configure_database() {
+
+  create_database
+  status=$?
+
+
+  # if ${status} == 0,
+  #
+  if [ ${status} -eq 0 ]
+  then
+    # the database is fresh created
+    create_database_schema
+  elif ( [ ${status} -gt 0 ] && [ ${status} -lt 4 ] )
+  then
+    # between 1 and 4, the creation of database was wrong
+    drop_database_schema
+    sleep 2s
+    create_database_schema
+  else
+    echo " [W] we found ${status} tables into schema ${WEB_DATABASE_NAME}"
+    exit 1
+  fi
+}
+
+
+create_resource_file() {
 
   if [ $(grep -c "icingaweb_db]" /etc/icingaweb2/resources.ini) -eq 0 ]
   then
@@ -163,25 +176,14 @@ EOF
       echo " [i] disable IDO Access for Icingaweb"
     fi
   fi
-
-#   if [ $(grep -c "admins]" /etc/icingaweb2/roles.ini) -eq 0 ]
-#   then
-#     cat << EOF > /etc/icingaweb2/roles.ini
-# [admins]
-# users               = "${ICINGAWEB_ADMIN_USER}"
-# permissions         = "*"
-#
-# EOF
-#   fi
-
 }
 
 
-waitForDatabase
+wait_for_database
 
-configureDatabase
+configure_database
 
-createResources
+create_resource_file
 
 # EOF
 

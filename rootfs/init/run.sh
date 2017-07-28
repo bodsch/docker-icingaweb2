@@ -34,9 +34,7 @@ prepare() {
   [ -d ${WORK_DIR} ] || mkdir -p ${WORK_DIR}
 
   MYSQL_ICINGAWEB2_PASSWORD=icingaweb2 # $(pwgen -s 15 1)
-#   ICINGAWEB_ADMIN_PASSWORD=$(openssl passwd -1 ${ICINGAWEB_ADMIN_PASS})
 
-#  [ -f /etc/icingaweb2/resources.ini ] && rm -f /etc/icingaweb2/resources.ini
   touch /etc/icingaweb2/resources.ini
   touch /etc/icingaweb2/roles.ini
 }
@@ -78,7 +76,6 @@ run() {
   . /init/database/mysql.sh
   . /init/configure_director.sh
   . /init/configure_commandtransport.sh
-#  . /init/configure_livestatus.sh
   . /init/configure_graphite.sh
   . /init/users.sh
 

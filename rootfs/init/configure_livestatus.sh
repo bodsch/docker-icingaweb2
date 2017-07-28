@@ -7,7 +7,7 @@ then
   return
 fi
 
-configureIcingaLivestatus() {
+configure_icinga_livestatus() {
 
   echo " [i] enable Live status for Host '${LIVESTATUS_HOST}'"
 
@@ -24,6 +24,6 @@ EOF
 
 }
 
-configureIcingaLivestatus
+configure_icinga_livestatus
 
 # EOF
