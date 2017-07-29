@@ -91,10 +91,7 @@ create_login_user() {
 
   lst=$( IFS=','; echo "${users_list[*]}" );
 
-  echo ${lst}
-
   insert_users_into_role ${lst}
-
 }
 
 
