@@ -122,9 +122,9 @@ configure_database() {
   then
     # the database is fresh created
     create_database_schema
-  elif ( [ ${status} -gt 0 ] && [ ${status} -lt 4 ] )
+  elif ( [ ${status} -gt 0 ] && [ ${status} -lt 5 ] )
   then
-    # between 1 and 4, the creation of database was wrong
+    # between 1 and 5, the creation of database was wrong
     drop_database_schema
     sleep 2s
     create_database_schema
