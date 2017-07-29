@@ -128,9 +128,6 @@ configure_database() {
     drop_database_schema
     sleep 2s
     create_database_schema
-  else
-    echo " [W] we found ${status} tables into schema ${WEB_DATABASE_NAME}"
-    exit 1
   fi
 }
 
