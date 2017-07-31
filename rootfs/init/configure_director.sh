@@ -5,7 +5,7 @@ then
   return
 fi
 
-configureIcingaDirector() {
+configure_icinga_director() {
 
   local director="/usr/share/webapps/icingaweb2/modules/director"
 
@@ -25,7 +25,7 @@ configureIcingaDirector() {
       # Database isn't created
       # well, i do my job ...
       #
-      echo " [i] Initializing databases and director configurations."
+      echo " [i] initializing databases and director configurations."
 
       (
         echo "CREATE DATABASE IF NOT EXISTS director DEFAULT CHARACTER SET 'utf8';"
@@ -48,7 +48,7 @@ configureIcingaDirector() {
 
     fi
 
-    echo " [i] configure Icingaweb2 Director"
+    echo " [i] configure Icingaweb2 director"
 
     if [ $(grep -c "director]" /etc/icingaweb2/resources.ini) -eq 0 ]
     then
@@ -70,6 +70,6 @@ EOF
 
 }
 
-configureIcingaDirector
+configure_icinga_director
 
 # EOF
