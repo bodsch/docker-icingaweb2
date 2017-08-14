@@ -5,13 +5,13 @@ Docker Container for icingaweb2 based on alpine-linux.
 
 Now with PHP7 Support and many installed modules (see below)
 
-Integrates also the grafana Modue from [Mikesch-mp](https://github.com/Mikesch-mp/icingaweb2-module-grafana.git)
+Integrates also the grafana Module from [Mikesch-mp](https://github.com/Mikesch-mp/icingaweb2-module-grafana.git)
 
 # Status
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/bodsch/docker-icingaweb2.svg?branch=1705-01)][hub]
-[![Image Size](https://images.microbadger.com/badges/image/bodsch/docker-icingaweb2.svg?branch=1705-01)][microbadger]
-[![Build Status](https://travis-ci.org/bodsch/docker-icingaweb2.svg?branch=1705-01)][travis]
+[![Docker Pulls](https://img.shields.io/docker/pulls/bodsch/docker-icingaweb2.svg?branch=1708-33)][hub]
+[![Image Size](https://images.microbadger.com/badges/image/bodsch/docker-icingaweb2.svg?branch=1708-33)][microbadger]
+[![Build Status](https://travis-ci.org/bodsch/docker-icingaweb2.svg?branch=1708-33)][travis]
 
 [hub]: https://hub.docker.com/r/bodsch/docker-icingaweb2/
 [microbadger]: https://microbadger.com/images/bodsch/docker-icingaweb2
