@@ -1,5 +1,5 @@
 
-configureIcingaGraphite() {
+configure_icinga_graphite() {
 
   echo " [i] graphite Support currently disabled"
 
@@ -20,6 +20,6 @@ configureIcingaGraphite() {
   fi
 }
 
-configureIcingaGraphite
+configure_icinga_graphite
 
 # EOF

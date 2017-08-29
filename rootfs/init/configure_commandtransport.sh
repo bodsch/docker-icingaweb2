@@ -15,9 +15,9 @@ then
   return
 fi
 
-configureIcingaCommand() {
+configure_command_transport() {
 
-  echo " [i] configure Command Transport over API"
+  echo " [i] configure command transport over API"
 
   cat << EOF > /etc/icingaweb2/modules/monitoring/commandtransports.ini
 
@@ -32,6 +32,6 @@ EOF
 
 }
 
-configureIcingaCommand
+configure_command_transport
 
 # EOF
