@@ -16,7 +16,7 @@ EXPOSE 80
 
 # Build-time metadata as defined at http://label-schema.org
 LABEL \
-  version="1708-35" \
+  version="1709-37" \
   org.label-schema.build-date=${BUILD_DATE} \
   org.label-schema.name="IcingaWeb2 Docker Image" \
   org.label-schema.description="Inofficial IcingaWeb2 Docker Image" \
