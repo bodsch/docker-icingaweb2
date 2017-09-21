@@ -1,7 +1,7 @@
 
 configure_icinga_graphite() {
 
-  echo " [i] graphite Support currently disabled"
+  echo " [i] graphite support is currently disabled"
 
   return
 

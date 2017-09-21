@@ -25,7 +25,7 @@ configure_icinga_director() {
       # Database isn't created
       # well, i do my job ...
       #
-      echo " [i] initializing databases and director configurations."
+      echo " [i] director: initializing databases"
 
       (
         echo "CREATE DATABASE IF NOT EXISTS director DEFAULT CHARACTER SET 'utf8';"
@@ -48,7 +48,7 @@ configure_icinga_director() {
 
     fi
 
-    echo " [i] configure Icingaweb2 director"
+    echo " [i] director: configure director for icingaweb"
 
     if [ $(grep -c "director]" /etc/icingaweb2/resources.ini) -eq 0 ]
     then
