@@ -36,10 +36,10 @@ insert_users_into_role() {
 
   local user_list="${1}"
 
-  if [ $(grep -c "admins]" /etc/icingaweb2/roles.ini) -eq 0 ]
+  if [ $(grep -c "\[local admins\]" /etc/icingaweb2/roles.ini) -eq 0 ]
   then
     cat << EOF > /etc/icingaweb2/roles.ini
-[admins]
+[local admins]
 users               = "${user_list}"
 permissions         = "*"
 
@@ -71,7 +71,7 @@ create_login_user() {
     insert_user_into_database ${ICINGAWEB_ADMIN_USER} ${ICINGAWEB_ADMIN_PASSWORD}
   else
 
-    echo " [i] create icingaweb2 users ..."
+    echo " [i] create local icingaweb users ..."
 
     for u in ${users}
     do
