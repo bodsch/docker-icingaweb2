@@ -78,6 +78,7 @@ run() {
   . /init/configure_commandtransport.sh
   . /init/configure_graphite.sh
   . /init/users.sh
+  . /init/configure_authentication.sh
 
   correctRights
 
