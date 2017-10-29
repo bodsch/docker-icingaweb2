@@ -10,7 +10,6 @@ INSTANCE = default
 
 .PHONY: build push shell run start stop rm release
 
-
 build:
 	docker build \
 		--rm \
