@@ -7,7 +7,7 @@ ENV \
   ALPINE_MIRROR="mirror1.hs-esslingen.de/pub/Mirrors" \
   ALPINE_VERSION="v3.6" \
   TERM=xterm \
-  BUILD_DATE="2017-09-28" \
+  BUILD_DATE="2017-10-29" \
   ICINGAWEB_VERSION="2.4.2" \
   APK_ADD="bash ca-certificates curl git jq mysql-client nginx netcat-openbsd openssl php7 php7-ctype php7-fpm php7-pdo_mysql php7-openssl php7-intl php7-ldap php7-gettext php7-json php7-mbstring php7-curl php7-iconv php7-session php7-xml php7-dom pwgen shadow supervisor" \
   APK_DEL="curl git shadow"
@@ -16,7 +16,7 @@ EXPOSE 80
 
 # Build-time metadata as defined at http://label-schema.org
 LABEL \
-  version="1709" \
+  version="1710" \
   org.label-schema.build-date=${BUILD_DATE} \
   org.label-schema.name="IcingaWeb2 Docker Image" \
   org.label-schema.description="Inofficial IcingaWeb2 Docker Image" \
@@ -33,9 +33,9 @@ LABEL \
 RUN \
   echo "http://${ALPINE_MIRROR}/alpine/${ALPINE_VERSION}/main"       > /etc/apk/repositories && \
   echo "http://${ALPINE_MIRROR}/alpine/${ALPINE_VERSION}/community" >> /etc/apk/repositories && \
-  apk --no-cache update && \
-  apk --no-cache upgrade && \
-  apk --no-cache add ${APK_ADD} && \
+  apk --quiet --no-cache update && \
+  apk --quiet --no-cache upgrade && \
+  apk --quiet --no-cache add ${APK_ADD} && \
   [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
   [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
   [ -d /opt ] || mkdir /opt && \
@@ -83,7 +83,7 @@ RUN \
   /usr/bin/icingacli module enable grafana && \
   mkdir /run/nginx && \
   mkdir /var/log/php-fpm && \
-  apk del --purge ${APK_DEL} && \
+  apk --quiet --purge del ${APK_DEL} && \
   rm -rf \
     /tmp/* \
     /var/cache/apk/*
