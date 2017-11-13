@@ -52,7 +52,6 @@ correctRights() {
   find /etc/icingaweb2 -type d -exec chmod 2770 {} \;
 
   chown nginx:nginx /var/log/icingaweb2
-
 }
 
 
@@ -73,6 +72,7 @@ run() {
 
   prepare
 
+  . /init/inject_themes.sh
   . /init/database/mysql.sh
   . /init/configure_director.sh
   . /init/configure_commandtransport.sh
