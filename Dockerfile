@@ -4,11 +4,9 @@ FROM alpine:3.6
 MAINTAINER Bodo Schulz <bodo@boone-schulz.de>
 
 ENV \
-  ALPINE_MIRROR="mirror1.hs-esslingen.de/pub/Mirrors" \
-  ALPINE_VERSION="v3.6" \
   TERM=xterm \
-  BUILD_DATE="2017-11-13" \
-  ICINGAWEB_VERSION="2.4.2"
+  BUILD_DATE="2017-11-28" \
+  ICINGAWEB_VERSION="2.5.0"
 
 EXPOSE 80
 
@@ -58,7 +56,6 @@ RUN \
     php7-xml \
     php7-dom \
     pwgen \
-    shadow \
     supervisor && \
   [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
   [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
@@ -111,7 +108,9 @@ RUN \
 
 COPY rootfs/ /
 
-WORKDIR "/etc/icingaweb2"
+WORKDIR /etc/icingaweb2
+
+VOLUME /etc/icingaweb2
 
 HEALTHCHECK \
   --interval=5s \
