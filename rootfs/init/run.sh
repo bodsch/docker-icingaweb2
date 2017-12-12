@@ -18,6 +18,9 @@ MYSQL_OPTS=
 ICINGAWEB_ADMIN_USER=${ICINGAWEB_ADMIN_USER:-"icinga"}
 ICINGAWEB_ADMIN_PASS=${ICINGAWEB_ADMIN_PASS:-"icinga"}
 
+GRAPHITE_HOST=${GRAPHITE_HOST:-""}
+GRAPHITE_HTTP_PORT=${GRAPHITE_HTTP_PORT:-8080}
+
 # -------------------------------------------------------------------------------------------------
 
 if [ -z ${MYSQL_HOST} ]
@@ -73,6 +76,7 @@ run() {
   prepare
 
   . /init/inject_themes.sh
+  . /init/fix_latin1_db_statements.sh
   . /init/database/mysql.sh
   . /init/configure_director.sh
   . /init/configure_commandtransport.sh

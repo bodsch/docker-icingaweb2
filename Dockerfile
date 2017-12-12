@@ -1,18 +1,18 @@
 
-FROM alpine:3.6
+FROM alpine:3.7
 
 MAINTAINER Bodo Schulz <bodo@boone-schulz.de>
 
 ENV \
   TERM=xterm \
-  BUILD_DATE="2017-11-28" \
+  BUILD_DATE="2017-12-12" \
   ICINGAWEB_VERSION="2.5.0"
 
 EXPOSE 80
 
 # Build-time metadata as defined at http://label-schema.org
 LABEL \
-  version="1711" \
+  version="1712" \
   org.label-schema.build-date=${BUILD_DATE} \
   org.label-schema.name="IcingaWeb2 Docker Image" \
   org.label-schema.description="Inofficial IcingaWeb2 Docker Image" \
@@ -91,14 +91,12 @@ RUN \
   /usr/bin/icingacli module enable director && \
   /usr/bin/icingacli module enable businessprocess && \
   /usr/bin/icingacli module enable monitoring && \
-  /usr/bin/icingacli module enable setup && \
-  /usr/bin/icingacli module enable translation && \
-  /usr/bin/icingacli module enable doc && \
-  /usr/bin/icingacli module enable graphite && \
-  /usr/bin/icingacli module enable cube && \
-  /usr/bin/icingacli module enable grafana && \
-  sed -i 's|font-size: 0.875em;|font-size: 1em;|g' /usr/share/webapps/icingaweb2/public/css/icinga/*.less && \
-  sed -i 's|font-size: 0.750em;|font-size: 1em;|g' /usr/share/webapps/icingaweb2/public/css/icinga/*.less && \
+  /usr/bin/icingacli module disable setup && \
+  /usr/bin/icingacli module disable translation && \
+  /usr/bin/icingacli module disable doc && \
+  /usr/bin/icingacli module disable graphite && \
+  /usr/bin/icingacli module disable cube && \
+  /usr/bin/icingacli module disable grafana && \
   mkdir /run/nginx && \
   mkdir /var/log/php-fpm && \
   apk del --quiet .build-deps && \

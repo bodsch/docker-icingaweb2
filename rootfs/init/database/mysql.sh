@@ -66,7 +66,8 @@ create_database() {
     echo " [i] create database '${WEB_DATABASE_NAME}' with user and grants for 'icingaweb2'"
     (
       echo "--- create user 'icingaweb2'@'%' IDENTIFIED BY '${IDO_PASSWORD}';"
-      echo "CREATE DATABASE IF NOT EXISTS ${WEB_DATABASE_NAME} DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE utf8_general_ci;"
+      echo "--- CREATE DATABASE IF NOT EXISTS ${WEB_DATABASE_NAME} DEFAULT CHARACTER SET 'utf8' DEFAULT COLLATE utf8_general_ci;"
+      echo "CREATE DATABASE IF NOT EXISTS ${WEB_DATABASE_NAME};"
       echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${WEB_DATABASE_NAME}.* TO 'icingaweb2'@'%' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
       echo "FLUSH PRIVILEGES;"
     ) | mysql ${MYSQL_OPTS}
@@ -139,14 +140,15 @@ create_resource_file() {
     cat << EOF >> /etc/icingaweb2/resources.ini
 
 [icingaweb_db]
-type                = "db"
-db                  = "mysql"
-host                = "${MYSQL_HOST}"
-port                = "3306"
-dbname              = "icingaweb2"
-username            = "icingaweb2"
-password            = "${MYSQL_ICINGAWEB2_PASSWORD}"
-prefix              = "icingaweb_"
+type      = "db"
+db        = "mysql"
+host      = "${MYSQL_HOST}"
+port      = "3306"
+dbname    = "icingaweb2"
+username  = "icingaweb2"
+password  = "${MYSQL_ICINGAWEB2_PASSWORD}"
+prefix    = "icingaweb_"
+charset   = "utf8"
 
 EOF
   fi
@@ -159,14 +161,14 @@ EOF
       cat << EOF >> /etc/icingaweb2/resources.ini
 
 [icinga_ido]
-type                = "db"
-db                  = "mysql"
-host                = "${MYSQL_HOST}"
-port                = "3306"
-dbname              = "${IDO_DATABASE_NAME}"
-username            = "icinga2"
-password            = "${IDO_PASSWORD}"
-
+type      = "db"
+db        = "mysql"
+host      = "${MYSQL_HOST}"
+port      = "3306"
+dbname    = "${IDO_DATABASE_NAME}"
+username  = "icinga2"
+password  = "${IDO_PASSWORD}"
+charset   = "utf8"
 EOF
     else
       echo " [i] IDO_PASSWORD isn't set."

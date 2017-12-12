@@ -55,14 +55,14 @@ configure_icinga_director() {
       cat << EOF >> /etc/icingaweb2/resources.ini
 
 [director]
-type                = "db"
-db                  = "mysql"
-charset             = "utf8"
-host                = "${MYSQL_HOST}"
-port                = "3306"
-dbname              = "director"
-username            = "director"
-password            = "${MYSQL_ICINGAWEB2_PASSWORD}"
+type       = "db"
+db         = "mysql"
+charset    = "utf8"
+host       = "${MYSQL_HOST}"
+port       = "3306"
+dbname     = "director"
+username   = "director"
+password   = "${MYSQL_ICINGAWEB2_PASSWORD}"
 
 EOF
     fi
