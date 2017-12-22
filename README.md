@@ -3,7 +3,7 @@ docker-icingaweb2
 
 Docker Container for icingaweb2 based on alpine-linux.
 
-Now with PHP7 Support and many installed modules (see below)
+Now with PHP7 (7.1.12) Support and many installed modules (see below)
 
 Integrates also the grafana Module from [Mikesch-mp](https://github.com/Mikesch-mp/icingaweb2-module-grafana.git)
 

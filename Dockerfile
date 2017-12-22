@@ -1,8 +1,6 @@
 
 FROM alpine:3.7
 
-MAINTAINER Bodo Schulz <bodo@boone-schulz.de>
-
 ENV \
   TERM=xterm \
   BUILD_DATE="2017-12-12" \
@@ -13,6 +11,7 @@ EXPOSE 80
 # Build-time metadata as defined at http://label-schema.org
 LABEL \
   version="1712" \
+  maintainer="Bodo Schulz <bodo@boone-schulz.de>" \
   org.label-schema.build-date=${BUILD_DATE} \
   org.label-schema.name="IcingaWeb2 Docker Image" \
   org.label-schema.description="Inofficial IcingaWeb2 Docker Image" \
@@ -92,11 +91,11 @@ RUN \
   /usr/bin/icingacli module enable businessprocess && \
   /usr/bin/icingacli module enable monitoring && \
   /usr/bin/icingacli module disable setup && \
-  /usr/bin/icingacli module disable translation && \
-  /usr/bin/icingacli module disable doc && \
-  /usr/bin/icingacli module disable graphite && \
-  /usr/bin/icingacli module disable cube && \
-  /usr/bin/icingacli module disable grafana && \
+  /usr/bin/icingacli module enable translation && \
+  /usr/bin/icingacli module enable doc && \
+  /usr/bin/icingacli module enable graphite && \
+  /usr/bin/icingacli module enable cube && \
+  /usr/bin/icingacli module enable grafana && \
   mkdir /run/nginx && \
   mkdir /var/log/php-fpm && \
   apk del --quiet .build-deps && \
