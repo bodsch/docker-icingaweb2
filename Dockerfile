@@ -3,14 +3,14 @@ FROM alpine:3.7
 
 ENV \
   TERM=xterm \
-  BUILD_DATE="2017-12-12" \
+  BUILD_DATE="2017-01-09" \
   ICINGAWEB_VERSION="2.5.0"
 
 EXPOSE 80
 
 # Build-time metadata as defined at http://label-schema.org
 LABEL \
-  version="1712" \
+  version="1801" \
   maintainer="Bodo Schulz <bodo@boone-schulz.de>" \
   org.label-schema.build-date=${BUILD_DATE} \
   org.label-schema.name="IcingaWeb2 Docker Image" \
