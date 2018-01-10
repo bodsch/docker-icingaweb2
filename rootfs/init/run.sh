@@ -86,7 +86,10 @@ run() {
 
   correctRights
 
-  startSupervisor
+  nohup /usr/bin/php-fpm --fpm-config /etc/php/php-fpm.conf --pid /run/php-fpm.pid --allow-to-run-as-root --nodaemonize > /dev/stdout 2>&1 &
+  /usr/sbin/nginx > /dev/stdout 2>&1
+
+  # startSupervisor
 }
 
 
