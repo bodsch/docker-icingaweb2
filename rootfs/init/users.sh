@@ -15,19 +15,18 @@ insert_user_into_database() {
 
   pass=$(openssl passwd -1 ${pass})
 
+  # insert default icingauser
+  (
+    echo "USE ${WEB_DATABASE_NAME};"
+    echo "INSERT IGNORE INTO icingaweb_user (name, active, password_hash) VALUES ('${user}', 1, '${pass}');"
+    echo "quit"
+  ) | mysql ${MYSQL_OPTS}
 
-    # insert default icingauser
-    (
-      echo "USE ${WEB_DATABASE_NAME};"
-      echo "INSERT IGNORE INTO icingaweb_user (name, active, password_hash) VALUES ('${user}', 1, '${pass}');"
-      echo "quit"
-    ) | mysql ${MYSQL_OPTS}
-
-    if [ $? -gt 0 ]
-    then
-      echo " [E] can't create the icingaweb user"
-      exit 1
-    fi
+  if [[ $? -gt 0 ]]
+  then
+    log_error "can't create the icingaweb user"
+    exit 1
+  fi
 }
 
 # create (or add) the user(s) to the admin role
@@ -36,7 +35,7 @@ insert_users_into_role() {
 
   local user_list="${1}"
 
-  if [ $(grep -c "\[local admins\]" /etc/icingaweb2/roles.ini) -eq 0 ]
+  if [[ $(grep -c "\[local admins\]" /etc/icingaweb2/roles.ini) -eq 0 ]]
   then
     cat << EOF > /etc/icingaweb2/roles.ini
 [local admins]
@@ -58,30 +57,24 @@ create_login_user() {
   local users=
   local users_list=()
 
-  if [ -n "${ICINGAWEB2_USERS}" ]
-  then
-    users=$(echo ${ICINGAWEB2_USERS} | sed -e 's/,/ /g' -e 's/\s+/\n/g' | uniq)
-  fi
+  [[ -n "${ICINGAWEB2_USERS}" ]] && users=$(echo ${ICINGAWEB2_USERS} | sed -e 's/,/ /g' -e 's/\s+/\n/g' | uniq)
 
-  if [ -z "${users}" ]
+  if [[ -z "${users}" ]]
   then
-
-    echo " [i] no user found, create default 'admin' user"
+    log_info "no user found, create default 'admin' user"
 
     insert_user_into_database ${ICINGAWEB_ADMIN_USER} ${ICINGAWEB_ADMIN_PASSWORD}
   else
-
-    echo " [i] create local icingaweb users ..."
+    log_info "create local icingaweb users ..."
 
     for u in ${users}
     do
-
       user=$(echo "${u}" | cut -d: -f1)
       pass=$(echo "${u}" | cut -d: -f2)
 
-      [ -z ${pass} ] && pass=${user}
+      [[ -z ${pass} ]] && pass=${user}
 
-      echo "      - '${user}'"
+      log_info "  - '${user}'"
 
       insert_user_into_database ${user} ${pass}
 

@@ -12,8 +12,15 @@ ldap_configuation() {
   local role_group_names=${8}
   local role_permissions=${9}
 
-  [ ${#port} -eq 0 ] && port=389
-  [ ${#search_filter} -eq 0 ] && search_filter="uid"
+  if ( [[ -z ${server} ]] || [[ ${server} == null ]] )
+  then
+    return
+  fi
+
+  log_info "create LDAP configuration"
+
+  [[ ${#port} -eq 0 ]] && port=389
+  [[ ${#search_filter} -eq 0 ]] && search_filter="uid"
 
   backend="ldap"
 
@@ -21,9 +28,9 @@ ldap_configuation() {
 
   # create a LDAP resource
   #
-  if [ $(grep -c "\[ldap\]" /etc/icingaweb2/resources.ini) -eq 0 ]
+  if [[ $(grep -c "\[ldap\]" /etc/icingaweb2/resources.ini) -eq 0 ]]
   then
-    echo "    - LDAP resource"
+    log_info "  - LDAP resource"
 
     cat << EOF >> /etc/icingaweb2/resources.ini
 
@@ -41,9 +48,9 @@ EOF
 
   # add user authentication
   #
-  if [ $(grep -c "\[ldap users\]" /etc/icingaweb2/authentication.ini) -eq 0 ]
+  if [[ $(grep -c "\[ldap users\]" /etc/icingaweb2/authentication.ini) -eq 0 ]]
   then
-    echo "    - LDAP authentication"
+    log_info "  - LDAP authentication"
 
     cat << EOF >> /etc/icingaweb2/authentication.ini
 
@@ -61,9 +68,9 @@ EOF
 
   # add group filter
   #
-  if ( [ ! -f /etc/icingaweb2/groups.ini ] || [ $(grep -c "\[ldap groups\]" /etc/icingaweb2/groups.ini) -eq 0 ] )
+  if ( [[ ! -f /etc/icingaweb2/groups.ini ]] || [[ $(grep -c "\[ldap groups\]" /etc/icingaweb2/groups.ini) -eq 0 ]] )
   then
-    echo "    - LDAP groups"
+    log_info "  - LDAP groups"
 
     cat << EOF >> /etc/icingaweb2/groups.ini
 
@@ -80,9 +87,9 @@ EOF
 
   # add LDAP role
   #
-  if [ $(grep -c "\[ldap roles\]" /etc/icingaweb2/roles.ini) -eq 0 ]
+  if [[ $(grep -c "\[ldap roles\]" /etc/icingaweb2/roles.ini) -eq 0 ]]
   then
-    echo "    - LDAP roles"
+    log_info "  - LDAP roles"
 
     if [[ ! -z ${role_group_names} ]]
     then
@@ -102,10 +109,8 @@ ldap_authentication() {
 
   ldap=$(echo "${LDAP}"  | jq '.')
 
-  if [ ! -z "${ldap}" ]
+  if [[ ! -z "${ldap}" ]]
   then
-    echo " [i] create LDAP configuration"
-
     echo "${ldap}" | jq --compact-output --raw-output '.' | while IFS='' read u
     do
       active_directory=$(echo "${u}" | jq --raw-output .active_directory)

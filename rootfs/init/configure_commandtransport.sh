@@ -8,16 +8,14 @@ ICINGA2_CMD_API_PASS=${ICINGA2_CMD_API_PASS:-""}
 
 # -------------------------------------------------------------------------------------------------
 
-if ( [ -z ${ICINGA2_HOST} ] || [ -z ${ICINGA2_CMD_API_USER} ] || [ -z ${ICINGA2_CMD_API_PASS} ] )
+if ( [[ -z ${ICINGA2_HOST} ]] || [[ -z ${ICINGA2_CMD_API_USER} ]] || [[ -z ${ICINGA2_CMD_API_PASS} ]] )
 then
-  echo " [i] no Settings for Command Transport over API"
-
   return
 fi
 
 configure_command_transport() {
 
-  echo " [i] configure command transport over API"
+  log_info "configure command transport over API"
 
   cat << EOF > /etc/icingaweb2/modules/monitoring/commandtransports.ini
 

@@ -3,7 +3,7 @@ FROM alpine:3.7
 
 ENV \
   TERM=xterm \
-  BUILD_DATE="2017-01-09" \
+  BUILD_DATE="2018-01-13" \
   ICINGAWEB_VERSION="2.5.0"
 
 EXPOSE 80
@@ -71,13 +71,13 @@ RUN \
   ln -s /usr/share/webapps/icingaweb2-${ICINGAWEB_VERSION} /usr/share/webapps/icingaweb2 && \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
   cd /usr/share/webapps/icingaweb2/modules && \
-  git clone https://github.com/Icinga/icingaweb2-module-director.git        --single-branch director && \
-  git clone https://github.com/Icinga/icingaweb2-module-graphite.git        --single-branch graphite && \
-  git clone https://github.com/Icinga/icingaweb2-module-generictts.git      --single-branch generictts && \
-  git clone https://github.com/Icinga/icingaweb2-module-businessprocess.git --single-branch businessprocess && \
-  git clone https://github.com/Icinga/icingaweb2-module-elasticsearch.git   --single-branch elasticsearch && \
-  git clone https://github.com/Icinga/icingaweb2-module-cube                --single-branch cube && \
-  git clone https://github.com/Mikesch-mp/icingaweb2-module-grafana.git     --single-branch grafana && \
+  git clone https://github.com/Icinga/icingaweb2-module-director        --single-branch director && \
+  git clone https://github.com/Icinga/icingaweb2-module-graphite        --single-branch graphite && \
+  git clone https://github.com/Icinga/icingaweb2-module-generictts      --single-branch generictts && \
+  git clone https://github.com/Icinga/icingaweb2-module-businessprocess --single-branch businessprocess && \
+  git clone https://github.com/Icinga/icingaweb2-module-elasticsearch   --single-branch elasticsearch && \
+  git clone https://github.com/Icinga/icingaweb2-module-cube            --single-branch cube && \
+  git clone https://github.com/Mikesch-mp/icingaweb2-module-grafana     --single-branch grafana && \
   rm -rf /usr/share/webapps/icingaweb2/modules/*/.git* && \
   mkdir -p /var/log/icingaweb2 && \
   mkdir -p /etc/icingaweb2/modules && \

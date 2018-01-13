@@ -1,9 +1,9 @@
 
-if ( [ -z ${GRAPHITE_HOST} ] || [ -z ${GRAPHITE_HTTP_PORT} ] )
+if ( [[ -z ${GRAPHITE_HOST} ]] || [[ -z ${GRAPHITE_HTTP_PORT} ]] )
 then
 
-  echo " [i] missing GRAPHITE_HOST or GRAPHITE_HTTP_PORT"
-  echo "     disable graphite support"
+  log_info "missing GRAPHITE_HOST or GRAPHITE_HTTP_PORT"
+  log_info "disable graphite support"
 
   /usr/bin/icingacli module disable graphite
   return
@@ -11,7 +11,7 @@ fi
 
 configure_icinga_graphite() {
 
-  echo " [i] configure graphite support"
+  log_info "configure graphite support"
 
   cat << EOF >> /etc/icingaweb2/modules/graphite/config.ini
 

@@ -5,8 +5,6 @@ Docker Container for icingaweb2 based on alpine-linux.
 
 Now with PHP7 (7.1.12) Support and many installed modules (see below)
 
-Integrates also the grafana Module from [Mikesch-mp](https://github.com/Mikesch-mp/icingaweb2-module-grafana.git)
-
 # Status
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/bodsch/docker-icingaweb2.svg?branch=1708-33)][hub]
@@ -22,34 +20,23 @@ Integrates also the grafana Module from [Mikesch-mp](https://github.com/Mikesch-
 
 Your can use the included Makefile.
 
-To build the Container: `make build`
-
-To remove the builded Docker Image: `make clean`
-
-Starts the Container: `make run`
-
-Starts the Container with Login Shell: `make shell`
-
-Entering the Container: `make exec`
-
-Stop (but **not kill**): `make stop`
-
-History `make history`
-
-Starts a *docker-compose*: `make compose-up`
-
-Remove the *docker-compose* images: `make compose-down`
-
+- To build the Container: `make build`
+- To remove the builded Docker Image: `make clean`
+- Starts the Container: `make run`
+- Starts the Container with Login Shell: `make shell`
+- Entering the Container: `make exec`
+- Stop (but **not kill**): `make stop`
+- History `make history`
 
 # Modules
 
- - director
- - graphite
- - genericTTS
- - businessprocess
- - elasticsearch
- - cube
- - grafana
+ - [director](https://github.com/Icinga/icingaweb2-module-director)
+ - [graphite](https://github.com/Icinga/icingaweb2-module-graphite)
+ - [genericTTS](https://github.com/Icinga/icingaweb2-module-generictts)
+ - [businessprocess](https://github.com/Icinga/icingaweb2-module-businessprocess)
+ - [elasticsearch](https://github.com/Icinga/icingaweb2-module-elasticsearch)
+ - [cube](https://github.com/Icinga/icingaweb2-module-cube)
+ - [grafana](https://github.com/Mikesch-mp/icingaweb2-module-grafana)
 
 
 # Docker Hub

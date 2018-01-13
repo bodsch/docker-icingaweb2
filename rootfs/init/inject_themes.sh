@@ -1,7 +1,7 @@
 
 for f in $(ls -1 /init/themes/*.less)
 do
-  echo " [i] install custom theme: ${f}"
+  log_info "install custom theme: ${f}"
   cp ${f} /usr/share/webapps/icingaweb2/public/css/themes/
 done
 

@@ -1,9 +1,6 @@
 
 
-if [ -z "${MYSQL_OPTS}" ]
-then
-  return
-fi
+[[ -z "${MYSQL_OPTS}" ]] && return
 
 configure_icinga_director() {
 
@@ -11,7 +8,7 @@ configure_icinga_director() {
 
   # icingaweb director
   #
-  if [ -d ${director} ]
+  if [[ -d ${director} ]]
   then
 
     # check if database already created ...
@@ -20,12 +17,12 @@ configure_icinga_director() {
 
     director_status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | wc -w )
 
-    if [ ${director_status} -eq 0 ]
+    if [[ ${director_status} -eq 0 ]]
     then
       # Database isn't created
       # well, i do my job ...
       #
-      echo " [i] director: initializing databases"
+      log_info "director: initializing databases"
 
       (
         echo "CREATE DATABASE IF NOT EXISTS director DEFAULT CHARACTER SET 'utf8';"
@@ -35,22 +32,22 @@ configure_icinga_director() {
 
       SCHEMA_FILE="${director}/schema/mysql.sql"
 
-      if [ -f ${SCHEMA_FILE} ]
+      if [[ -f ${SCHEMA_FILE} ]]
       then
         mysql ${MYSQL_OPTS} --force  director < ${SCHEMA_FILE}
 
         if [ $? -gt 0 ]
         then
-          echo " [E] can't insert the director Database Schema"
+          log_error "can't insert the director Database Schema"
           exit 1
         fi
       fi
 
     fi
 
-    echo " [i] director: configure director for icingaweb"
+    log_info "director: configure director for icingaweb"
 
-    if [ $(grep -c "director]" /etc/icingaweb2/resources.ini) -eq 0 ]
+    if [[ $(grep -c "director]" /etc/icingaweb2/resources.ini) -eq 0 ]]
     then
       cat << EOF >> /etc/icingaweb2/resources.ini
 

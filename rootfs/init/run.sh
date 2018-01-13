@@ -2,10 +2,7 @@
 #
 #
 
-if [ ${DEBUG} ]
-then
-  set -x
-fi
+[[ ${DEBUG} ]] && set -x
 
 WORK_DIR="/srv/icingaweb2"
 
@@ -21,11 +18,13 @@ ICINGAWEB_ADMIN_PASS=${ICINGAWEB_ADMIN_PASS:-"icinga"}
 GRAPHITE_HOST=${GRAPHITE_HOST:-""}
 GRAPHITE_HTTP_PORT=${GRAPHITE_HTTP_PORT:-8080}
 
+. /init/output.sh
+
 # -------------------------------------------------------------------------------------------------
 
-if [ -z ${MYSQL_HOST} ]
+if [[ -z ${MYSQL_HOST} ]]
 then
-  echo " [i] no MYSQL_HOST set ..."
+  log_info "no MYSQL_HOST set ..."
 else
   export MYSQL_OPTS="--host=${MYSQL_HOST} --user=${MYSQL_ROOT_USER} --password=${MYSQL_ROOT_PASS} --port=${MYSQL_PORT}"
 fi
@@ -34,9 +33,9 @@ fi
 
 prepare() {
 
-  [ -d ${WORK_DIR} ] || mkdir -p ${WORK_DIR}
+  [[ -d ${WORK_DIR} ]] || mkdir -p ${WORK_DIR}
 
-  MYSQL_ICINGAWEB2_PASSWORD=icingaweb2 # $(pwgen -s 15 1)
+  MYSQL_ICINGAWEB2_PASSWORD=icingaweb2
 
   touch /etc/icingaweb2/resources.ini
   touch /etc/icingaweb2/roles.ini
@@ -58,19 +57,6 @@ correctRights() {
 }
 
 
-startSupervisor() {
-
-  echo -e "\n Starting Supervisor.\n\n"
-
-  if [ -f /etc/supervisord.conf ]
-  then
-    /usr/bin/supervisord -c /etc/supervisord.conf >> /dev/null
-  else
-    exec /bin/sh
-  fi
-}
-
-
 run() {
 
   prepare
@@ -88,8 +74,6 @@ run() {
 
   nohup /usr/bin/php-fpm --fpm-config /etc/php/php-fpm.conf --pid /run/php-fpm.pid --allow-to-run-as-root --nodaemonize > /dev/stdout 2>&1 &
   /usr/sbin/nginx > /dev/stdout 2>&1
-
-  # startSupervisor
 }
 
 
