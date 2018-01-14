@@ -3,7 +3,7 @@ FROM alpine:3.7
 
 ENV \
   TERM=xterm \
-  BUILD_DATE="2018-01-13" \
+  BUILD_DATE="2018-01-14" \
   ICINGAWEB_VERSION="2.5.0"
 
 EXPOSE 80
@@ -70,7 +70,8 @@ RUN \
     | tar x -C /usr/share/webapps/ && \
   ln -s /usr/share/webapps/icingaweb2-${ICINGAWEB_VERSION} /usr/share/webapps/icingaweb2 && \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
-  cd /usr/share/webapps/icingaweb2/modules && \
+  MODULE_DIRECTORY="/usr/share/webapps/icingaweb2/modules" && \
+  cd ${MODULE_DIRECTORY} && \
   git clone https://github.com/Icinga/icingaweb2-module-director        --single-branch director && \
   git clone https://github.com/Icinga/icingaweb2-module-graphite        --single-branch graphite && \
   git clone https://github.com/Icinga/icingaweb2-module-generictts      --single-branch generictts && \
@@ -78,7 +79,7 @@ RUN \
   git clone https://github.com/Icinga/icingaweb2-module-elasticsearch   --single-branch elasticsearch && \
   git clone https://github.com/Icinga/icingaweb2-module-cube            --single-branch cube && \
   git clone https://github.com/Mikesch-mp/icingaweb2-module-grafana     --single-branch grafana && \
-  rm -rf /usr/share/webapps/icingaweb2/modules/*/.git* && \
+  rm -rf ${MODULE_DIRECTORY}/*/.git* && \
   mkdir -p /var/log/icingaweb2 && \
   mkdir -p /etc/icingaweb2/modules && \
   mkdir /etc/icingaweb2/modules/graphite && \
@@ -96,6 +97,24 @@ RUN \
   /usr/bin/icingacli module enable graphite && \
   /usr/bin/icingacli module enable cube && \
   /usr/bin/icingacli module enable grafana && \
+  cd /tmp && \
+  git clone https://github.com/Mikesch-mp/icingaweb2-theme-unicorn && \
+  mkdir ${MODULE_DIRECTORY}/unicorn && \
+  mv /tmp/icingaweb2-theme-unicorn/public ${MODULE_DIRECTORY}/unicorn/ && \
+  curl \
+    --silent \
+    --location \
+    --retry 3 \
+    --output ${MODULE_DIRECTORY}/unicorn/public/img/unicorn.png \
+    http://i.imgur.com/SCfMd.png && \
+  git clone https://github.com/Icinga/icingaweb2-theme-company && \
+  mkdir ${MODULE_DIRECTORY}/company && \
+  mv /tmp/icingaweb2-theme-company/public ${MODULE_DIRECTORY}/company/ && \
+  git clone https://github.com/Wintermute2k6/icingaweb2-module-beyondthepines && \
+  mkdir ${MODULE_DIRECTORY}/beyondthepines && \
+  mv /tmp/icingaweb2-module-beyondthepines/public ${MODULE_DIRECTORY}/beyondthepines/ && \
+  /usr/bin/icingacli module enable unicorn && \
+  /usr/bin/icingacli module enable company && \
   mkdir /run/nginx && \
   mkdir /var/log/php-fpm && \
   apk del --quiet .build-deps && \
