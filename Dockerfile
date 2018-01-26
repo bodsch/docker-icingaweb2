@@ -55,7 +55,7 @@ RUN \
     php7-xml \
     php7-dom \
     pwgen \
-    supervisor && \
+    yajl-tools && \
   [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
   [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
   mkdir /usr/share/webapps && \

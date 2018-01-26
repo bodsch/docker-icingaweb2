@@ -68,3 +68,44 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 | `ICINGAWEB2_USERS`                 | -                    | comma separated List to create Icingaweb2 Users. The Format are `username:password` |
 |                                    |                      | (e.g. `admin:admin,dashing:dashing` and so on)                  |
 |                                    |                      |                                                                 |
+
+
+
+## LDAP support
+
+Please read more at the [official Icingaweb2 Doku](https://www.icinga.com/docs/icingaweb2/latest/doc/05-Authentication/#active-directory-or-ldap-authentication).
+
+The environment variables for LDAP can be configured for 2 different reasons.:
+
+### each environment variable is specified individually
+
+- `LDAP_AD` (default: `false`) is the LDAP server an Active Directory
+- `LDAP_SERVER` (default: `-`) the LDAP server
+- `LDAP_PORT` (default:  `389`) the LDAP Port
+- `LDAP_BIND_DN` (default:  `-`) LDAP Bind DN
+- `LDAP_BIND_PASSWORD` (default:  `-`) Bind Password
+- `LDAP_BASE_DN` (default:  `-`) Base DN
+- `LDAP_FILTER` (default:  `-`) LDAP filter
+- `LDAP_ROLE_GROUPS` (default:  `-`) LDAP groups
+- `LDAP_ROLE_PERMISSIONS` (default:  `*`) LDAP group permissions
+
+### an environment variable summarizes everything as json
+
+- `LDAP`(default: `-`) json formated configuration
+
+```json
+{
+  "active_directory": "true",
+  "server":"${LDAP_SERVER}",
+  "port":"${LDAP_PORT}",
+  "bind_dn": "${LDAP_BIND_DN}",
+  "bind_password": "${LDAP_BIND_PASSWORD}",
+  "base_dn": "${LDAP_BASE_DN}",
+  "filter": "${LDAP_FILTER}",
+  "role": {
+    "groups": "${LDAP_ROLE_GROUPS}",
+    "permissions": "${LDAP_ROLE_PERMISSIONS}"
+  }
+}
+```
+

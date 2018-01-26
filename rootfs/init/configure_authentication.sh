@@ -1,40 +1,18 @@
 
-
+# configure the LDAP resources
+#
 ldap_configuation() {
 
-set -x
-
-  [[ "${USE_LDAP}" == "false" ]] && return
-
-
-  return
-set +x
-
-  local active_directory=${1}
-  local server=${2}
-  local port=${3}
-  local bind_dn=${4}
-  local bind_password=${5}
-  local base_dn=${6}
-  local search_filter=${7}
-  local role_group_names=${8}
-  local role_permissions=${9}
-
-  if ( [[ -z ${server} ]] || [[ ${server} == null ]] )
-  then
-    return
-  fi
-
-  log_info "create LDAP configuration"
-
-  [[ ${#port} -eq 0 ]] && port=389
-  [[ ${#search_filter} -eq 0 ]] && search_filter="uid"
+  [[ "${USE_LDAP}" = "false" ]] && return
 
   backend="ldap"
   user_name_attribute="uid"
+  user_class="inetOrgPerson"
 
-  [[ "${active_directory}" == "true" ]] && backend="msldap"
-  [[ "${active_directory}" == "true" ]] && user_name_attribute="sAMAccountName"
+  [[ "${LDAP_AD}" = "true" ]] && backend="msldap"
+  [[ "${LDAP_AD}" = "true" ]] && user_name_attribute="sAMAccountName"
+  [[ "${LDAP_AD}" = "true" ]] && user_class="user"
+
 
   # create a LDAP resource
   #
@@ -46,15 +24,16 @@ set +x
 
 [ldap]
 type       = "ldap"
-hostname   = "${server}"
-port       = "${port}"
+hostname   = "${LDAP_SERVER}"
+port       = "${LDAP_PORT}"
 encryption = "none"
-root_dn    = "${base_dn}"
-bind_dn    = "${bind_dn}"
-bind_pw    = "${bind_password}"
+root_dn    = "${LDAP_BASE_DN}"
+bind_dn    = "${LDAP_BIND_DN}"
+bind_pw    = "${LDAP_BIND_PASSWORD}"
 
 EOF
   fi
+
 
   # add user authentication
   #
@@ -67,13 +46,16 @@ EOF
 [ldap users]
 backend             = "${backend}"
 resource            = "ldap"
-user_class          = "user"
-base_dn             = "${base_dn}"
+user_class          = "${user_class}"
+base_dn             = "${LDAP_BASE_DN}"
 # the login AND displayed name
 user_name_attribute = "${user_name_attribute}"
-filter              = "${filter}"
 
 EOF
+    if [[ ! -z "${LDAP_FILTER}" ]]
+    then
+      echo "filter              = \"${LDAP_FILTER}\"" >> /etc/icingaweb2/authentication.ini
+    fi
   fi
 
   # add group filter
@@ -101,13 +83,13 @@ EOF
   then
     log_info "  - LDAP roles"
 
-    if [[ ! -z ${role_group_names} ]]
+    if [[ ! -z "${LDAP_ROLE_GROUPS}" ]]
     then
       cat << EOF >> /etc/icingaweb2/roles.ini
 
 [ldap roles]
-groups      = "${role_group_names}"
-permissions = "${role_permissions}"
+groups      = "${LDAP_ROLE_GROUPS}"
+permissions = "${LDAP_ROLE_PERMISSIONS}"
 
 EOF
 
@@ -116,35 +98,8 @@ EOF
 
 }
 
-ldap_authentication() {
-
-  ldap=$(echo "${LDAP}"  | jq '.')
-
-  if [[ ! -z "${ldap}" ]]
-  then
-    echo "${ldap}" | jq --compact-output --raw-output '.' | while IFS='' read u
-    do
-      active_directory=$(echo "${u}" | jq --raw-output .active_directory)
-      server=$(echo "${u}" | jq --raw-output .server)
-      port=$(echo "${u}" | jq --raw-output .port)
-      bind_dn=$(echo "${u}" | jq --raw-output .bind_dn)
-      bind_password=$(echo "${u}" | jq --raw-output .bind_password)
-      base_dn=$(echo "${u}" | jq --raw-output .base_dn)
-      filter=$(echo "${u}" | jq --raw-output .filter)
-      role_group_names=$(echo "${u}" | jq --raw-output .role.groups)
-      role_permissions=$(echo "${u}" | jq --raw-output .role.permissions)
-
-      [[ ${active_directory} = null ]] && active_directory="false"
-      [[ ${role_group_names} = null ]] && role_group_names=
-      [[ ${role_permissions} = null ]] && role_permissions='*'
-
-
-      ldap_configuation "${active_directory}" "${server}" "${port}" "${bind_dn}" "${bind_password}" "${base_dn}" "${filter}" "${role_group_names}" "${role_permissions}"
-    done
-  fi
-}
-
-
+# extract Environment variables
+#
 extract_vars() {
 
   # default values for our Environment
@@ -155,7 +110,6 @@ extract_vars() {
   LDAP_USER_CLASS=${LDAP_USER_CLASS:-user}
   LDAP_BASE_DN=${LDAP_BASE_DN:-}
   LDAP_FILTER=${LDAP_FILTER:-}
-  LDAP_ROOT_DN=${LDAP_ROOT_DN:-}
   LDAP_BIND_DN=${LDAP_BIND_DN:-}
   LDAP_BIND_PASSWORD=${LDAP_BIND_PASSWORD:-}
   LDAP_ROLE_GROUPS=${LDAP_ROLE_GROUPS:-}
@@ -192,7 +146,6 @@ extract_vars() {
     then
       log_error "the LDAP Environment must be an json, not true or false!"
     else
-
       LDAP_AD=$(echo "${LDAP}" | jq --raw-output .active_directory)
       LDAP_SERVER=$(echo "${LDAP}" | jq --raw-output .server)
       LDAP_PORT=$(echo "${LDAP}" | jq --raw-output .port)
@@ -205,7 +158,7 @@ extract_vars() {
 
       [[ "${LDAP_AD}" == null ]] && LDAP_AD=
       [[ "${LDAP_SERVER}" == null ]] && LDAP_SERVER=
-      [[ "${LDAP_PORT}" == null ]] && LDAP_PORT=8080
+      [[ "${LDAP_PORT}" == null ]] && LDAP_PORT=389
       [[ "${LDAP_BIND_DN}" == null ]] && LDAP_BIND_DN=
       [[ "${LDAP_BIND_PASSWORD}" == null ]] && LDAP_BIND_PASSWORD=
       [[ "${LDAP_BASE_DN}" == null ]] && LDAP_BASE_DN=
@@ -220,7 +173,6 @@ extract_vars() {
     LDAP_USER_CLASS=${LDAP_USER_CLASS:-user}
     LDAP_BASE_DN=${LDAP_BASE_DN:-}
     LDAP_FILTER=${LDAP_FILTER:-}
-    LDAP_ROOT_DN=${LDAP_ROOT_DN:-}
     LDAP_BIND_DN=${LDAP_BIND_DN:-}
     LDAP_BIND_PASSWORD=${LDAP_BIND_PASSWORD:-}
     LDAP_ROLE_GROUPS=${LDAP_ROLE_GROUPS:-}
@@ -230,6 +182,8 @@ extract_vars() {
   validate_ldap_environment
 }
 
+# validate extracted Environment variables
+#
 validate_ldap_environment() {
 
   LDAP_AD=${LDAP_AD:-false}
@@ -238,7 +192,6 @@ validate_ldap_environment() {
   LDAP_USER_CLASS=${LDAP_USER_CLASS:-user}
   LDAP_BASE_DN=${LDAP_BASE_DN:-}
   LDAP_FILTER=${LDAP_FILTER:-}
-  LDAP_ROOT_DN=${LDAP_ROOT_DN:-}
   LDAP_BIND_DN=${LDAP_BIND_DN:-}
   LDAP_BIND_PASSWORD=${LDAP_BIND_PASSWORD:-}
   LDAP_ROLE_GROUPS=${LDAP_ROLE_GROUPS:-}
@@ -267,7 +220,6 @@ validate_ldap_environment() {
     export LDAP_USER_CLASS
     export LDAP_BASE_DN
     export LDAP_FILTER
-    export LDAP_ROOT_DN
     export LDAP_BIND_DN
     export LDAP_ROLE_GROUPS
     export LDAP_ROLE_PERMISSIONS
@@ -277,4 +229,3 @@ validate_ldap_environment() {
 extract_vars
 
 ldap_configuation
-
