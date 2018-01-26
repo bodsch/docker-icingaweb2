@@ -3,7 +3,7 @@ FROM alpine:3.7
 
 ENV \
   TERM=xterm \
-  BUILD_DATE="2018-01-14" \
+  BUILD_DATE="2018-01-18" \
   ICINGAWEB_VERSION="2.5.0"
 
 EXPOSE 80
@@ -110,11 +110,24 @@ RUN \
   git clone https://github.com/Icinga/icingaweb2-theme-company && \
   mkdir ${MODULE_DIRECTORY}/company && \
   mv /tmp/icingaweb2-theme-company/public ${MODULE_DIRECTORY}/company/ && \
-  git clone https://github.com/Wintermute2k6/icingaweb2-module-beyondthepines && \
-  mkdir ${MODULE_DIRECTORY}/beyondthepines && \
-  mv /tmp/icingaweb2-module-beyondthepines/public ${MODULE_DIRECTORY}/beyondthepines/ && \
+  git clone https://github.com/jschanz/icingaweb2-theme-batman && \
+  mkdir ${MODULE_DIRECTORY}/batman && \
+  mv /tmp/icingaweb2-theme-batman/public ${MODULE_DIRECTORY}/batman/ && \
+  curl \
+    --silent \
+    --location \
+    --retry 3 \
+    --output ${MODULE_DIRECTORY}/batman/public/img/batman.jpg \
+    https://unsplash.com/photos/meqVd5zwylI && \
+  curl \
+    --silent \
+    --location \
+    --retry 3 \
+    --output ${MODULE_DIRECTORY}/batman/public/img/batman.svg \
+    https://www.shareicon.net/download/2015/09/24/106444_man.svg && \
   /usr/bin/icingacli module enable unicorn && \
   /usr/bin/icingacli module enable company && \
+  /usr/bin/icingacli module enable batman && \
   mkdir /run/nginx && \
   mkdir /var/log/php-fpm && \
   apk del --quiet .build-deps && \
