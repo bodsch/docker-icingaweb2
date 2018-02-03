@@ -104,6 +104,7 @@ extract_vars() {
 
   # default values for our Environment
   #
+  USE_LDAP=false
   LDAP_AD=${LDAP_AD:-false}
   LDAP_SERVER=${LDAP_SERVER:-}
   LDAP_PORT=${LDAP_PORT:-389}
@@ -139,7 +140,6 @@ extract_vars() {
   #
   if [[ "${USE_JSON}" == "true" ]]
   then
-
     log_info "the LDAP Environment is an json"
 
     if ( [[ "${LDAP}" == "true" ]] || [[ "${LDAP}" == "false" ]] )
@@ -200,7 +200,6 @@ validate_ldap_environment() {
   # use the new Cert Service to create and get a valide certificat for distributed icinga services
   #
   if (
-
     [[ ! -z ${LDAP_AD} ]] &&
     [[ ! -z ${LDAP_SERVER} ]] &&
     [[ ! -z ${LDAP_PORT} ]] &&
@@ -214,6 +213,7 @@ validate_ldap_environment() {
   then
     USE_LDAP=true
 
+    export LDAP_AD
     export LDAP_FILTER
     export LDAP_SERVER
     export LDAP_PORT
@@ -223,6 +223,8 @@ validate_ldap_environment() {
     export LDAP_BIND_DN
     export LDAP_ROLE_GROUPS
     export LDAP_ROLE_PERMISSIONS
+
+    export USE_LDAP
   fi
 }
 
