@@ -15,15 +15,16 @@ database:
 # includes a certificate service to create and provide a icinga certificate
 #
 icinga2-master:
-  image: bodsch/docker-icinga2:1801-dev
+  image: bodsch/docker-icinga2:2.8.1-master-r1
   container_name: icinga2-master
   hostname: icinga2-master.matrix.lan
+  restart: always
   ports:
     - 5665:5665
     - 4567:4567
   environment:
-    ICINGA_MASTER: icinga2-master.matrix.lan
-    ICINGA_API_USERS: 'root:icinga,cert:foo-bar'
+    ICINGA2_MASTER: icinga2-master.matrix.lan
+    ICINGA2_API_USERS: root:icinga,dashing:dashing,cert:foo-bar
     MYSQL_HOST: database
     MYSQL_ROOT_USER: root
     MYSQL_ROOT_PASS: vYUQ14SGVrJRi69PsujC
@@ -43,28 +44,28 @@ icingaweb2:
   ports:
     - 80:80
   environment:
-    ICINGA_HOST: icinga2-master.matrix.lan
+    ICINGA2_MASTER: icinga2-master.matrix.lan
+    ICINGA2_CMD_API_USER: root
+    ICINGA2_CMD_API_PASS: icinga
     MYSQL_HOST: database
     MYSQL_ROOT_USER: root
     MYSQL_ROOT_PASS: vYUQ14SGVrJRi69PsujC
-    ICINGA2_CMD_API_USER: root
-    ICINGA2_CMD_API_PASS: icinga
     ICINGAWEB2_USERS: 'icinga:icinga,foo:bar'
     IDO_DATABASE_NAME: icinga2core
     IDO_PASSWORD: ido.pass
-    LDAP: '{
-      "active_directory": "true",
-      "server":"${LDAP_SERVER}",
-      "port":"${LDAP_PORT}",
-      "bind_dn": "${LDAP_BIND_DN}",
-      "bind_password": "${LDAP_BIND_PASSWORD}",
-      "base_dn": "${LDAP_BASE_DN}",
-      "filter": "${LDAP_FILTER}",
-      "role": {
-        "groups": "${LDAP_GROUP_NAMES}",
-        "permissions": "${GROUP_PERMISSIONS}"
-      }
-    }'
+#    LDAP: '{
+#      "active_directory": "true",
+#      "server":"${LDAP_SERVER}",
+#      "port":"${LDAP_PORT}",
+#      "bind_dn": "${LDAP_BIND_DN}",
+#      "bind_password": "${LDAP_BIND_PASSWORD}",
+#      "base_dn": "${LDAP_BASE_DN}",
+#      "filter": "${LDAP_FILTER}",
+#      "role": {
+#        "groups": "${LDAP_GROUP_NAMES}",
+#        "permissions": "${GROUP_PERMISSIONS}"
+#      }
+#    }'
   volumes:
     - /etc/localtime:/etc/localtime:ro
 #    - /tmp/docker-data/icingaweb2:/srv
