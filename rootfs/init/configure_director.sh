@@ -63,6 +63,38 @@ password   = "${MYSQL_ICINGAWEB2_PASSWORD}"
 
 EOF
     fi
+
+    # we must wait for icinha2-master
+
+    if [[ ! -f /etc/icingaweb2/modules/director/kickstart.ini ]]
+    then
+      cat << EOF >> /etc/icingaweb2/modules/director/kickstart.ini
+[config]
+endpoint = ${ICINGA2_MASTER}
+; host = ${ICINGA2_MASTER}
+; port = ${ICINGA2_API_PORT}
+username = ${ICINGA2_CMD_API_USER}
+password = ${ICINGA2_CMD_API_PASS}
+EOF
+
+      icingacli director migration pending --verbose
+      status="${?}"
+      log_info "director: migration pending  ${status}"
+      if [[ ${status} -eq 0 ]]
+      then
+        log_info "director: icingacli director migration run"
+        icingacli director migration run --verbose
+      fi
+
+      icingacli director kickstart required --verbose
+      status="${?}"
+      log_info "director: kickstart required  ${status}"
+      if [[ ${status} -eq 0 ]]
+      then
+        log_info "director: icingacli director kickstart run"
+        icingacli director kickstart run --verbose
+      fi
+    fi
   fi
 
 }

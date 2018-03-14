@@ -3,14 +3,16 @@ FROM alpine:3.7
 
 ENV \
   TERM=xterm \
-  BUILD_DATE="2018-01-26" \
-  ICINGAWEB_VERSION="2.5.1"
+  BUILD_DATE="2018-03-12" \
+  ICINGAWEB_VERSION="2.5.1" \
+  INSTALL_THEMES="true" \
+  INSTALL_MODULES="true"
 
 EXPOSE 80
 
 # Build-time metadata as defined at http://label-schema.org
 LABEL \
-  version="1801" \
+  version="1803" \
   maintainer="Bodo Schulz <bodo@boone-schulz.de>" \
   org.label-schema.build-date=${BUILD_DATE} \
   org.label-schema.name="IcingaWeb2 Docker Image" \
@@ -24,6 +26,8 @@ LABEL \
   com.microscaling.license="GNU General Public License v3.0"
 
 # ---------------------------------------------------------------------------------------
+
+COPY build /build
 
 RUN \
   apk update --quiet --no-cache && \
@@ -54,12 +58,14 @@ RUN \
     php7-session \
     php7-xml \
     php7-dom \
+    php7-soap \
+    php7-posix \
     pwgen \
     yajl-tools && \
   [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
   [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
   mkdir /usr/share/webapps && \
-  echo "fetch: Icingaweb2 ${ICINGAWEB_VERSION}" && \
+  echo "install 'icingaweb2' v${ICINGAWEB_VERSION}" && \
   curl \
     --silent \
     --location \
@@ -70,68 +76,20 @@ RUN \
     | tar x -C /usr/share/webapps/ && \
   ln -s /usr/share/webapps/icingaweb2-${ICINGAWEB_VERSION} /usr/share/webapps/icingaweb2 && \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
-  MODULE_DIRECTORY="/usr/share/webapps/icingaweb2/modules" && \
-  cd ${MODULE_DIRECTORY} && \
-  git clone https://github.com/Icinga/icingaweb2-module-director        --single-branch director && \
-  git clone https://github.com/Icinga/icingaweb2-module-graphite        --single-branch graphite && \
-  git clone https://github.com/Icinga/icingaweb2-module-generictts      --single-branch generictts && \
-  git clone https://github.com/Icinga/icingaweb2-module-businessprocess --single-branch businessprocess && \
-  git clone https://github.com/Icinga/icingaweb2-module-elasticsearch   --single-branch elasticsearch && \
-  git clone https://github.com/Icinga/icingaweb2-module-cube            --single-branch cube && \
-  git clone https://github.com/Mikesch-mp/icingaweb2-module-grafana     --single-branch grafana && \
-  rm -rf ${MODULE_DIRECTORY}/*/.git* && \
   mkdir -p /var/log/icingaweb2 && \
   mkdir -p /etc/icingaweb2/modules && \
-  mkdir /etc/icingaweb2/modules/graphite && \
-  mkdir /etc/icingaweb2/modules/generictts && \
-  mkdir /etc/icingaweb2/modules/businessprocess && \
-  mkdir /etc/icingaweb2/modules/cube && \
-  mkdir /etc/icingaweb2/modules/grafana && \
-  mkdir /etc/icingaweb2/enabledModules && \
-  /usr/bin/icingacli module enable director && \
-  /usr/bin/icingacli module enable businessprocess && \
-  /usr/bin/icingacli module enable monitoring && \
+  mkdir -p /etc/icingaweb2/enabledModules && \
+  /build/install_modules.sh && \
+  /build/install_themes.sh && \
   /usr/bin/icingacli module disable setup && \
+  /usr/bin/icingacli module enable monitoring && \
   /usr/bin/icingacli module enable translation && \
   /usr/bin/icingacli module enable doc && \
-  /usr/bin/icingacli module enable graphite && \
-  /usr/bin/icingacli module enable cube && \
-  /usr/bin/icingacli module enable grafana && \
-  cd /tmp && \
-  git clone https://github.com/Mikesch-mp/icingaweb2-theme-unicorn && \
-  mkdir ${MODULE_DIRECTORY}/unicorn && \
-  mv /tmp/icingaweb2-theme-unicorn/public ${MODULE_DIRECTORY}/unicorn/ && \
-  curl \
-    --silent \
-    --location \
-    --retry 3 \
-    --output ${MODULE_DIRECTORY}/unicorn/public/img/unicorn.png \
-    http://i.imgur.com/SCfMd.png && \
-  git clone https://github.com/Icinga/icingaweb2-theme-company && \
-  mkdir ${MODULE_DIRECTORY}/company && \
-  mv /tmp/icingaweb2-theme-company/public ${MODULE_DIRECTORY}/company/ && \
-  git clone https://github.com/jschanz/icingaweb2-theme-batman && \
-  mkdir ${MODULE_DIRECTORY}/batman && \
-  mv /tmp/icingaweb2-theme-batman/public ${MODULE_DIRECTORY}/batman/ && \
-  curl \
-    --silent \
-    --location \
-    --retry 3 \
-    --output ${MODULE_DIRECTORY}/batman/public/img/batman.jpg \
-    https://unsplash.com/photos/meqVd5zwylI && \
-  curl \
-    --silent \
-    --location \
-    --retry 3 \
-    --output ${MODULE_DIRECTORY}/batman/public/img/batman.svg \
-    https://www.shareicon.net/download/2015/09/24/106444_man.svg && \
-  /usr/bin/icingacli module enable unicorn && \
-  /usr/bin/icingacli module enable company && \
-  /usr/bin/icingacli module enable batman && \
   mkdir /run/nginx && \
   mkdir /var/log/php-fpm && \
   apk del --quiet .build-deps && \
   rm -rf \
+    /build \
     /tmp/* \
     /var/cache/apk/*
 

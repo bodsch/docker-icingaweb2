@@ -12,6 +12,8 @@ MYSQL_ROOT_USER=${MYSQL_ROOT_USER:-"root"}
 MYSQL_ROOT_PASS=${MYSQL_ROOT_PASS:-""}
 MYSQL_OPTS=
 
+ICINGA2_API_PORT=${ICINGA2_API_PORT:-5665}
+
 ICINGAWEB_ADMIN_USER=${ICINGAWEB_ADMIN_USER:-"icinga"}
 ICINGAWEB_ADMIN_PASS=${ICINGAWEB_ADMIN_PASS:-"icinga"}
 
@@ -56,19 +58,49 @@ correctRights() {
   chown nginx:nginx /var/log/icingaweb2
 }
 
+# side channel to inject some wild-style customized scripts
+#
+custom_scripts() {
+
+  if [[ -d /init/custom.d ]]
+  then
+    for f in /init/custom.d/*
+    do
+      case "$f" in
+        *.sh)
+          log_WARN "------------------------------------------------------"
+          log_WARN "RUN SCRIPT: ${f}"
+          log_WARN "YOU SHOULD KNOW WHAT YOU'RE DOING."
+          log_WARN "THIS CAN BREAK THE COMPLETE ICINGA2 CONFIGURATION!"
+          nohup "${f}" > /dev/stdout 2>&1 &
+          log_WARN "------------------------------------------------------"
+          ;;
+        *)
+          log_warn "ignoring file ${f}"
+          ;;
+      esac
+      echo
+    done
+  fi
+}
+
+
 
 run() {
 
   prepare
 
-  . /init/inject_themes.sh
-  . /init/fix_latin1_db_statements.sh
   . /init/database/mysql.sh
-  . /init/configure_director.sh
+
+  . /init/wait_for/icinga_master.sh
+
   . /init/configure_commandtransport.sh
   . /init/configure_graphite.sh
+  . /init/configure_director.sh
+
   . /init/users.sh
   . /init/configure_authentication.sh
+  . /init/fix_latin1_db_statements.sh
 
   correctRights
 
