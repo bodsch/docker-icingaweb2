@@ -71,27 +71,27 @@ EOF
       cat << EOF >> /etc/icingaweb2/modules/director/kickstart.ini
 [config]
 endpoint = ${ICINGA2_MASTER}
-; host = 127.0.0.1
-; port = 5665
+; host = ${ICINGA2_MASTER}
+; port = ${ICINGA2_API_PORT}
 username = ${ICINGA2_CMD_API_USER}
 password = ${ICINGA2_CMD_API_PASS}
 EOF
 
       icingacli director migration pending --verbose
       status="${?}"
-      echo "migration pending  ${status}"
+      log_info "director: migration pending  ${status}"
       if [[ ${status} -eq 0 ]]
       then
-        echo "icingacli director migration run"
+        log_info "director: icingacli director migration run"
         icingacli director migration run --verbose
       fi
 
       icingacli director kickstart required --verbose
       status="${?}"
-      echo "kickstart required  ${status}"
+      log_info "director: kickstart required  ${status}"
       if [[ ${status} -eq 0 ]]
       then
-        echo "icingacli director kickstart run"
+        log_info "director: icingacli director kickstart run"
         icingacli director kickstart run --verbose
       fi
     fi

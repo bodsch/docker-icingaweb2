@@ -10,6 +10,7 @@ WEB_DATABASE_NAME=${WEB_DATABASE_NAME:-"icingaweb2"}
 # -------------------------------------------------------------------------------------------------
 
 [[ -z "${MYSQL_OPTS}" ]] && return
+[[ -z "${MYSQL_HOST}" ]] && return
 
 
 create_database() {

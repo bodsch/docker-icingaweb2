@@ -12,6 +12,8 @@ MYSQL_ROOT_USER=${MYSQL_ROOT_USER:-"root"}
 MYSQL_ROOT_PASS=${MYSQL_ROOT_PASS:-""}
 MYSQL_OPTS=
 
+ICINGA2_API_PORT=${ICINGA2_API_PORT:-5665}
+
 ICINGAWEB_ADMIN_USER=${ICINGAWEB_ADMIN_USER:-"icinga"}
 ICINGAWEB_ADMIN_PASS=${ICINGAWEB_ADMIN_PASS:-"icinga"}
 
@@ -88,7 +90,6 @@ run() {
 
   prepare
 
-#   . /init/inject_themes.sh
   . /init/database/mysql.sh
 
   . /init/wait_for/icinga_master.sh

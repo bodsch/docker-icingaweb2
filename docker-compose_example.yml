@@ -1,75 +1,87 @@
-# version: '2.0'
+---
+version: '3.3'
 
+services:
 
-database:
-  image: bodsch/docker-mysql:10.1.28-r1
-  container_name: database
-  hostname: database
-  environment:
-    - MYSQL_SYSTEM_USER=root
-    - MYSQL_ROOT_PASS=vYUQ14SGVrJRi69PsujC
-  volumes:
-    - /etc/localtime:/etc/localtime:ro
+  database:
+    image: bodsch/docker-mysql:10.1.28-r1
+    container_name: database
+    hostname: database
+    environment:
+      - MYSQL_SYSTEM_USER=root
+      - MYSQL_ROOT_PASS=vYUQ14SGVrJRi69PsujC
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
-# the Icinga2 Master
-# includes a certificate service to create and provide a icinga certificate
-#
-icinga2-master:
-  image: bodsch/docker-icinga2:2.8.1-master-r1
-  container_name: icinga2-master
-  hostname: icinga2-master.matrix.lan
-  restart: always
-  ports:
-    - 5665:5665
-    - 4567:4567
-  environment:
-    ICINGA2_MASTER: icinga2-master.matrix.lan
-    ICINGA2_API_USERS: root:icinga,dashing:dashing,cert:foo-bar
-    MYSQL_HOST: database
-    MYSQL_ROOT_USER: root
-    MYSQL_ROOT_PASS: vYUQ14SGVrJRi69PsujC
-    IDO_DATABASE_NAME: icinga2core
-    IDO_PASSWORD: ido.pass
-  volumes:
-    - /etc/localtime:/etc/localtime:ro
-  links:
-    - database:database
+  graphite:
+    restart: always
+    image: bodsch/docker-graphite:1.1.2-r1
+    container_name: graphite
+    hostname: graphite
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
-# icingaweb2
-#
-icingaweb2:
-  build: .
-  container_name: icingaweb2
-  hostname: icingaweb2.matrix.lan
-  ports:
-    - 80:80
-  environment:
-    ICINGA2_MASTER: icinga2-master.matrix.lan
-    ICINGA2_CMD_API_USER: root
-    ICINGA2_CMD_API_PASS: icinga
-    MYSQL_HOST: database
-    MYSQL_ROOT_USER: root
-    MYSQL_ROOT_PASS: vYUQ14SGVrJRi69PsujC
-    ICINGAWEB2_USERS: 'icinga:icinga,foo:bar'
-    IDO_DATABASE_NAME: icinga2core
-    IDO_PASSWORD: ido.pass
-#    LDAP: '{
-#      "active_directory": "true",
-#      "server":"${LDAP_SERVER}",
-#      "port":"${LDAP_PORT}",
-#      "bind_dn": "${LDAP_BIND_DN}",
-#      "bind_password": "${LDAP_BIND_PASSWORD}",
-#      "base_dn": "${LDAP_BASE_DN}",
-#      "filter": "${LDAP_FILTER}",
-#      "role": {
-#        "groups": "${LDAP_GROUP_NAMES}",
-#        "permissions": "${GROUP_PERMISSIONS}"
-#      }
-#    }'
-  volumes:
-    - /etc/localtime:/etc/localtime:ro
-#    - /tmp/docker-data/icingaweb2:/srv
-  links:
-    - icinga2-master:icinga2-master.matrix.lan
-    - database:database
+  # the Icinga2 Master
+  # includes a certificate service to create and provide a icinga certificate
+  #
+  icinga2-master:
+    image: bodsch/docker-icinga2:2.8.1-master-r1
+    container_name: icinga2-master
+    hostname: icinga2-master.matrix.lan
+    restart: always
+    ports:
+      - 5665:5665
+      - 4567:4567
+    environment:
+      ICINGA2_MASTER: icinga2-master.matrix.lan
+      ICINGA2_API_USERS: root:icinga,dashing:dashing,cert:foo-bar
+      MYSQL_HOST: database
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASS: vYUQ14SGVrJRi69PsujC
+      IDO_DATABASE_NAME: icinga2core
+      IDO_PASSWORD: ido.pass
+      CARBON_HOST: graphite
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    links:
+      - database:database
+
+  # icingaweb2
+  #
+  icingaweb2:
+    build: .
+    container_name: icingaweb2
+    hostname: icingaweb2.matrix.lan
+    ports:
+      - 80:80
+    environment:
+      ICINGA2_MASTER: icinga2-master.matrix.lan
+      ICINGA2_CMD_API_USER: root
+      ICINGA2_CMD_API_PASS: icinga
+      MYSQL_HOST: database
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASS: vYUQ14SGVrJRi69PsujC
+      GRAPHITE_HOST: graphite
+      ICINGAWEB2_USERS: 'icinga:icinga,foo:bar'
+      IDO_DATABASE_NAME: icinga2core
+      IDO_PASSWORD: ido.pass
+  #    LDAP: '{
+  #      "active_directory": "true",
+  #      "server":"${LDAP_SERVER}",
+  #      "port":"${LDAP_PORT}",
+  #      "bind_dn": "${LDAP_BIND_DN}",
+  #      "bind_password": "${LDAP_BIND_PASSWORD}",
+  #      "base_dn": "${LDAP_BASE_DN}",
+  #      "filter": "${LDAP_FILTER}",
+  #      "role": {
+  #        "groups": "${LDAP_GROUP_NAMES}",
+  #        "permissions": "${GROUP_PERMISSIONS}"
+  #      }
+  #    }'
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+  #    - /tmp/docker-data/icingaweb2:/srv
+    links:
+      - icinga2-master:icinga2-master.matrix.lan
+      - database:database
 
