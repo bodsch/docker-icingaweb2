@@ -3,7 +3,7 @@ FROM alpine:3.7
 
 ENV \
   TERM=xterm \
-  BUILD_DATE="2018-03-12" \
+  BUILD_DATE="2018-03-21" \
   ICINGAWEB_VERSION="2.5.1" \
   INSTALL_THEMES="true" \
   INSTALL_MODULES="true"

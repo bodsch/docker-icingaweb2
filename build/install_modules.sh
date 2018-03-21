@@ -13,7 +13,7 @@ MODULE_LIST="\
     Icinga|businessprocess|2.1.0 \
     Icinga|elasticsearch|0.9.0 \
     Icinga|cube|1.0.1 \
-    Mikesch-mp|grafana|1.2.0"
+    Mikesch-mp|grafana|1.2.1"
 
 cd ${MODULE_DIRECTORY}
 
