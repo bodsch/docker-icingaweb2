@@ -58,7 +58,7 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 | `GRAPHITE_HOST`                    | -                    |                                                                 |
 | `GRAPHITE_PORT`                    | `2003`               |                                                                 |
 |                                    |                      |                                                                 |
-| `ICINGA2_HOST`                     | `icinga2-master`     | Icinga2 Host for Command Transport over API                     |
+| `ICINGA2_MASTER`                   | `icinga2-master`     | Icinga2 Host for Command Transport over API                     |
 | `ICINGA2_PORT`                     | `5665`               | Icinga2 API Port                                                |
 | `ICINGA2_CMD_API_USER`             | -                    | API User for Command Transport                                  |
 | `ICINGA2_CMD_API_PASS`             | -                    | API Password for Command Transport                              |
