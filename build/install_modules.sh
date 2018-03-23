@@ -8,12 +8,12 @@ MODULE_DIRECTORY="/usr/share/webapps/icingaweb2/modules"
 MODULE_LIST="\
     Icinga|director|1.4.3 \
     Icinga|vsphere|1.0.0 \
-    Icinga|graphite|0.9.0 \
+    Icinga|graphite|1.0.0 \
     Icinga|generictts|2.0.0 \
     Icinga|businessprocess|2.1.0 \
     Icinga|elasticsearch|0.9.0 \
     Icinga|cube|1.0.1 \
-    Mikesch-mp|grafana|1.2.0"
+    Mikesch-mp|grafana|1.2.1"
 
 cd ${MODULE_DIRECTORY}
 
