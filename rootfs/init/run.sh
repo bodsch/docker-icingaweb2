@@ -26,7 +26,8 @@ GRAPHITE_HTTP_PORT=${GRAPHITE_HTTP_PORT:-8080}
 
 if [[ -z ${MYSQL_HOST} ]]
 then
-  log_info "no MYSQL_HOST set ..."
+  log_error "no MYSQL_HOST set ..."
+  exit 1
 else
   export MYSQL_OPTS="--host=${MYSQL_HOST} --user=${MYSQL_ROOT_USER} --password=${MYSQL_ROOT_PASS} --port=${MYSQL_PORT}"
 fi

@@ -3,7 +3,7 @@ docker-icingaweb2
 
 Docker Container for icingaweb2 based on alpine-linux.
 
-Now with PHP7 (7.1.12) Support and many installed modules (see below)
+Now with PHP7 (7.1.16) Support and many installed modules and themes (see below).
 
 # Status
 
@@ -36,7 +36,22 @@ Your can use the included Makefile.
  - [businessprocess](https://github.com/Icinga/icingaweb2-module-businessprocess)
  - [elasticsearch](https://github.com/Icinga/icingaweb2-module-elasticsearch)
  - [cube](https://github.com/Icinga/icingaweb2-module-cube)
+ - [vsphere](https://github.com/Icinga/icingaweb2-module-vsphere)
+ - [aws](https://github.com/Icinga/icingaweb2-module-aws)
+ - [fileshipper](https://github.com/Icinga/icingaweb2-module-fileshipper)
+ - [toplevelview](https://github.com/Icinga/icingaweb2-module-toplevelview)
  - [grafana](https://github.com/Mikesch-mp/icingaweb2-module-grafana)
+
+
+# Themes
+
+ - [unicorn](https://github.com/Mikesch-mp/icingaweb2-theme-unicorn)
+ - [lsd](https://github.com/Mikesch-mp/icingaweb2-theme-lsd)
+ - [april](https://github.com/Mikesch-mp/icingaweb2-theme-april)
+ - [company](https://github.com/Icinga/icingaweb2-theme-company)
+ - [batman](https://github.com/jschanz/icingaweb2-theme-batman)
+ - [nordlicht](https://github.com/sysadmama/icingaweb2-theme-nordlicht)
+ - [spring](https://github.com/dnsmichi/icingaweb2-theme-spring)
 
 
 # Docker Hub
@@ -56,10 +71,10 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 | `IDO_PASSWORD`                     | -                    | IDO password                                                    |
 |                                    |                      |                                                                 |
 | `GRAPHITE_HOST`                    | -                    |                                                                 |
-| `GRAPHITE_PORT`                    | `2003`               |                                                                 |
+| `GRAPHITE_HTTP_PORT`               | `8080`               |                                                                 |
 |                                    |                      |                                                                 |
 | `ICINGA2_MASTER`                   | `icinga2-master`     | Icinga2 Host for Command Transport over API                     |
-| `ICINGA2_PORT`                     | `5665`               | Icinga2 API Port                                                |
+| `ICINGA2_API_PORT`                 | `5665`               | Icinga2 API Port                                                |
 | `ICINGA2_CMD_API_USER`             | -                    | API User for Command Transport                                  |
 | `ICINGA2_CMD_API_PASS`             | -                    | API Password for Command Transport                              |
 |                                    |                      |                                                                 |
