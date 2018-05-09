@@ -3,18 +3,38 @@ sudo: required
 services:
   - docker
 
-install:
-  - travis_retry docker build --tag bodsch/docker-icingaweb2 .
-  - docker run --detach --name icingaweb2 bodsch/docker-icingaweb2
+env:
+  global:
+    - ICINGAWEB_VERSION=${ICINGAWEB_VERSION:-2.5.3}
+    - BUILD_DATE=$(date +"%Y-%m-%d")
 
-script:
-  - docker ps | grep -q icingaweb2
-
-after_success:
-  - |
-    [ "${TRAVIS_BRANCH}" == "master" ] && curl \
-      --request POST \
-      --header "Content-Type: application/json"  \
-      --data '{"source_type":"Branch","source_name":"master"}' \
-      https://registry.hub.docker.com/u/bodsch/docker-icingaweb2/trigger/${DOCKER_HUB_TOKEN}/
-
+jobs:
+  include:
+    - stage: build, test and push docker image
+      script:
+        - make build
+        - make start
+        - docker ps | grep -q icingaweb2
+        - make stop
+        - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+        - docker push ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
+        - docker tag ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION} ${DOCKER_USERNAME}/docker-icingaweb2:latest
+        - docker push ${DOCKER_USERNAME}/docker-icingaweb2:latest
+#
+#
+#install:
+#  - travis_retry docker build --tag bodsch/docker-icingaweb2 .
+#  - docker run --detach --name icingaweb2 bodsch/docker-icingaweb2
+#
+#script:
+#  - docker ps | grep -q icingaweb2
+#
+#after_success:
+#  - |
+#    [ "${TRAVIS_BRANCH}" == "master" ] && curl \
+#      --request POST \
+#      --header "Content-Type: application/json"  \
+#      --data '{"source_type":"Branch","source_name":"master"}' \
+#      https://registry.hub.docker.com/u/bodsch/docker-icingaweb2/trigger/${DOCKER_HUB_TOKEN}/
+#
+#

@@ -2,6 +2,8 @@
 #
 # install a set of icingaweb2 modules
 
+set -e
+
 [[ "${INSTALL_MODULES}" = "false" ]] && exit 0
 
 MODULE_DIRECTORY="/usr/share/webapps/icingaweb2/modules"
@@ -16,7 +18,7 @@ MODULE_LIST="\
     Icinga|aws|0.6.0 \
     Icinga|fileshipper|1.0.1 \
     Icinga|toplevelview|0.2.1 \
-    Mikesch-mp|grafana|1.2.1"
+    Mikesch-mp|grafana|1.2.4"
 
 cd ${MODULE_DIRECTORY}
 
@@ -25,7 +27,7 @@ for g in ${MODULE_LIST} ; do \
   module="$(echo "${g}" | cut -d "|" -f2)"
   version="$(echo "${g}" | cut -d "|" -f3)"
 
-  echo "install module '$module' v$version"
+  echo "install module '$module' $version"
 
   curl \
     --silent \

@@ -1,18 +1,20 @@
 
 FROM alpine:3.7
 
-ENV \
-  TERM=xterm \
-  BUILD_DATE="2018-04-04" \
-  ICINGAWEB_VERSION="2.5.1" \
-  INSTALL_THEMES="true" \
-  INSTALL_MODULES="true"
-
 EXPOSE 80
+
+ARG BUILD_DATE
+ARG BUILD_VERSION
+ARG ICINGAWEB_VERSION
+ARG INSTALL_THEMES
+ARG INSTALL_MODULES
+
+ENV \
+  TERM=xterm
 
 # Build-time metadata as defined at http://label-schema.org
 LABEL \
-  version="1804" \
+  version=${BUILD_VERSION} \
   maintainer="Bodo Schulz <bodo@boone-schulz.de>" \
   org.label-schema.build-date=${BUILD_DATE} \
   org.label-schema.name="IcingaWeb2 Docker Image" \
@@ -71,7 +73,7 @@ RUN \
     --location \
     --retry 3 \
     --cacert /etc/ssl/certs/ca-certificates.crt \
-    "https://github.com/Icinga/icingaweb2/archive/v${ICINGAWEB_VERSION}.tar.gz" \
+    https://github.com/Icinga/icingaweb2/archive/v${ICINGAWEB_VERSION}.tar.gz \
     | gunzip \
     | tar x -C /usr/share/webapps/ && \
   ln -s /usr/share/webapps/icingaweb2-${ICINGAWEB_VERSION} /usr/share/webapps/icingaweb2 && \
