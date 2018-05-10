@@ -16,7 +16,27 @@ INSTALL_MODULES ?= 'true'
 
 .PHONY: build push shell run start stop rm release
 
-build:
+default:
+	@echo ""
+	@echo "Targets:"
+	@echo ""
+	@echo "  params                 Print build parameter"
+	@echo "  build                  Build images"
+#	@echo "  version                Print version of images"
+	@echo "  test                   Test images"
+	@echo "  publish                Publish images"
+	@echo ""
+
+
+params:
+	@echo ""
+	@echo " ICINGAWEB_VERSION: ${ICINGAWEB_VERSION}"
+	@echo " INSTALL_THEMES   : ${INSTALL_THEMES}"
+	@echo " INSTALL_MODULES  : ${INSTALL_MODULES}"
+	@echo " BUILD_DATE       : $(BUILD_DATE)"
+	@echo ""
+
+build:	params
 	docker build \
 		--force-rm \
 		--compress \

@@ -66,6 +66,7 @@ RUN \
     yajl-tools && \
   [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
   [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
+  sed -i -e '/^#/ d' -e '/^;/ d'  -e '/^ *$/ d' /etc/php7/php.ini && \
   mkdir /usr/share/webapps && \
   echo "install 'icingaweb2' v${ICINGAWEB_VERSION}" && \
   curl \
