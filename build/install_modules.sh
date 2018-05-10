@@ -28,7 +28,9 @@ MODULE_JSON='{
   "http://github.com/Mikesch-mp/icingaweb2-module-grafana.git": {},
   "https://github.com/Mikesch-mp/icingaweb2-module-globe": {},
   "nbuchwitz/icingaweb2-module-map": {},
-  "Thomas-Gelf/icingaweb2-module-vspheredb": {},
+  "Thomas-Gelf/icingaweb2-module-vspheredb": {
+    "enable": "false"
+  },
   "morgajel/icingaweb2-module-boxydash": {}
 }'
 
