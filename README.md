@@ -3,13 +3,13 @@ docker-icingaweb2
 
 Docker Container for icingaweb2 based on alpine-linux.
 
-Now with PHP7 (7.1.16) Support and many installed modules and themes (see below).
+Now with PHP7 (7.1.x) Support and many installed modules and themes (see below).
 
 # Status
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/bodsch/docker-icingaweb2.svg?branch=1708-33)][hub]
-[![Image Size](https://images.microbadger.com/badges/image/bodsch/docker-icingaweb2.svg?branch=1708-33)][microbadger]
-[![Build Status](https://travis-ci.org/bodsch/docker-icingaweb2.svg?branch=1708-33)][travis]
+[![Docker Pulls](https://img.shields.io/docker/pulls/bodsch/docker-icingaweb2.svg)][hub]
+[![Image Size](https://images.microbadger.com/badges/image/bodsch/docker-icingaweb2.svg)][microbadger]
+[![Build Status](https://travis-ci.org/bodsch/docker-icingaweb2.svg)][travis]
 
 [hub]: https://hub.docker.com/r/bodsch/docker-icingaweb2/
 [microbadger]: https://microbadger.com/images/bodsch/docker-icingaweb2
@@ -39,9 +39,12 @@ Your can use the included Makefile.
  - [vsphere](https://github.com/Icinga/icingaweb2-module-vsphere)
  - [aws](https://github.com/Icinga/icingaweb2-module-aws)
  - [fileshipper](https://github.com/Icinga/icingaweb2-module-fileshipper)
- - [toplevelview](https://github.com/Icinga/icingaweb2-module-toplevelview)
  - [grafana](https://github.com/Mikesch-mp/icingaweb2-module-grafana)
-
+ - [globe](https://github.com/Mikesch-mp/icingaweb2-module-globe)
+ - [map](https://github.com/nbuchwitz/icingaweb2-module-map)
+ - [boxydash](https://github.com/morgajel/icingaweb2-module-boxydash)
+ - [vspheredb](https://github.com/Thomas-Gelf/icingaweb2-module-vspheredb) (currently disabled, alpha status, not functional)
+ - [toplevelview](https://github.com/Icinga/icingaweb2-module-toplevelview) (currently disabled, missing php7-yaml support)
 
 # Themes
 
@@ -52,6 +55,9 @@ Your can use the included Makefile.
  - [batman](https://github.com/jschanz/icingaweb2-theme-batman)
  - [nordlicht](https://github.com/sysadmama/icingaweb2-theme-nordlicht)
  - [spring](https://github.com/dnsmichi/icingaweb2-theme-spring)
+ - [dark](https://github.com/vita2/icingaweb2-module-theme-dark)
+ - [beyondthepines](https://github.com/Wintermute2k6/icingaweb2-module-beyondthepines)
+ - [always-green](https://github.com/xam-stephan/icingaweb2-module-theme-always-green)
 
 
 # Docker Hub
