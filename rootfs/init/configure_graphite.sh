@@ -20,6 +20,11 @@ url = "http://${GRAPHITE_HOST}:${GRAPHITE_HTTP_PORT}"
 ; user = "user"
 ; password = "pass"
 
+[ui]
+default_time_range = "12"
+default_time_range_unit = "hours"
+disable_no_graphs_found = "0"
+
 ;[icinga]
 ; graphite_writer_host_name_template = "host tpl"
 ; graphite_writer_service_name_template = "service tpl"

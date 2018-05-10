@@ -27,7 +27,9 @@ MODULE_JSON='{
   },
   "http://github.com/Mikesch-mp/icingaweb2-module-grafana.git": {},
   "https://github.com/Mikesch-mp/icingaweb2-module-globe": {},
-  "nbuchwitz/icingaweb2-module-map": {}
+  "nbuchwitz/icingaweb2-module-map": {},
+  "Thomas-Gelf/icingaweb2-module-vspheredb": {},
+  "morgajel/icingaweb2-module-boxydash": {}
 }'
 
 echo " - get latest published versions"
@@ -66,42 +68,61 @@ do
   url=$(jq --raw-output ".tarball_url" ${file})
   enable=$(jq --raw-output ".enable" ${file})
 
-  if [[ -e /etc/alpine-release ]]
+  if [[ ${published_at} != null ]]
   then
-    unix_time=$(date -u -D %Y-%m-%dT%TZ -d "${published_at}" +%s)
+    if [[ -e /etc/alpine-release ]]
+    then
+      unix_time=$(date -u -D %Y-%m-%dT%TZ -d "${published_at}" +%s)
+    else
+      unix_time=${published_at}
+    fi
+
+    release="released at $(date -d "${unix_time}" +%d.%m.%Y)"
   else
-    unix_time=${published_at}
+    version=""
+    release="never released, use git"
   fi
 
-  echo " - ${project_maintainer} :: ${project_name} ${version} (released at $(date -d "${unix_time}" +%d.%m.%Y))"
+  echo " - ${project_maintainer} :: ${project_name} ${version} (${release})"
 
-  if [[ ! -f "${project_name}.tgz" ]]
+  if [[ ${url} != null ]]
   then
-  curl \
-    --silent \
-    --location \
-    --retry 3 \
-    --output "${project_name}.tgz" \
-    ${url}
-  fi
-
-  if [[ -f "${project_name}.tgz" ]]
-  then
-
-    if [[ ! -d ${MODULE_DIRECTORY} ]]
+    if [[ ! -f "${project_name}.tgz" ]]
     then
-      continue
+    curl \
+      --silent \
+      --location \
+      --retry 3 \
+      --output "${project_name}.tgz" \
+      ${url}
     fi
 
-    tar -xzf ${project_name}.tgz
-    find . -mindepth 1 -maxdepth 1 -type d -name "*${project_name}*" -exec mv {} ${MODULE_DIRECTORY}/${project_name} \;
-
-    rm -f ${project_name}.tgz
-    mkdir /etc/icingaweb2/modules/${project_name}
-
-    if [[ "${enable}" = "true" ]]
+    if [[ -f "${project_name}.tgz" ]]
     then
-      /usr/bin/icingacli module enable ${project_name}
+      [[ -d ${MODULE_DIRECTORY} ]] || continue
+
+      tar -xzf ${project_name}.tgz
+      find . -mindepth 1 -maxdepth 1 -type d -name "*${project_name}*" -exec mv {} ${MODULE_DIRECTORY}/${project_name} \;
+
+      rm -f ${project_name}.tgz
+      mkdir /etc/icingaweb2/modules/${project_name}
+
     fi
+
+  else
+    [[ -d icingaweb2-module-${project_name} ]] && rm -rf icingaweb2-module-${project_name}
+    git clone \
+      --quiet \
+      https://github.com/${project_maintainer}/icingaweb2-module-${project_name} > /dev/null
+
+    [[ -d ${MODULE_DIRECTORY} ]] || continue
+
+    mv icingaweb2-module-${project_name} ${MODULE_DIRECTORY}/${project_name}
   fi
+
+  if [[ "${enable}" = "true" ]]
+  then
+    /usr/bin/icingacli module enable ${project_name}
+  fi
+
 done
