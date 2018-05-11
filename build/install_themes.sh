@@ -10,31 +10,36 @@ MODULE_DIRECTORY="/usr/share/webapps/icingaweb2/modules"
 
 cd /tmp
 
-THEMES_JSON='{
-  "Mikesch-mp/icingaweb2-theme-unicorn" : {
-    "image": [{
-      "name": "unicorn.png",
-      "url": "http://i.imgur.com/SCfMd.png"
-    }]
-  },
-  "Mikesch-mp/icingaweb2-theme-lsd": {},
-  "Mikesch-mp/icingaweb2-theme-april": {},
-  "Icinga/icingaweb2-theme-company": {},
-  "jschanz/icingaweb2-theme-batman": {
-    "image": [{
-      "url": "https://www.shareicon.net/download/2015/09/24/106444_man.svg",
-      "name": "batman.svg"
-    },{
-      "url": "https://unsplash.com/photos/meqVd5zwylI",
-      "name": "batman.jpg"
-    }]
-  },
-  "sysadmama/icingaweb2-theme-nordlicht": {},
-  "dnsmichi/icingaweb2-theme-spring": {},
-  "vita2/icingaweb2-module-theme-dark": {},
-  "Wintermute2k6/icingaweb2-module-beyondthepines": {},
-  "xam-stephan/icingaweb2-module-theme-always-green": {}
-}'
+if [[ -f /build/themes.json ]]
+then
+  THEMES_JSON=$(cat /build/themes.json)
+else
+  THEMES_JSON='{
+    "Mikesch-mp/icingaweb2-theme-unicorn" : {
+      "image": [{
+        "name": "unicorn.png",
+        "url": "http://i.imgur.com/SCfMd.png"
+      }]
+    },
+    "Mikesch-mp/icingaweb2-theme-lsd": {},
+    "Mikesch-mp/icingaweb2-theme-april": {},
+    "Icinga/icingaweb2-theme-company": {},
+    "jschanz/icingaweb2-theme-batman": {
+      "image": [{
+        "url": "https://www.shareicon.net/download/2015/09/24/106444_man.svg",
+        "name": "batman.svg"
+      },{
+        "url": "https://unsplash.com/photos/meqVd5zwylI",
+        "name": "batman.jpg"
+      }]
+    },
+    "sysadmama/icingaweb2-theme-nordlicht": {},
+    "dnsmichi/icingaweb2-theme-spring": {},
+    "vita2/icingaweb2-module-theme-dark": {},
+    "Wintermute2k6/icingaweb2-module-beyondthepines": {},
+    "xam-stephan/icingaweb2-module-theme-always-green": {}
+  }'
+fi
 
 set -e
 

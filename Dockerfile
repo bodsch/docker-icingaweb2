@@ -35,7 +35,7 @@ RUN \
   apk update --quiet --no-cache && \
   apk upgrade --quiet --no-cache && \
   apk add --quiet --no-cache --virtual .build-deps \
-    git shadow && \
+    git php7-dev php7-pear g++ make shadow yaml-dev && \
   apk add --quiet --no-cache \
     bash \
     ca-certificates \
@@ -63,7 +63,10 @@ RUN \
     php7-soap \
     php7-posix \
     pwgen \
+    yaml \
     yajl-tools && \
+  printf "\n" | pecl install yaml && \
+  echo "extension=yaml.so" > /etc/php7/conf.d/ext-yaml.ini && \
   [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
   [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
   sed -i -e '/^#/ d' -e '/^;/ d'  -e '/^ *$/ d' /etc/php7/php.ini && \

@@ -12,27 +12,32 @@ cd /tmp
 
 MODULE_DIRECTORY="/usr/share/webapps/icingaweb2/modules"
 
-MODULE_JSON='{
-  "Icinga/icingaweb2-module-director": {},
-  "Icinga/icingaweb2-module-vsphere": {},
-  "Icinga/icingaweb2-module-graphite": {},
-  "Icinga/icingaweb2-module-generictts": {},
-  "Icinga/icingaweb2-module-businessprocess": {},
-  "Icinga/icingaweb2-module-elasticsearch": {},
-  "Icinga/icingaweb2-module-cube": {},
-  "Icinga/icingaweb2-module-aws": {},
-  "Icinga/icingaweb2-module-fileshipper": {},
-  "https://github.com/Icinga/icingaweb2-module-toplevelview": {
-    "enable": "false"
-  },
-  "http://github.com/Mikesch-mp/icingaweb2-module-grafana.git": {},
-  "https://github.com/Mikesch-mp/icingaweb2-module-globe": {},
-  "nbuchwitz/icingaweb2-module-map": {},
-  "Thomas-Gelf/icingaweb2-module-vspheredb": {
-    "enable": "false"
-  },
-  "morgajel/icingaweb2-module-boxydash": {}
-}'
+if [[ -f /build/modules.json ]]
+then
+  MODULE_JSON=$(cat /build/modules.json)
+else
+  MODULE_JSON='{
+    "Icinga/icingaweb2-module-director": {},
+    "Icinga/icingaweb2-module-vsphere": {},
+    "Icinga/icingaweb2-module-graphite": {},
+    "Icinga/icingaweb2-module-generictts": {},
+    "Icinga/icingaweb2-module-businessprocess": {},
+    "Icinga/icingaweb2-module-elasticsearch": {},
+    "Icinga/icingaweb2-module-cube": {},
+    "Icinga/icingaweb2-module-aws": {},
+    "Icinga/icingaweb2-module-fileshipper": {},
+    "https://github.com/Icinga/icingaweb2-module-toplevelview": {
+      "enable": "false"
+    },
+    "http://github.com/Mikesch-mp/icingaweb2-module-grafana.git": {},
+    "https://github.com/Mikesch-mp/icingaweb2-module-globe": {},
+    "nbuchwitz/icingaweb2-module-map": {},
+    "Thomas-Gelf/icingaweb2-module-vspheredb": {
+      "enable": "false"
+    },
+    "morgajel/icingaweb2-module-boxydash": {}
+  }'
+fi
 
 echo " - get latest published versions"
 
