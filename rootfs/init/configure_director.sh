@@ -65,9 +65,11 @@ EOF
     fi
 
     # we must wait for icinha2-master
-
+    #
     if [[ ! -f /etc/icingaweb2/modules/director/kickstart.ini ]]
     then
+      . /init/wait_for/icinga_master.sh
+
       cat << EOF >> /etc/icingaweb2/modules/director/kickstart.ini
 [config]
 endpoint = ${ICINGA2_MASTER}
