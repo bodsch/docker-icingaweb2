@@ -1,16 +1,17 @@
 
 
 [[ -z "${MYSQL_OPTS}" ]] && return
-[[ "${ICINGAWEB_DIRECTOR}" = "false" ]] && return
 
-configure_icinga_director() {
+if [[ "${ICINGAWEB_DIRECTOR}" = "false" ]]
+then
+  log_info "disable director support"
 
-  local director="/usr/share/webapps/icingaweb2/modules/director"
+  /usr/bin/icingacli module disable director
+  return
+fi
 
-  # icingaweb director
-  #
-  if [[ -d ${director} ]]
-  then
+
+director_create_database() {
 
     # check if database already created ...
     #
@@ -23,7 +24,7 @@ configure_icinga_director() {
       # Database isn't created
       # well, i do my job ...
       #
-      log_info "director: initializing databases"
+      log_info "  - initializing databases"
 
       (
         echo "CREATE DATABASE IF NOT EXISTS director DEFAULT CHARACTER SET 'utf8';"
@@ -45,8 +46,23 @@ configure_icinga_director() {
       fi
 
     fi
+}
 
-    log_info "director: configure director for icingaweb"
+
+configure_icinga_director() {
+
+  local director="/usr/share/webapps/icingaweb2/modules/director"
+
+  # icingaweb director
+  #
+  if [[ -d ${director} ]]
+  then
+
+    log_info "configure director"
+
+    director_create_database
+
+    log_info "  - create config files for icingaweb"
 
     if [[ $(grep -c "director]" /etc/icingaweb2/resources.ini) -eq 0 ]]
     then
@@ -79,33 +95,65 @@ password = ${ICINGA2_CMD_API_PASS}
 EOF
     fi
 
+    set +e
+    set +u
+
+    retry=4
+    migration_status=
+    kickstart_status=
+
+    until [[ ${retry} -le 0 ]]
+    do
+      migration_status=
+      kickstart_status=
+
+#      log_debug " -- ${retry} | ${migration_status} | ${kickstart_status}"
+
+      icingacli director endpoint exists ${ICINGA2_MASTER}
+#      log_debug "$?"
+
       . /init/wait_for/icinga_master.sh
 
-      icingacli director migration pending --verbose
-      status="${?}"
-      log_info "director: migration pending  ${status}"
+      code=$(icingacli director migration pending --verbose)
+      migration_status="${?}"
+      log_info "  - migration pending '${code}' (${migration_status})"
 
-      if [[ ${status} -eq 0 ]]
+      if [[ ${migration_status} -eq 0 ]]
       then
-        log_info "director: icingacli director migration run"
+        log_info "  - icingacli director migration run"
 
         . /init/wait_for/icinga_master.sh
-        icingacli director migration run --verbose
-
-        sleep 5s
+        icingacli director migration run --verbose --debug
       fi
 
-      icingacli director kickstart required --verbose
-      status="${?}"
-      log_info "director: kickstart required  ${status}"
-      if [[ ${status} -eq 0 ]]
+      sleep 5s
+
+      code=$(icingacli director kickstart required --verbose)
+      kickstart_status="${?}"
+
+      log_info "  - kickstart required '${code}' (${kickstart_status})"
+
+      if [[ ${kickstart_status} -eq 1 ]]
       then
-        log_info "director: icingacli director kickstart run"
+        break
+      fi
+
+      if [[ ${kickstart_status} -eq 0 ]]
+      then
+        log_info "  - icingacli director kickstart run"
 
         . /init/wait_for/icinga_master.sh
-        icingacli director kickstart run --verbose
+        icingacli director kickstart run --verbose --debug
       fi
-#    fi
+
+#      log_debug " -- ${retry} | ${migration_status} | ${kickstart_status}"
+
+      retry=$(expr ${retry} - 1)
+    done
+
+    icingacli director config render
+    icingacli director config deploy
+
   fi
 
 }

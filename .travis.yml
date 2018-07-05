@@ -7,16 +7,19 @@ env:
   global:
     - ICINGAWEB_VERSION=${ICINGAWEB_VERSION:-2.5.3}
     - BUILD_DATE=$(date +"%Y-%m-%d")
+    - BUILD_TYPE=${ICINGAWEB_VERSION:-stable}
 
 jobs:
   include:
     - stage: build, test and push docker image
       script:
         - make build
-        - make start
+        - make compose-file
+        - docker-compose up --build -d
         - docker ps | grep -q icingaweb2
-        - make stop
+        - docker-compose kill
+        - docker-compose down
         - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
-        - docker push ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
         - docker tag ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION} ${DOCKER_USERNAME}/docker-icingaweb2:latest
         - docker push ${DOCKER_USERNAME}/docker-icingaweb2:latest
+        - docker logout

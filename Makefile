@@ -12,8 +12,8 @@ BUILD_DATE        := $(shell date +%Y-%m-%d)
 BUILD_VERSION     := $(shell date +%y%m)
 BUILD_TYPE        ?= stable
 ICINGAWEB_VERSION ?= 2.5.3
-INSTALL_THEMES    ?= 'true'
-INSTALL_MODULES   ?= 'true'
+INSTALL_THEMES    ?= true
+INSTALL_MODULES   ?= true
 
 .PHONY: build push shell run start stop rm release
 
@@ -105,6 +105,17 @@ stop:
 rm:
 	docker rm \
 		$(NAME)-$(INSTANCE)
+
+compose-file:params
+	echo "BUILD_DATE=$(BUILD_DATE)" > .env
+	echo "BUILD_VERSION=$(BUILD_VERSION)" >> .env
+	echo "BUILD_TYPE=$(BUILD_TYPE)" >> .env
+	echo "ICINGAWEB_VERSION=${ICINGAWEB_VERSION}" >> .env
+	echo "INSTALL_THEMES=${INSTALL_THEMES}" >> .env
+	echo "INSTALL_MODULES=${INSTALL_MODULES}" >> .env
+	docker-compose \
+		--file docker-compose_example.yml \
+		config > docker-compose.yml
 
 release: build
 	make push -e VERSION=${ICINGAWEB_VERSION}

@@ -1,9 +1,7 @@
 
 if ( [[ -z ${GRAPHITE_HOST} ]] || [[ -z ${GRAPHITE_HTTP_PORT} ]] )
 then
-
-  log_info "missing GRAPHITE_HOST or GRAPHITE_HTTP_PORT"
-  log_info "disable graphite support"
+  log_info "disable graphite support while missing GRAPHITE_HOST or GRAPHITE_HTTP_PORT"
 
   /usr/bin/icingacli module disable graphite
   return
