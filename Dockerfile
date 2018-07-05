@@ -1,10 +1,11 @@
 
-FROM alpine:3.7
+FROM alpine:latest
 
 EXPOSE 80
 
 ARG BUILD_DATE
 ARG BUILD_VERSION
+ARG BUILD_TYPE
 ARG ICINGAWEB_VERSION
 ARG INSTALL_THEMES
 ARG INSTALL_MODULES
@@ -71,16 +72,28 @@ RUN \
   [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
   sed -i -e '/^#/ d' -e '/^;/ d'  -e '/^ *$/ d' /etc/php7/php.ini && \
   mkdir /usr/share/webapps && \
-  echo "install 'icingaweb2' v${ICINGAWEB_VERSION}" && \
-  curl \
-    --silent \
-    --location \
-    --retry 3 \
-    --cacert /etc/ssl/certs/ca-certificates.crt \
-    https://github.com/Icinga/icingaweb2/archive/v${ICINGAWEB_VERSION}.tar.gz \
-    | gunzip \
-    | tar x -C /usr/share/webapps/ && \
-  ln -s /usr/share/webapps/icingaweb2-${ICINGAWEB_VERSION} /usr/share/webapps/icingaweb2 && \
+  if ( [ -z ${BUILD_TYPE} ] || [ "${BUILD_TYPE}" == "stable" ] ) ; then \
+    echo "install 'icingaweb2' v${ICINGAWEB_VERSION}" && \
+    curl \
+      --silent \
+      --location \
+      --retry 3 \
+      --cacert /etc/ssl/certs/ca-certificates.crt \
+      https://github.com/Icinga/icingaweb2/archive/v${ICINGAWEB_VERSION}.tar.gz \
+      | gunzip \
+      | tar x -C /usr/share/webapps/ && \
+    ln -s /usr/share/webapps/icingaweb2-${ICINGAWEB_VERSION} /usr/share/webapps/icingaweb2 ; \
+  else \
+    echo "install 'icingaweb2' from git " && \
+    cd /tmp && \
+    git clone https://github.com/Icinga/icingaweb2.git && \
+    cd icingaweb2 && \
+    version=$(git describe --tags --always | sed 's/^v//') && \
+    echo "  version: ${version}" && \
+    mv /tmp/icingaweb2 /usr/share/webapps/ && \
+    rm -rf /usr/share/webapps/icingaweb2/.git* && \
+    rm -rf /usr/share/webapps/icingaweb2/.puppet ; \
+  fi && \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
   mkdir -p /var/log/icingaweb2 && \
   mkdir -p /etc/icingaweb2/modules && \

@@ -1,6 +1,7 @@
 
 
 [[ -z "${MYSQL_OPTS}" ]] && return
+[[ "${ICINGAWEB_DIRECTOR}" = "false" ]] && return
 
 configure_icinga_director() {
 
@@ -68,9 +69,7 @@ EOF
     #
     if [[ ! -f /etc/icingaweb2/modules/director/kickstart.ini ]]
     then
-      . /init/wait_for/icinga_master.sh
-
-      cat << EOF >> /etc/icingaweb2/modules/director/kickstart.ini
+      cat << EOF > /etc/icingaweb2/modules/director/kickstart.ini
 [config]
 endpoint = ${ICINGA2_MASTER}
 ; host = ${ICINGA2_MASTER}
@@ -78,14 +77,22 @@ endpoint = ${ICINGA2_MASTER}
 username = ${ICINGA2_CMD_API_USER}
 password = ${ICINGA2_CMD_API_PASS}
 EOF
+    fi
+
+      . /init/wait_for/icinga_master.sh
 
       icingacli director migration pending --verbose
       status="${?}"
       log_info "director: migration pending  ${status}"
+
       if [[ ${status} -eq 0 ]]
       then
         log_info "director: icingacli director migration run"
+
+        . /init/wait_for/icinga_master.sh
         icingacli director migration run --verbose
+
+        sleep 5s
       fi
 
       icingacli director kickstart required --verbose
@@ -94,9 +101,11 @@ EOF
       if [[ ${status} -eq 0 ]]
       then
         log_info "director: icingacli director kickstart run"
+
+        . /init/wait_for/icinga_master.sh
         icingacli director kickstart run --verbose
       fi
-    fi
+#    fi
   fi
 
 }

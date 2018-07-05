@@ -44,7 +44,7 @@ Your can use the included Makefile.
  - [map](https://github.com/nbuchwitz/icingaweb2-module-map)
  - [boxydash](https://github.com/morgajel/icingaweb2-module-boxydash)
  - [vspheredb](https://github.com/Thomas-Gelf/icingaweb2-module-vspheredb) (currently disabled, alpha status, not functional)
- - [toplevelview](https://github.com/Icinga/icingaweb2-module-toplevelview) (currently disabled, missing php7-yaml support)
+ - [toplevelview](https://github.com/Icinga/icingaweb2-module-toplevelview)
 
 # Themes
 

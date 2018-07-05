@@ -20,6 +20,8 @@ ICINGAWEB_ADMIN_PASS=${ICINGAWEB_ADMIN_PASS:-"icinga"}
 GRAPHITE_HOST=${GRAPHITE_HOST:-""}
 GRAPHITE_HTTP_PORT=${GRAPHITE_HTTP_PORT:-8080}
 
+ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-"true"}
+
 . /init/output.sh
 
 # -------------------------------------------------------------------------------------------------

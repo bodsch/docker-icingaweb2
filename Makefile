@@ -8,11 +8,12 @@ REPO     = docker-icingaweb2
 NAME     = icingaweb2
 INSTANCE = default
 
-BUILD_DATE := $(shell date +%Y-%m-%d)
-BUILD_VERSION := $(shell date +%y%m)
+BUILD_DATE        := $(shell date +%Y-%m-%d)
+BUILD_VERSION     := $(shell date +%y%m)
+BUILD_TYPE        ?= stable
 ICINGAWEB_VERSION ?= 2.5.3
-INSTALL_THEMES ?= 'true'
-INSTALL_MODULES ?= 'true'
+INSTALL_THEMES    ?= 'true'
+INSTALL_MODULES   ?= 'true'
 
 .PHONY: build push shell run start stop rm release
 
@@ -42,6 +43,7 @@ build:	params
 		--compress \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg BUILD_VERSION=$(BUILD_VERSION) \
+		--build-arg BUILD_TYPE=$(BUILD_TYPE) \
 		--build-arg ICINGAWEB_VERSION=${ICINGAWEB_VERSION} \
 		--build-arg INSTALL_THEMES=$(INSTALL_THEMES) \
 		--build-arg INSTALL_MODULES=${INSTALL_MODULES} \
