@@ -1,5 +1,5 @@
 
-FROM alpine:latest
+FROM alpine:edge
 
 EXPOSE 80
 

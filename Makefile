@@ -35,6 +35,8 @@ params:
 	@echo " INSTALL_THEMES   : ${INSTALL_THEMES}"
 	@echo " INSTALL_MODULES  : ${INSTALL_MODULES}"
 	@echo " BUILD_DATE       : $(BUILD_DATE)"
+	@echo " BUILD_VERSION    : $(BUILD_VERSION)"
+	@echo " BUILD_TYPE       : $(BUILD_TYPE)"
 	@echo ""
 
 build:	params
