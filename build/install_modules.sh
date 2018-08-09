@@ -129,3 +129,6 @@ do
     /usr/bin/icingacli module enable ${project_name} 2> /dev/null
   fi
 done
+
+find ${MODULE_DIRECTORY} -name ".git*" -exec rm -rf {} \;
+
