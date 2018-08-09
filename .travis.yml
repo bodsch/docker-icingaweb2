@@ -9,9 +9,19 @@ env:
     - BUILD_DATE=$(date +"%Y-%m-%d")
     - BUILD_TYPE=${ICINGAWEB_VERSION:-stable}
 
+stages:
+  - build
+  - build and test
+  - push lates docker image
+  - push version docker image
+    if: branch != master
+
 jobs:
   include:
-    - stage: build, test and push docker image
+    - stage: build
+        - make build
+
+    - stage: build and test
       script:
         - make build
         - make compose-file
@@ -19,7 +29,18 @@ jobs:
         - docker ps | grep -q icingaweb2
         - docker-compose kill
         - docker-compose down
+
+    - stage: push latest docker image
+      script:
+        - make build
         - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
         - docker tag ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION} ${DOCKER_USERNAME}/docker-icingaweb2:latest
         - docker push ${DOCKER_USERNAME}/docker-icingaweb2:latest
+        - docker logout
+
+    - stage: push version docker image
+      script:
+        - make build
+        - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+        - docker push ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
         - docker logout
