@@ -8,8 +8,8 @@
   "Icinga/icingaweb2-module-cube": {},
   "Icinga/icingaweb2-module-aws": {},
   "Icinga/icingaweb2-module-fileshipper": {},
-  "https://github.com/Icinga/icingaweb2-module-toplevelview": {},
-  "http://github.com/Mikesch-mp/icingaweb2-module-grafana.git": {},
+  "Icinga/icingaweb2-module-toplevelview": {},
+  "Mikesch-mp/icingaweb2-module-grafana.git": {},
   "https://github.com/Mikesch-mp/icingaweb2-module-globe": {},
   "nbuchwitz/icingaweb2-module-map": {},
   "Thomas-Gelf/icingaweb2-module-vspheredb": {

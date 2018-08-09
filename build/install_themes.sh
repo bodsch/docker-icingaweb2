@@ -91,7 +91,7 @@ do
 
   if [[ "${enable}" = "true" ]]
   then
-    /usr/bin/icingacli module enable ${project_name}
+    /usr/bin/icingacli module enable ${project_name} 2> /dev/null
   fi
 
   popd > /dev/null

@@ -26,9 +26,7 @@ else
     "Icinga/icingaweb2-module-cube": {},
     "Icinga/icingaweb2-module-aws": {},
     "Icinga/icingaweb2-module-fileshipper": {},
-    "https://github.com/Icinga/icingaweb2-module-toplevelview": {
-      "enable": "false"
-    },
+    "https://github.com/Icinga/icingaweb2-module-toplevelview": {},
     "http://github.com/Mikesch-mp/icingaweb2-module-grafana.git": {},
     "https://github.com/Mikesch-mp/icingaweb2-module-globe": {},
     "nbuchwitz/icingaweb2-module-map": {},
@@ -129,7 +127,7 @@ do
 
   if [[ "${enable}" = "true" ]]
   then
-    /usr/bin/icingacli module enable ${project_name}
+    /usr/bin/icingacli module enable ${project_name} 2> /dev/null
   fi
 
 done
