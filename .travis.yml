@@ -13,7 +13,7 @@ stages:
   - build
   - build and test
   - push lates docker image
-  - push version docker image
+  - name: push version docker image
     if: branch != master
 
 jobs:
