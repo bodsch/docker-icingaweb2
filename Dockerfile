@@ -155,6 +155,8 @@ HEALTHCHECK \
 
 CMD [ "/init/run.sh" ]
 
+# ---------------------------------------------------------------------------------------
+
 # Build-time metadata as defined at http://label-schema.org
 LABEL \
   version=${BUILD_VERSION} \
@@ -170,9 +172,4 @@ LABEL \
   com.microscaling.docker.dockerfile="/Dockerfile" \
   com.microscaling.license="GNU General Public License v3.0"
 
-
 # ---------------------------------------------------------------------------------------
-
-
-#
-

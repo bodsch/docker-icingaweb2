@@ -77,12 +77,12 @@ do
   then
     if [[ -e /etc/alpine-release ]]
     then
-      unix_time=$(date -u -D %Y-%m-%dT%TZ -d "${published_at}" +%s)
+      release_date=$(date -d @$(date -u -D %Y-%m-%dT%TZ -d "${published_at}" +%s) +%d.%m.%Y)
     else
-      unix_time=${published_at}
+      release_date=$(date -d ${published_at} +%d.%m.%Y)
     fi
 
-    release="released at $(date -d "${unix_time}" +%d.%m.%Y)"
+    release="released at ${release_date}"
   else
     version=""
     release="never released, use git"
@@ -111,7 +111,6 @@ do
 
       rm -f ${project_name}.tgz
       mkdir /etc/icingaweb2/modules/${project_name}
-
     fi
 
   else
@@ -129,5 +128,4 @@ do
   then
     /usr/bin/icingacli module enable ${project_name} 2> /dev/null
   fi
-
 done
