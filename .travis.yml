@@ -9,16 +9,10 @@ env:
     - BUILD_DATE=$(date +"%Y-%m-%d")
     - BUILD_TYPE=${ICINGAWEB_VERSION:-stable}
 
-stages:
-  - build
-  - build and test
-  - push lates docker image
-  - name: push version docker image
-    if: branch != master
-
 jobs:
   include:
     - stage: build
+      script:
         - make build
 
     - stage: build and test
