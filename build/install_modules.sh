@@ -130,5 +130,4 @@ do
   fi
 done
 
-find ${MODULE_DIRECTORY} -name ".git*" -exec rm -rf {} 2> /dev/null \;
-
+find ${MODULE_DIRECTORY} -name ".git*" -exec rm -rf {} 2> /dev/null \; || true
