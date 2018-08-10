@@ -26,9 +26,7 @@ else
     "Icinga/icingaweb2-module-cube": {},
     "Icinga/icingaweb2-module-aws": {},
     "Icinga/icingaweb2-module-fileshipper": {},
-    "https://github.com/Icinga/icingaweb2-module-toplevelview": {
-      "enable": "false"
-    },
+    "https://github.com/Icinga/icingaweb2-module-toplevelview": {},
     "http://github.com/Mikesch-mp/icingaweb2-module-grafana.git": {},
     "https://github.com/Mikesch-mp/icingaweb2-module-globe": {},
     "nbuchwitz/icingaweb2-module-map": {},
@@ -82,17 +80,18 @@ do
   then
     if [[ -e /etc/alpine-release ]]
     then
-      unix_time=$(date -u -D %Y-%m-%dT%TZ -d "${published_at}" +%s)
+      release_date=$(date -d @$(date -u -D %Y-%m-%dT%TZ -d "${published_at}" +%s) +%d.%m.%Y)
     else
-      unix_time=${published_at}
+      release_date=$(date -d ${published_at} +%d.%m.%Y)
     fi
 
-    release="released at $(date -d "${unix_time}" +%d.%m.%Y)"
+    release="released at ${release_date}"
 
     if [[ "${use_git}" == "true" ]]
     then
       release="${release} but use git"
     fi
+
   else
     version=""
     release="never released, use git"
@@ -136,7 +135,8 @@ do
 
   if [[ "${enable}" = "true" ]]
   then
-    /usr/bin/icingacli module enable ${project_name}
+    /usr/bin/icingacli module enable ${project_name} 2> /dev/null
   fi
-
 done
+
+find ${MODULE_DIRECTORY} -name ".git*" -exec rm -rf {} 2> /dev/null \; || true

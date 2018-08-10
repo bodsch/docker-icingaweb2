@@ -103,7 +103,7 @@ run() {
 
   . /init/users.sh
   . /init/configure_authentication.sh
-  . /init/fix_latin1_db_statements.sh
+  # . /init/fix_latin1_db_statements.sh
 
   correctRights
 

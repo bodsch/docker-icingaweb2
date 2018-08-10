@@ -1,5 +1,49 @@
 
-FROM alpine:latest
+FROM alpine:edge as builder
+
+RUN \
+  apk update --quiet --no-cache && \
+  apk upgrade --quiet --no-cache && \
+  apk add --quiet --no-cache \
+    bash \
+    ca-certificates \
+    curl \
+    git \
+    g++ \
+    make \
+    jq \
+    mysql-client \
+    nginx \
+    netcat-openbsd \
+    openssl \
+    php7 \
+    php7-ctype \
+    php7-dev \
+    php7-pear \
+    php7-fpm \
+    php7-pdo_mysql \
+    php7-openssl \
+    php7-intl \
+    php7-ldap \
+    php7-gettext \
+    php7-json \
+    php7-mbstring \
+    php7-curl \
+    php7-iconv \
+    php7-session \
+    php7-xml \
+    php7-dom \
+    php7-soap \
+    php7-posix \
+    pwgen \
+    yaml \
+    yaml-dev \
+    yajl-tools && \
+  printf "\n" | pecl install yaml
+
+# ---------------------------------------------------------------------------------------
+
+FROM alpine:edge
 
 EXPOSE 80
 
@@ -13,21 +57,6 @@ ARG INSTALL_MODULES
 ENV \
   TERM=xterm
 
-# Build-time metadata as defined at http://label-schema.org
-LABEL \
-  version=${BUILD_VERSION} \
-  maintainer="Bodo Schulz <bodo@boone-schulz.de>" \
-  org.label-schema.build-date=${BUILD_DATE} \
-  org.label-schema.name="IcingaWeb2 Docker Image" \
-  org.label-schema.description="Inofficial IcingaWeb2 Docker Image" \
-  org.label-schema.url="https://www.icinga.org/" \
-  org.label-schema.vcs-url="https://github.com/bodsch/docker-icingaweb2" \
-  org.label-schema.vendor="Bodo Schulz" \
-  org.label-schema.version=${ICINGAWEB_VERSION} \
-  org.label-schema.schema-version="1.0" \
-  com.microscaling.docker.dockerfile="/Dockerfile" \
-  com.microscaling.license="GNU General Public License v3.0"
-
 # ---------------------------------------------------------------------------------------
 
 COPY build /build
@@ -36,7 +65,7 @@ RUN \
   apk update --quiet --no-cache && \
   apk upgrade --quiet --no-cache && \
   apk add --quiet --no-cache --virtual .build-deps \
-    git php7-dev php7-pear g++ make shadow yaml-dev && \
+    git shadow && \
   apk add --quiet --no-cache \
     bash \
     ca-certificates \
@@ -66,7 +95,6 @@ RUN \
     pwgen \
     yaml \
     yajl-tools && \
-  printf "\n" | pecl install yaml && \
   echo "extension=yaml.so" > /etc/php7/conf.d/ext-yaml.ini && \
   [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
   [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
@@ -100,10 +128,10 @@ RUN \
   mkdir -p /etc/icingaweb2/enabledModules && \
   /build/install_modules.sh && \
   /build/install_themes.sh && \
-  /usr/bin/icingacli module disable setup && \
-  /usr/bin/icingacli module enable monitoring && \
-  /usr/bin/icingacli module enable translation && \
-  /usr/bin/icingacli module enable doc && \
+  /usr/bin/icingacli module disable setup      2> /dev/null && \
+  /usr/bin/icingacli module enable monitoring  2> /dev/null && \
+  /usr/bin/icingacli module enable translation 2> /dev/null && \
+  /usr/bin/icingacli module enable doc         2> /dev/null && \
   mkdir /run/nginx && \
   mkdir /var/log/php-fpm && \
   apk del --quiet .build-deps && \
@@ -113,10 +141,11 @@ RUN \
     /var/cache/apk/*
 
 COPY rootfs/ /
+COPY --from=builder /usr/lib/php7/modules/yaml.so /usr/lib/php7/modules/
 
 WORKDIR /etc/icingaweb2
 
-VOLUME /etc/icingaweb2
+VOLUME [ "/etc/icingaweb2" "/usr/share/webapps/icingaweb2" ]
 
 HEALTHCHECK \
   --interval=5s \
@@ -125,5 +154,22 @@ HEALTHCHECK \
   CMD curl --silent --fail http://localhost/health || exit 1
 
 CMD [ "/init/run.sh" ]
+
+# ---------------------------------------------------------------------------------------
+
+# Build-time metadata as defined at http://label-schema.org
+LABEL \
+  version=${BUILD_VERSION} \
+  maintainer="Bodo Schulz <bodo@boone-schulz.de>" \
+  org.label-schema.build-date=${BUILD_DATE} \
+  org.label-schema.name="IcingaWeb2 Docker Image" \
+  org.label-schema.description="Inofficial IcingaWeb2 Docker Image" \
+  org.label-schema.url="https://www.icinga.org/" \
+  org.label-schema.vcs-url="https://github.com/bodsch/docker-icingaweb2" \
+  org.label-schema.vendor="Bodo Schulz" \
+  org.label-schema.version=${ICINGAWEB_VERSION} \
+  org.label-schema.schema-version="1.0" \
+  com.microscaling.docker.dockerfile="/Dockerfile" \
+  com.microscaling.license="GNU General Public License v3.0"
 
 # ---------------------------------------------------------------------------------------
