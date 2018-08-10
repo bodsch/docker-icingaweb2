@@ -1,5 +1,7 @@
 {
-  "Icinga/icingaweb2-module-director": {},
+  "Icinga/icingaweb2-module-director": {
+    "use_git": "true"
+  },
   "Icinga/icingaweb2-module-vsphere": {},
   "Icinga/icingaweb2-module-graphite": {},
   "Icinga/icingaweb2-module-generictts": {},

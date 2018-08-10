@@ -11,7 +11,7 @@ INSTANCE = default
 BUILD_DATE        := $(shell date +%Y-%m-%d)
 BUILD_VERSION     := $(shell date +%y%m)
 BUILD_TYPE        ?= stable
-ICINGAWEB_VERSION ?= 2.5.3
+ICINGAWEB_VERSION ?= 2.6.1
 INSTALL_THEMES    ?= true
 INSTALL_MODULES   ?= true
 

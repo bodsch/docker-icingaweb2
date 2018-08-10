@@ -44,7 +44,9 @@ echo " - get latest published versions"
 for k in $(echo ${MODULE_JSON} | jq -r '. | to_entries | .[] | .key')
 do
   enable="$(echo "${MODULE_JSON}" | jq -r ".[\"$k\"].enable")"
+  use_git="$(echo "${MODULE_JSON}" | jq -r ".[\"$k\"].use_git")"
   [[ "${enable}" == null ]] && enable=true
+  [[ "${use_git}" == null ]] && use_git=false
 
   project="$(echo "${k}" | sed -e 's|\.git||g' -e 's/https\?:\/\///' -e 's|github.com/||g')"
   project_maintainer="$(echo "${project}" | cut -d "/" -f1)"
@@ -60,7 +62,7 @@ do
   fi
 
   cat "github_${outfile}.json" | \
-    jq ". |= .+ {\"enable\": \"${enable}\", \"project_maintainer\": \"${project_maintainer}\", \"project_name\": \"${project_name}\" }" > github_${outfile}.json_TMP
+    jq ". |= .+ {\"enable\": \"${enable}\", \"use_git\": \"${use_git}\", \"project_maintainer\": \"${project_maintainer}\", \"project_name\": \"${project_name}\" }" > github_${outfile}.json_TMP
   mv github_${outfile}.json_TMP github_${outfile}.json
 done
 
@@ -74,6 +76,7 @@ do
   version=$(jq --raw-output ".tag_name" ${file})
   url=$(jq --raw-output ".tarball_url" ${file})
   enable=$(jq --raw-output ".enable" ${file})
+  use_git=$(jq --raw-output ".use_git" ${file})
 
   if [[ ${published_at} != null ]]
   then
@@ -85,6 +88,11 @@ do
     fi
 
     release="released at $(date -d "${unix_time}" +%d.%m.%Y)"
+
+    if [[ "${use_git}" == "true" ]]
+    then
+      release="${release} but use git"
+    fi
   else
     version=""
     release="never released, use git"
@@ -92,7 +100,7 @@ do
 
   echo " - ${project_maintainer} :: ${project_name} ${version} (${release})"
 
-  if [[ ${url} != null ]]
+  if [[ ${url} != null ]] && [[ "${use_git}" = "false" ]]
   then
     if [[ ! -f "${project_name}.tgz" ]]
     then
@@ -113,7 +121,6 @@ do
 
       rm -f ${project_name}.tgz
       mkdir /etc/icingaweb2/modules/${project_name}
-
     fi
 
   else
