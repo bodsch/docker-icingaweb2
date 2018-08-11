@@ -4,7 +4,7 @@ version: '3.3'
 services:
 
   database:
-    image: bodsch/docker-mysql:10.1.28-r1
+    image: bodsch/docker-mysql
     container_name: database
     hostname: database
     environment:
@@ -25,7 +25,7 @@ services:
   # includes a certificate service to create and provide a icinga certificate
   #
   icinga2-master:
-    image: bodsch/docker-icinga2:alpine-master-latest
+    image: bodsch/docker-icinga2
     container_name: icinga2-master
     hostname: icinga2-master.matrix.lan
     restart: always

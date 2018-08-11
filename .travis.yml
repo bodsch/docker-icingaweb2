@@ -19,7 +19,8 @@ jobs:
       script:
         - make build
         - make compose-file
-        - docker-compose up --build -d
+        - docker-compose build
+        - docker-compose up -d
         - docker ps | grep -q icingaweb2
         - docker-compose kill
         - docker-compose down
