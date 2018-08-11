@@ -88,8 +88,8 @@ EOF
       cat << EOF > /etc/icingaweb2/modules/director/kickstart.ini
 [config]
 endpoint = ${ICINGA2_MASTER}
-; host = ${ICINGA2_MASTER}
-; port = ${ICINGA2_API_PORT}
+host     = ${ICINGA2_MASTER}
+port     = ${ICINGA2_API_PORT}
 username = ${ICINGA2_CMD_API_USER}
 password = ${ICINGA2_CMD_API_PASS}
 EOF
@@ -107,12 +107,8 @@ EOF
       migration_status=
       kickstart_status=
 
-#      log_debug " -- ${retry} | ${migration_status} | ${kickstart_status}"
-
-      icingacli director endpoint exists ${ICINGA2_MASTER}
-#      log_debug "$?"
-
-      . /init/wait_for/icinga_master.sh
+      status=$(icingacli director endpoint exists ${ICINGA2_MASTER})
+      #log_info "    ${status}"
 
       code=$(icingacli director migration pending --verbose)
       migration_status="${?}"
@@ -121,12 +117,9 @@ EOF
       if [[ ${migration_status} -eq 0 ]]
       then
         log_info "  - icingacli director migration run"
-
-        . /init/wait_for/icinga_master.sh
-        icingacli director migration run --verbose --debug
+        status=$(icingacli director migration run --verbose)
+        #log_info "    ${status}"
       fi
-
-      sleep 5s
 
       code=$(icingacli director kickstart required --verbose)
       kickstart_status="${?}"
@@ -141,19 +134,17 @@ EOF
       if [[ ${kickstart_status} -eq 0 ]]
       then
         log_info "  - icingacli director kickstart run"
-
-        . /init/wait_for/icinga_master.sh
-        icingacli director kickstart run --verbose --debug
+        status=$(icingacli director kickstart run --verbose)
+        #log_info "    ${status}"
       fi
-
-#      log_debug " -- ${retry} | ${migration_status} | ${kickstart_status}"
 
       retry=$(expr ${retry} - 1)
     done
 
-    icingacli director config render
-    icingacli director config deploy
-
+    status=$(icingacli director config render)
+    #log_info "    ${status}"
+    status=$(icingacli director config deploy)
+    #log_info "    ${status}"
   fi
 
 }

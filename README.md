@@ -3,7 +3,7 @@ docker-icingaweb2
 
 Docker Container for icingaweb2 based on alpine-linux.
 
-Now with PHP7 (7.1.x) Support and many installed modules and themes (see below).
+Now with PHP7 (7.x) Support and many installed modules and themes (see below).
 
 # Status
 
@@ -27,6 +27,15 @@ Your can use the included Makefile.
 - Entering the Container: `make exec`
 - Stop (but **not kill**): `make stop`
 - History `make history`
+
+
+# director integration in combination with a dockerized icinga2-master
+
+The Director will be automated configured.
+For this we need a stable running Icinga2 master.
+
+For this we check the availability of the API port (5665) and wait until the Icinga2 master has reached an uptime of 2 minutes.
+
 
 # Modules
 

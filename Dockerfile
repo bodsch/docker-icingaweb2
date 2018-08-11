@@ -1,5 +1,5 @@
 
-FROM alpine:edge as builder
+FROM alpine:3.8 as builder
 
 RUN \
   apk update --quiet --no-cache && \
@@ -43,7 +43,7 @@ RUN \
 
 # ---------------------------------------------------------------------------------------
 
-FROM alpine:edge
+FROM alpine:3.8
 
 EXPOSE 80
 
@@ -60,12 +60,13 @@ ENV \
 # ---------------------------------------------------------------------------------------
 
 COPY build /build
+COPY --from=builder /usr/lib/php7/modules/yaml.so /usr/lib/php7/modules/
 
 RUN \
   apk update --quiet --no-cache && \
   apk upgrade --quiet --no-cache && \
   apk add --quiet --no-cache --virtual .build-deps \
-    git shadow && \
+    git shadow tzdata && \
   apk add --quiet --no-cache \
     bash \
     ca-certificates \
@@ -95,6 +96,7 @@ RUN \
     pwgen \
     yaml \
     yajl-tools && \
+  cp /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
   echo "extension=yaml.so" > /etc/php7/conf.d/ext-yaml.ini && \
   [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
   [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
@@ -141,7 +143,6 @@ RUN \
     /var/cache/apk/*
 
 COPY rootfs/ /
-COPY --from=builder /usr/lib/php7/modules/yaml.so /usr/lib/php7/modules/
 
 WORKDIR /etc/icingaweb2
 

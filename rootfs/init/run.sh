@@ -2,17 +2,14 @@
 #
 #
 
-[[ ${DEBUG} ]] && set -x
-
-WORK_DIR="/srv/icingaweb2"
-
-MYSQL_HOST=${MYSQL_HOST:-""}
+MYSQL_HOST=${MYSQL_HOST:-"database"}
 MYSQL_PORT=${MYSQL_PORT:-"3306"}
 MYSQL_ROOT_USER=${MYSQL_ROOT_USER:-"root"}
 MYSQL_ROOT_PASS=${MYSQL_ROOT_PASS:-""}
 MYSQL_OPTS=
 
 ICINGA2_API_PORT=${ICINGA2_API_PORT:-5665}
+ICINGA2_UPTIME=${ICINGA2_UPTIME:-125}
 
 ICINGAWEB_ADMIN_USER=${ICINGAWEB_ADMIN_USER:-"icinga"}
 ICINGAWEB_ADMIN_PASS=${ICINGAWEB_ADMIN_PASS:-"icinga"}
@@ -31,14 +28,17 @@ then
   log_error "no MYSQL_HOST set ..."
   exit 1
 else
-  export MYSQL_OPTS="--host=${MYSQL_HOST} --user=${MYSQL_ROOT_USER} --password=${MYSQL_ROOT_PASS} --port=${MYSQL_PORT}"
+  MYSQL_OPTS=
+  MYSQL_OPTS="${MYSQL_OPTS} --host=${MYSQL_HOST}"
+  MYSQL_OPTS="${MYSQL_OPTS} --port=${MYSQL_PORT}"
+  MYSQL_OPTS="${MYSQL_OPTS} --user=${MYSQL_ROOT_USER}"
+  MYSQL_OPTS="${MYSQL_OPTS} --password=${MYSQL_ROOT_PASS}"
+  export MYSQL_OPTS
 fi
 
 # -------------------------------------------------------------------------------------------------
 
 prepare() {
-
-  [[ -d ${WORK_DIR} ]] || mkdir -p ${WORK_DIR}
 
   MYSQL_ICINGAWEB2_PASSWORD=icingaweb2
 
@@ -97,17 +97,21 @@ run() {
 
   . /init/wait_for/icinga_master.sh
 
-  . /init/configure_commandtransport.sh
-  . /init/configure_graphite.sh
-  . /init/configure_director.sh
+  . /init/configure_modules/commandtransport.sh
+  . /init/configure_modules/graphite.sh
+  . /init/configure_modules/director.sh
 
-  . /init/users.sh
-  . /init/configure_authentication.sh
-  # . /init/fix_latin1_db_statements.sh
+  . /init/create_login_users.sh
+  . /init/configure_modules/authentication.sh
+  # . /init/database/fix_latin1_db_statements.sh
 
   correctRights
 
-  nohup /usr/bin/php-fpm --fpm-config /etc/php/php-fpm.conf --pid /run/php-fpm.pid --allow-to-run-as-root --nodaemonize > /dev/stdout 2>&1 &
+  nohup /usr/bin/php-fpm \
+    --fpm-config /etc/php/php-fpm.conf \
+    --pid /run/php-fpm.pid \
+    --allow-to-run-as-root \
+    --nodaemonize > /dev/stdout 2>&1 &
   /usr/sbin/nginx > /dev/stdout 2>&1
 }
 
