@@ -8,6 +8,7 @@ RUN \
     bash \
     ca-certificates \
     curl \
+    file \
     git \
     g++ \
     make \
@@ -19,7 +20,6 @@ RUN \
     php7 \
     php7-ctype \
     php7-dev \
-    php7-pear \
     php7-fpm \
     php7-pdo_mysql \
     php7-openssl \
@@ -38,8 +38,28 @@ RUN \
     pwgen \
     yaml \
     yaml-dev \
-    yajl-tools && \
-  printf "\n" | pecl install yaml
+    yajl-tools
+
+RUN \
+  cd /tmp && \
+  curl \
+    --silent \
+    --location \
+    --retry 3 \
+    --cacert /etc/ssl/certs/ca-certificates.crt \
+    --out yaml.tgz \
+    https://pecl.php.net/get/yaml
+
+RUN \
+  cd /tmp && \
+  tar -xzf yaml.tgz && \
+  cd yaml-* && \
+  phpize && \
+  ./configure && \
+  make && \
+  make install
+
+CMD "/bin/bash"
 
 # ---------------------------------------------------------------------------------------
 

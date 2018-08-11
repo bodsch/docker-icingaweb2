@@ -41,6 +41,7 @@ params:
 
 build:	params
 	docker build \
+		--file Dockerfile \
 		--force-rm \
 		--compress \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
