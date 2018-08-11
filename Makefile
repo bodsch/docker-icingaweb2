@@ -109,7 +109,7 @@ rm:
 	docker rm \
 		$(NAME)-$(INSTANCE)
 
-compose-file:params
+compose-file: params
 	echo "BUILD_DATE=$(BUILD_DATE)" > .env
 	echo "BUILD_VERSION=$(BUILD_VERSION)" >> .env
 	echo "BUILD_TYPE=$(BUILD_TYPE)" >> .env
