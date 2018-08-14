@@ -11,7 +11,17 @@ configure_icinga_graphite() {
 
   log_info "configure graphite support"
 
-  cat << EOF >> /etc/icingaweb2/modules/graphite/config.ini
+  if [[ $(/usr/bin/icingacli module list | grep -c graphite) -eq 0 ]]
+  then
+    log_warn "Module graphite is not installed"
+    return
+  fi
+
+  /usr/bin/icingacli module enable graphite
+
+  [[ -d /etc/icingaweb2/modules/graphite ]] || mkdir -p /etc/icingaweb2/modules/graphite
+
+  cat << EOF > /etc/icingaweb2/modules/graphite/config.ini
 
 [graphite]
 url = "http://${GRAPHITE_HOST}:${GRAPHITE_HTTP_PORT}"

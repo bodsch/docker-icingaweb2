@@ -8,7 +8,6 @@ set -e
 
 echo "install icingaweb2 modules"
 
-cd /tmp
 
 MODULE_DIRECTORY="/usr/share/webapps/icingaweb2/modules"
 
@@ -39,6 +38,8 @@ fi
 
 echo " - get latest published versions"
 
+current_time=$(date +%s)
+
 for k in $(echo ${MODULE_JSON} | jq -r '. | to_entries | .[] | .key')
 do
   enable="$(echo "${MODULE_JSON}" | jq -r ".[\"$k\"].enable")"
@@ -51,19 +52,37 @@ do
   project_name="$(echo "${project}" | cut -d "/" -f2 | sed -e 's|icingaweb2-module-||g')"
   outfile=$(echo "${project}" | tr [:upper:] [:lower:] | sed -e 's|/|_|g')
 
+  if [[ -f "/build/cache/github_${outfile}.json" ]]
+  then
+    file_time=$(stat -c '%Y' "/build/cache/github_${outfile}.json")
+
+    echo "${file_time}"
+
+    if (( file_time < ( current_time - ( 60 * 60 * 24 * 10 ) ) )); then
+      echo "cached file for github_${outfile}.json is older than 10 days"
+    else
+      echo "use cached file"
+      cp -v /build/cache/github_${outfile}.json /tmp/
+    fi
+  else
+    echo "no cache"
+  fi
+
   if [[ ! -f "github_${outfile}.json" ]]
   then
     curl \
       --silent \
-      --out "github_${outfile}.json" \
+      --out "/tmp/github_${outfile}.json" \
       https://api.github.com/repos/${project}/releases/latest
   fi
 
   cat "github_${outfile}.json" | \
-    jq ". |= .+ {\"enable\": \"${enable}\", \"use_git\": \"${use_git}\", \"project_maintainer\": \"${project_maintainer}\", \"project_name\": \"${project_name}\" }" > github_${outfile}.json_TMP
-  mv github_${outfile}.json_TMP github_${outfile}.json
+    jq ". |= .+ {\"enable\": \"${enable}\", \"use_git\": \"${use_git}\", \"project_maintainer\": \"${project_maintainer}\", \"project_name\": \"${project_name}\" }" > /tmp/github_${outfile}.json_TMP
+  mv /tmp/github_${outfile}.json_TMP /tmp/github_${outfile}.json
+
 done
 
+cd /tmp
 
 for file in $(ls -1 github_*.json)
 do
