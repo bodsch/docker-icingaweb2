@@ -114,7 +114,6 @@ else
 fi
 
 tar -czf cache.tgz cache
+rm -f cache/*.json
 
 popd
-
-ls -l1 build

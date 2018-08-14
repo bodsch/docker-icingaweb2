@@ -123,7 +123,7 @@ RUN \
   sed -i -e '/^#/ d' -e '/^;/ d'  -e '/^ *$/ d' /etc/php7/php.ini && \
   mkdir /usr/share/webapps && \
   if ( [ -z ${BUILD_TYPE} ] || [ "${BUILD_TYPE}" == "stable" ] ) ; then \
-    echo "install 'icingaweb2' v${ICINGAWEB_VERSION}" && \
+    echo "install icingaweb2 v${ICINGAWEB_VERSION}" && \
     curl \
       --silent \
       --location \
@@ -134,7 +134,7 @@ RUN \
       | tar x -C /usr/share/webapps/ && \
     ln -s /usr/share/webapps/icingaweb2-${ICINGAWEB_VERSION} /usr/share/webapps/icingaweb2 ; \
   else \
-    echo "install 'icingaweb2' from git " && \
+    echo "install icingaweb2 from git " && \
     cd /tmp && \
     git clone https://github.com/Icinga/icingaweb2.git && \
     cd icingaweb2 && \
