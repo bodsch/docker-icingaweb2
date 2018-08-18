@@ -39,6 +39,9 @@ params:
 	@echo " BUILD_TYPE       : $(BUILD_TYPE)"
 	@echo ""
 
+github-cache:
+	build/build_cache.sh
+
 build:	params
 	docker build \
 		--file Dockerfile \
