@@ -3,7 +3,9 @@
     "use_git": "false"
   },
   "Icinga/icingaweb2-module-vsphere": {},
-  "Icinga/icingaweb2-module-graphite": {},
+  "Icinga/icingaweb2-module-graphite": {
+    "use_git": "true"
+  },
   "Icinga/icingaweb2-module-generictts": {},
   "Icinga/icingaweb2-module-businessprocess": {},
   "Icinga/icingaweb2-module-elasticsearch": {},

@@ -14,40 +14,43 @@ wait_for_icinga_master() {
   . /init/wait_for/port.sh
   wait_for_port ${ICINGA2_MASTER} 5665 50
 
-  RETRY=50
+  if [[ "${ICINGAWEB_DIRECTOR}" == "true" ]]
+  then
 
-  until [[ ${RETRY} -le 0 ]]
-  do
-    code=$(curl \
-      --silent \
-      --user ${ICINGA2_CMD_API_USER}:${ICINGA2_CMD_API_PASS} \
-      --header 'Accept: application/json' \
-      --insecure \
-      https://${ICINGA2_MASTER}:5665/v1/status/CIB)
+    RETRY=50
 
-    if [[ $? -eq 0 ]]
-    then
-      uptime=$(echo "${code}" | jq --raw-output ".results[].status.uptime")
+    until [[ ${RETRY} -le 0 ]]
+    do
+      code=$(curl \
+        --silent \
+        --user ${ICINGA2_CMD_API_USER}:${ICINGA2_CMD_API_PASS} \
+        --header 'Accept: application/json' \
+        --insecure \
+        https://${ICINGA2_MASTER}:5665/v1/status/CIB)
 
-      utime=${uptime%.*}
-
-      if [[ ${utime} -gt ${ICINGA2_UPTIME} ]]
+      if [[ $? -eq 0 ]]
       then
-        break
+          uptime=$(echo "${code}" | jq --raw-output ".results[].status.uptime")
+
+          utime=${uptime%.*}
+
+          if [[ ${utime} -gt ${ICINGA2_UPTIME} ]]
+          then
+            break
+          else
+            sleep 20s
+            RETRY=$(expr ${RETRY} - 1)
+          fi
       else
-        sleep 20s
+        sleep 10s
         RETRY=$(expr ${RETRY} - 1)
       fi
+    done
 
-    else
-      sleep 10s
-      RETRY=$(expr ${RETRY} - 1)
-    fi
-  done
+    sleep 5s
 
-  sleep 5s
-
-  log_info "icinga2 master '${ICINGA2_MASTER}' are available"
+    log_info "icinga2 master '${ICINGA2_MASTER}' are available"
+  fi
 }
 
 wait_for_icinga_master
