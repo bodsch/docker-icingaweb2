@@ -17,17 +17,7 @@ INSTALL_MODULES   ?= true
 
 .PHONY: build push shell run start stop rm release
 
-default:
-	@echo ""
-	@echo "Targets:"
-	@echo ""
-	@echo "  params                 Print build parameter"
-	@echo "  build                  Build images"
-#	@echo "  version                Print version of images"
-	@echo "  test                   Test images"
-	@echo "  publish                Publish images"
-	@echo ""
-
+default: build
 
 params:
 	@echo ""
