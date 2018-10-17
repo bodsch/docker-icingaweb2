@@ -11,7 +11,10 @@ wait_for_icinga_master() {
 
   log_info "wait for icinga2 master '${ICINGA2_MASTER}'"
 
+  . /init/wait_for/dns.sh
   . /init/wait_for/port.sh
+
+  wait_for_dns ${ICINGA2_MASTER}
   wait_for_port ${ICINGA2_MASTER} 5665 50
 
   if [[ "${ICINGAWEB_DIRECTOR}" == "true" ]]

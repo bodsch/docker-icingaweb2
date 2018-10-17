@@ -44,6 +44,8 @@ prepare() {
 
   touch /etc/icingaweb2/resources.ini
   touch /etc/icingaweb2/roles.ini
+
+  [[ -e /etc/php/php.ini ]] || cp /etc/php7/php.ini /etc/php/php.ini
 }
 
 

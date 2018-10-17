@@ -1,8 +1,12 @@
+
 # wait for mariadb / mysql
 #
 wait_for_database() {
 
+  . /init/wait_for/dns.sh
   . /init/wait_for/port.sh
+
+  wait_for_dns ${MYSQL_HOST}
   wait_for_port ${MYSQL_HOST} ${MYSQL_PORT} 15
 
   sleep 2s

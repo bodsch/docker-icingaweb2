@@ -1,5 +1,5 @@
 
-FROM alpine:3.8 as builder
+FROM alpine:3.7 as builder
 
 RUN \
   apk update --quiet --no-cache && \
@@ -59,11 +59,9 @@ RUN \
   make && \
   make install
 
-CMD "/bin/bash"
-
 # ---------------------------------------------------------------------------------------
 
-FROM alpine:3.8
+FROM alpine:3.7
 
 EXPOSE 80
 
@@ -73,9 +71,6 @@ ARG BUILD_TYPE
 ARG ICINGAWEB_VERSION
 ARG INSTALL_THEMES
 ARG INSTALL_MODULES
-
-ENV \
-  TERM=xterm
 
 # ---------------------------------------------------------------------------------------
 
@@ -89,6 +84,7 @@ RUN \
     git shadow tzdata && \
   apk add --quiet --no-cache \
     bash \
+    bind-tools \
     ca-certificates \
     curl \
     jq \
@@ -140,9 +136,9 @@ RUN \
     cd icingaweb2 && \
     version=$(git describe --tags --always | sed 's/^v//') && \
     echo "  version: ${version}" && \
-    mv /tmp/icingaweb2 /usr/share/webapps/ && \
-    rm -rf /usr/share/webapps/icingaweb2/.git* && \
-    rm -rf /usr/share/webapps/icingaweb2/.puppet ; \
+    rm -rf /tmp/icingaweb2/.git* && \
+    rm -rf /tmp/icingaweb2/.puppet && \
+    mv /tmp/icingaweb2 /usr/share/webapps/ ; \
   fi && \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
   mkdir -p /var/log/icingaweb2 && \
