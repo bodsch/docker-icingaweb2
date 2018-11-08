@@ -65,6 +65,7 @@ FROM alpine:3.7
 
 EXPOSE 80
 
+ARG VCS_REF
 ARG BUILD_DATE
 ARG BUILD_VERSION
 ARG BUILD_TYPE
@@ -182,6 +183,7 @@ LABEL \
   org.label-schema.name="IcingaWeb2 Docker Image" \
   org.label-schema.description="Inofficial IcingaWeb2 Docker Image" \
   org.label-schema.url="https://www.icinga.org/" \
+  org.label-schema.vcs-ref=${VCS_REF} \
   org.label-schema.vcs-url="https://github.com/bodsch/docker-icingaweb2" \
   org.label-schema.vendor="Bodo Schulz" \
   org.label-schema.version=${ICINGAWEB_VERSION} \

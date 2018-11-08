@@ -1,0 +1,17 @@
+
+PORTS="
+  --publish 80:80"
+
+VOLUMES=""
+
+ENV="
+  --env URL_PATH="/" \
+  --env AUTH_LDAP_SERVER="smb.matrix.lan" \
+  --env AUTH_LDAP_PORT="389" \
+  --env AUTH_LDAP_USER_CLASS="user" \
+  --env AUTH_LDAP_BASE_DN="cn=users,dc=matrix,dc=lan" \
+  --env AUTH_LDAP_USER_NAME_ATTRIBUTE="sAMAccountName" \
+  --env AUTH_LDAP_FILTER="memberOf=CN=Office,CN=Users,DC=matrix,DC=lan" \
+  --env AUTH_LDAP_ROOT_DN="cn=users,dc=matrix,dc=lan" \
+  --env AUTH_LDAP_BIND_DN="CN=Administrator,CN=Users,DC=matrix,DC=lan" \
+  --env AUTH_LDAP_BIND_PASSWORD="foo""
