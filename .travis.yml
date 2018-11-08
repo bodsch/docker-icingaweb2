@@ -29,7 +29,7 @@ jobs:
       script:
         - make build
         - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
-        - docker tag ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION} ${DOCKER_USERNAME}/docker-icingaweb2:latest
+        - docker tag ${USER}/icingaweb2:latest ${DOCKER_USERNAME}/docker-icingaweb2:latest
         - docker push ${DOCKER_USERNAME}/docker-icingaweb2:latest
         - docker logout
 
@@ -37,5 +37,6 @@ jobs:
       script:
         - make build
         - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+        - docker tag ${USER}/icingaweb2:latest ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
         - docker push ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
         - docker logout
