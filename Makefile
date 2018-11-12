@@ -10,9 +10,12 @@ export INSTALL_THEMES    ?= true
 export INSTALL_MODULES   ?= true
 
 
-.PHONY: build shell run exec start stop clean compose-file
+.PHONY: build shell run exec start stop clean compose-file github-cache
 
 default: build
+
+github-cache:
+	@hooks/github-cache
 
 build:
 	@hooks/build
@@ -37,3 +40,11 @@ clean:
 
 compose-file:
 	@hooks/compose-file
+
+linter:
+	@tests/linter.sh
+
+integration_test:
+	@tests/integration_test.sh
+
+test: linter integration_test

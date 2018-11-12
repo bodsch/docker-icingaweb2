@@ -7,7 +7,7 @@
   },
   "Icinga/icingaweb2-module-vspheredb": {},
   "Icinga/icingaweb2-module-graphite": {
-    "use_git": "true"
+    "use_git": "false"
   },
   "Icinga/icingaweb2-module-generictts": {},
   "Icinga/icingaweb2-module-businessprocess": {},
@@ -22,5 +22,19 @@
   "morgajel/icingaweb2-module-boxydash": {},
   "Thomas-Gelf/icingaweb2-module-reporting": {
     "use_git": "true"
+  },
+  "https://github.com/Icinga/icingaweb2-module-reactbundle": {
+    "comment": "needed by icingaweb2-module-vspheredb",
+    "use_git": "false",
+    "tarball_url": "https://github.com/Icinga/icingaweb2-module-reactbundle/archive/v0.4.1.tar.gz"
+  },
+  "https://github.com/Icinga/icingaweb2-module-ipl": {
+    "comment": "needed by icingaweb2-module-vspheredb",
+    "use_git": "false",
+    "tarball_url": "https://github.com/Icinga/icingaweb2-module-ipl/archive/v0.1.1.tar.gz"
+  },
+  "https://github.com/Icinga/icingaweb2-module-incubator": {
+    "comment": "needed by icingaweb2-module-vspheredb",
+    "tarball_url": "https://github.com/Icinga/icingaweb2-module-incubator/archive/v0.1.0.tar.gz"
   }
 }

@@ -14,10 +14,7 @@ ICINGA2_UPTIME=${ICINGA2_UPTIME:-125}
 ICINGAWEB_ADMIN_USER=${ICINGAWEB_ADMIN_USER:-"icinga"}
 ICINGAWEB_ADMIN_PASS=${ICINGAWEB_ADMIN_PASS:-"icinga"}
 
-GRAPHITE_HOST=${GRAPHITE_HOST:-""}
-GRAPHITE_HTTP_PORT=${GRAPHITE_HTTP_PORT:-8080}
-
-ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-"true"}
+export ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-"true"}
 
 . /init/output.sh
 
@@ -90,6 +87,31 @@ custom_scripts() {
 }
 
 
+configure_modules() {
+
+  log_info "configure modules"
+
+  if [[ -d /init/modules.d ]]
+  then
+    for f in /init/modules.d/*
+    do
+      case "$f" in
+        *.sh)
+          if [[ -x ${f} ]]
+          then
+            # log_debug "execute file: $(basename ${f})"
+            ${f}  # > /proc/self/fd/2 2>&1
+          else
+            log_warn "file '${f}' is not executable"
+          fi
+          ;;
+        *)
+          # log_warn "ignoring file ${f}"
+          ;;
+      esac
+    done
+  fi
+}
 
 run() {
 
@@ -98,14 +120,16 @@ run() {
   . /init/database/mysql.sh
 
   . /init/wait_for/icinga_master.sh
-
-  . /init/configure_modules/commandtransport.sh
-  . /init/configure_modules/graphite.sh
-  . /init/configure_modules/director.sh
-
   . /init/create_login_users.sh
-  . /init/configure_modules/authentication.sh
-  # . /init/database/fix_latin1_db_statements.sh
+
+  configure_modules
+
+#  . /init/configure_modules/commandtransport.sh
+#  . /init/configure_modules/graphite.sh
+#  . /init/configure_modules/director.sh
+#
+#  . /init/configure_modules/authentication.sh
+#  # . /init/database/fix_latin1_db_statements.sh
 
   correctRights
 
@@ -113,8 +137,8 @@ run() {
     --fpm-config /etc/php/php-fpm.conf \
     --pid /run/php-fpm.pid \
     --allow-to-run-as-root \
-    --nodaemonize > /dev/stdout 2>&1 &
-  /usr/sbin/nginx > /dev/stdout 2>&1
+    --nodaemonize > /proc/self/fd/2 2>&1 &
+  /usr/sbin/nginx > /proc/self/fd/2 2>&1
 }
 
 

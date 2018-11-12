@@ -109,7 +109,9 @@ RUN \
     php7-xml \
     php7-dom \
     php7-soap \
+    php7-sockets \
     php7-posix \
+    php7-pcntl \
     pwgen \
     yaml \
     yajl-tools && \

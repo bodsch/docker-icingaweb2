@@ -84,6 +84,17 @@ then
       [[ -d ${MODULE_DIRECTORY} ]] || continue
 
       mv icingaweb2-module-${project_name} ${MODULE_DIRECTORY}/${project_name}
+
+      # install PHP dependency
+      #
+#      if [[ -e ${MODULE_DIRECTORY}/${project_name}/composer.json ]]
+#      then
+#        pushd ${MODULE_DIRECTORY}/${project_name}
+#
+#        /usr/bin/composer install
+#
+#        popd
+#      fi
     fi
 
     if [[ "${enable}" = "true" ]]

@@ -1,7 +1,14 @@
+#!/bin/bash
+#
+#
+
+. /init/output.sh
+
+log_info "  - authentication"
 
 # configure the LDAP resources
 #
-ldap_configuation() {
+configure() {
 
   [[ "${USE_LDAP}" = "false" ]] && return
 
@@ -18,7 +25,7 @@ ldap_configuation() {
   #
   if [[ $(grep -c "\[ldap\]" /etc/icingaweb2/resources.ini) -eq 0 ]]
   then
-    log_info "  - LDAP resource"
+    log_info "      - LDAP resource"
 
     cat << EOF >> /etc/icingaweb2/resources.ini
 
@@ -39,7 +46,7 @@ EOF
   #
   if [[ $(grep -c "\[ldap users\]" /etc/icingaweb2/authentication.ini) -eq 0 ]]
   then
-    log_info "  - LDAP authentication"
+    log_info "      - LDAP authentication"
 
     cat << EOF >> /etc/icingaweb2/authentication.ini
 
@@ -62,7 +69,7 @@ EOF
   #
   if ( [[ ! -f /etc/icingaweb2/groups.ini ]] || [[ $(grep -c "\[ldap groups\]" /etc/icingaweb2/groups.ini) -eq 0 ]] )
   then
-    log_info "  - LDAP groups"
+    log_info "      - LDAP groups"
 
     cat << EOF >> /etc/icingaweb2/groups.ini
 
@@ -81,7 +88,7 @@ EOF
   #
   if [[ $(grep -c "\[ldap roles\]" /etc/icingaweb2/roles.ini) -eq 0 ]]
   then
-    log_info "  - LDAP roles"
+    log_info "      - LDAP roles"
 
     if [[ ! -z "${LDAP_ROLE_GROUPS}" ]]
     then
@@ -97,6 +104,7 @@ EOF
   fi
 
 }
+
 
 # extract Environment variables
 #
@@ -126,12 +134,12 @@ extract_vars() {
 
     if [[ $? -gt 0 ]]
     then
-      log_info "the LDAP Environment is not an json"
+      log_debug "    the LDAP Environment is not an json"
 #       log_info "use fallback strategy."
       USE_JSON="false"
     fi
   else
-    log_info "the LDAP Environment is not an json"
+    log_debug "    the LDAP Environment is not an json"
 #     log_info "use fallback strategy."
     USE_JSON="false"
   fi
@@ -140,11 +148,11 @@ extract_vars() {
   #
   if [[ "${USE_JSON}" == "true" ]]
   then
-    log_info "the LDAP Environment is an json"
+    #log_info "the LDAP Environment is an json"
 
     if ( [[ "${LDAP}" == "true" ]] || [[ "${LDAP}" == "false" ]] )
     then
-      log_error "the LDAP Environment must be an json, not true or false!"
+      log_error "    the LDAP Environment must be an json, not true or false!"
     else
       LDAP_AD=$(echo "${LDAP}" | jq --raw-output .active_directory)
       LDAP_SERVER=$(echo "${LDAP}" | jq --raw-output .server)
@@ -230,4 +238,4 @@ validate_ldap_environment() {
 
 extract_vars
 
-ldap_configuation
+configure
