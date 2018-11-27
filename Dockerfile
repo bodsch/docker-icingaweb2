@@ -2,9 +2,9 @@
 FROM alpine:3.7 as builder
 
 RUN \
-  apk update --quiet --no-cache && \
-  apk upgrade --quiet --no-cache && \
-  apk add --quiet --no-cache \
+  apk update  --quiet && \
+  apk upgrade --quiet && \
+  apk add     --quiet \
     bash \
     ca-certificates \
     curl \
@@ -79,11 +79,11 @@ COPY build /build
 COPY --from=builder /usr/lib/php7/modules/yaml.so /usr/lib/php7/modules/
 
 RUN \
-  apk update --quiet --no-cache && \
-  apk upgrade --quiet --no-cache && \
-  apk add --quiet --no-cache --virtual .build-deps \
+  apk update  --quiet && \
+  apk upgrade --quiet && \
+  apk add     --quiet --virtual .build-deps \
     git shadow tzdata && \
-  apk add --quiet --no-cache \
+  apk add     --quiet \
     bash \
     bind-tools \
     ca-certificates \

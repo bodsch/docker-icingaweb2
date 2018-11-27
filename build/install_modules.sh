@@ -20,6 +20,7 @@ then
 
   for file in $(ls -1 github_*.json)
   do
+
     published_at=$(jq --raw-output ".published_at" ${file})
     project_name=$(jq --raw-output ".project_name" ${file})
     project_maintainer=$(jq --raw-output ".project_maintainer" ${file})
@@ -28,6 +29,9 @@ then
     url=$(jq --raw-output ".tarball_url" ${file})
     enable=$(jq --raw-output ".enable" ${file})
     use_git=$(jq --raw-output ".use_git" ${file})
+    destination=$(jq --raw-output ".destination" ${file})
+
+    [[ "${destination}" == null ]] && destination=
 
     if [[ ${published_at} != null ]]
     then
@@ -69,10 +73,20 @@ then
         [[ -d ${MODULE_DIRECTORY} ]] || continue
 
         tar -xzf ${project_name}.tgz
-        find . -mindepth 1 -maxdepth 1 -type d -name "*${project_name}*" -exec mv {} ${MODULE_DIRECTORY}/${project_name} \;
 
-        rm -f ${project_name}.tgz
-        mkdir /etc/icingaweb2/modules/${project_name}
+        if [[ ! -z ${destination} ]]
+        then
+          [[ -d ${destination} ]] || mkdir -p ${destination}
+
+          find . -mindepth 1 -maxdepth 1 -type d -name "*${project_name}*" -exec mv {} ${project_name} \;
+          mv ${project_name}/* ${destination}/
+          rm -f ${project_name}.tgz
+        else
+          find . -mindepth 1 -maxdepth 1 -type d -name "*${project_name}*" -exec mv {} ${MODULE_DIRECTORY}/${project_name} \;
+
+          rm -f ${project_name}.tgz
+          mkdir /etc/icingaweb2/modules/${project_name}
+        fi
       fi
 
     else
@@ -84,23 +98,13 @@ then
       [[ -d ${MODULE_DIRECTORY} ]] || continue
 
       mv icingaweb2-module-${project_name} ${MODULE_DIRECTORY}/${project_name}
-
-      # install PHP dependency
-      #
-#      if [[ -e ${MODULE_DIRECTORY}/${project_name}/composer.json ]]
-#      then
-#        pushd ${MODULE_DIRECTORY}/${project_name}
-#
-#        /usr/bin/composer install
-#
-#        popd
-#      fi
     fi
 
-    if [[ "${enable}" = "true" ]]
+    if [[ "${enable}" = "true" ]] && [[ -d ${MODULE_DIRECTORY}/${project_name} ]]
     then
       /usr/bin/icingacli module enable ${project_name} 2> /dev/null
     fi
+
   done
 
   find ${MODULE_DIRECTORY} -name ".git*" -exec rm -rf {} 2> /dev/null \; || true

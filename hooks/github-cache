@@ -77,6 +77,7 @@ check_downloads() {
     url=$(jq --raw-output ".tarball_url" ${file})
     enable=$(jq --raw-output ".enable" ${file})
     use_git=$(jq --raw-output ".use_git" ${file})
+    destination=$(jq --raw-output ".destination" ${file})
 
     if [[ ${published_at} != null ]]
     then
@@ -117,12 +118,21 @@ download_modules() {
   for k in $(echo ${MODULE_JSON} | jq --raw-output '. | to_entries | .[] | .key')
   do
     enable="$(echo "${MODULE_JSON}" | jq --raw-output ".[\"$k\"].enable")"
+    ignore=$(echo "${MODULE_JSON}" | jq --raw-output ".[\"$k\"].ignore")
     use_git="$(echo "${MODULE_JSON}" | jq --raw-output ".[\"$k\"].use_git")"
     tarball_url=$(echo "${MODULE_JSON}" | jq --raw-output ".[\"$k\"].tarball_url")
+    destination=$(echo "${MODULE_JSON}" | jq --raw-output ".[\"$k\"].destination")
 
     [[ "${enable}" == null ]] && enable=true
+    [[ "${ignore}" == null ]] && ignore=false
     [[ "${use_git}" == null ]] && use_git=false
     [[ "${tarball_url}" == null ]] && tarball_url=''
+    [[ "${destination}" == null ]] && destination=
+
+    if [[ ${ignore} == true ]]
+    then
+      continue
+    fi
 
     project="$(echo "${k}" | sed -e 's|\.git||g' -e 's/https\?:\/\///' -e 's|github.com/||g')"
     project_maintainer="$(echo "${project}" | cut -d "/" -f1)"
@@ -164,7 +174,7 @@ download_modules() {
         --out "cache/github_${outfile}.json" \
         https://api.github.com/repos/${project}/releases/latest)
     fi
-
+set -x
     # remove some unneeded parts
     # and add our things
     #
@@ -173,6 +183,15 @@ download_modules() {
       cat "cache/github_${outfile}.json" | \
         jq 'del(.author) | del(.body_html) | del(.body_text) | del(.body) | del(.assets)' | \
         jq ". |= .+ {\"enable\": \"${enable}\", \"use_git\": \"${use_git}\", \"project_maintainer\": \"${project_maintainer}\", \"project_name\": \"${project_name}\" }" > cache/github_${outfile}.json_TMP
+
+      if [[ ! -z ${destination} ]]
+      then
+        cat "cache/github_${outfile}.json_TMP" | \
+          jq ". |= .+ {\"destination\": \"${destination}\" }" > cache/github_${outfile}.json_TMP2
+
+        mv cache/github_${outfile}.json_TMP2 cache/github_${outfile}.json_TMP
+      fi
+set +x
       mv cache/github_${outfile}.json_TMP cache/github_${outfile}.json
     fi
 

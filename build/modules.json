@@ -1,21 +1,21 @@
 {
-  "https://github.com/Icinga/icingaweb2-module-director": {
-    "use_git": "false"
+  "aws/aws-sdk-php": {
+    "destination": "/usr/share/webapps/icingaweb2/modules/aws/library/vendor/aws"
   },
+  "Icinga/icingaweb2-module-aws": {},
+  "https://github.com/Icinga/icingaweb2-module-director": {},
   "Icinga/icingaweb2-module-vsphere": {
-    "enable": "false"
+    "ignore": "true"
   },
   "Icinga/icingaweb2-module-vspheredb": {},
-  "Icinga/icingaweb2-module-graphite": {
-    "use_git": "false"
-  },
+  "Icinga/icingaweb2-module-graphite": {},
   "Icinga/icingaweb2-module-generictts": {},
   "Icinga/icingaweb2-module-businessprocess": {},
   "Icinga/icingaweb2-module-elasticsearch": {},
   "Icinga/icingaweb2-module-cube": {},
-  "Icinga/icingaweb2-module-aws": {},
   "Icinga/icingaweb2-module-fileshipper": {},
   "Icinga/icingaweb2-module-toplevelview": {},
+  "Icinga/icingaweb2-module-x509": {},
   "Mikesch-mp/icingaweb2-module-grafana.git": {},
   "Mikesch-mp/icingaweb2-module-globe": {},
   "nbuchwitz/icingaweb2-module-map": {},
@@ -23,18 +23,7 @@
   "Thomas-Gelf/icingaweb2-module-reporting": {
     "use_git": "true"
   },
-  "https://github.com/Icinga/icingaweb2-module-reactbundle": {
-    "comment": "needed by icingaweb2-module-vspheredb",
-    "use_git": "false",
-    "tarball_url": "https://github.com/Icinga/icingaweb2-module-reactbundle/archive/v0.4.1.tar.gz"
-  },
-  "https://github.com/Icinga/icingaweb2-module-ipl": {
-    "comment": "needed by icingaweb2-module-vspheredb",
-    "use_git": "false",
-    "tarball_url": "https://github.com/Icinga/icingaweb2-module-ipl/archive/v0.1.1.tar.gz"
-  },
-  "https://github.com/Icinga/icingaweb2-module-incubator": {
-    "comment": "needed by icingaweb2-module-vspheredb",
-    "tarball_url": "https://github.com/Icinga/icingaweb2-module-incubator/archive/v0.1.0.tar.gz"
-  }
+  "https://github.com/Icinga/icingaweb2-module-reactbundle": {},
+  "https://github.com/Icinga/icingaweb2-module-ipl": {},
+  "https://github.com/Icinga/icingaweb2-module-incubator": {}
 }

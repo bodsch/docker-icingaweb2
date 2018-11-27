@@ -7,7 +7,6 @@ docker build \
   --file Dockerfile \
   --rm \
   --compress \
-  --no-cache \
   --build-arg VCS_REF=${GIT_SHA1} \
   --build-arg BUILD_DATE=${BUILD_DATE} \
   --build-arg BUILD_VERSION=${BUILD_VERSION} \
