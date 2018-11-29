@@ -1,69 +1,55 @@
 
-FROM alpine:3.7 as builder
+FROM alpine:3.8 as stage1
 
 RUN \
-  apk update  --quiet && \
-  apk upgrade --quiet && \
+  apk update  --quiet
+
+RUN \
   apk add     --quiet \
-    bash \
     ca-certificates \
     curl \
-    file \
-    git \
-    g++ \
-    make \
-    jq \
-    mysql-client \
-    nginx \
-    netcat-openbsd \
-    openssl \
-    php7 \
-    php7-ctype \
-    php7-dev \
     php7-fpm \
-    php7-pdo_mysql \
-    php7-openssl \
-    php7-intl \
-    php7-ldap \
-    php7-gettext \
-    php7-json \
-    php7-mbstring \
+    php7-ctype \
     php7-curl \
-    php7-iconv \
-    php7-session \
-    php7-xml \
     php7-dom \
-    php7-soap \
-    php7-posix \
-    pwgen \
-    yaml \
-    yaml-dev \
-    yajl-tools
+    php7-fpm \
+    php7-gettext \
+    php7-gd \
+    php7-iconv \
+    php7-intl \
+    php7-json \
+    php7-ldap \
+    php7-mbstring \
+    php7-openssl \
+    php7-pdo_mysql \
+    php7-pear \
+    php7-phar \
+    php7-session \
+    php7-simplexml \
+    php7-tokenizer \
+    php7-xml \
+    yaml
 
 RUN \
-  cd /tmp && \
-  curl \
-    --silent \
-    --location \
-    --retry 3 \
-    --cacert /etc/ssl/certs/ca-certificates.crt \
-    --out yaml.tgz \
-    https://pecl.php.net/get/yaml
+  apk add     --quiet \
+    build-base \
+    php7-dev \
+    yaml-dev
+
+# patch fucking pecl to read php.ini
+RUN \
+  sed -i 's|$PHP -C -n -q |$PHP -C -q |' /usr/bin/pecl
 
 RUN \
-  cd /tmp && \
-  tar -xzf yaml.tgz && \
-  cd yaml-* && \
-  phpize && \
-  ./configure && \
-  make && \
-  make install
+  pecl channel-update pecl.php.net
+
+RUN \
+  (yes '' | pecl install yaml) && \
+  (yes '' | pecl install xdebug)
 
 # ---------------------------------------------------------------------------------------
 
-FROM alpine:3.7
-
-EXPOSE 80
+FROM alpine:3.8 as stage2
 
 ARG VCS_REF
 ARG BUILD_DATE
@@ -73,16 +59,78 @@ ARG ICINGAWEB_VERSION
 ARG INSTALL_THEMES
 ARG INSTALL_MODULES
 
-# ---------------------------------------------------------------------------------------
+RUN \
+  apk update  --quiet && \
+  apk add     --quiet \
+    bash \
+    ca-certificates \
+    curl \
+    composer \
+    jq \
+    git
+
+RUN \
+  apk add     --quiet \
+    php7 \
+    php7-ctype \
+    php7-openssl \
+    php7-intl \
+    php7-gettext
 
 COPY build /build
-COPY --from=builder /usr/lib/php7/modules/yaml.so /usr/lib/php7/modules/
+
+RUN \
+  mkdir /usr/share/webapps && \
+  if ( [ -z ${BUILD_TYPE} ] || [ "${BUILD_TYPE}" == "stable" ] ) ; then \
+    echo "install icingaweb2 v${ICINGAWEB_VERSION}" && \
+    curl \
+      --silent \
+      --location \
+      --retry 3 \
+      --cacert /etc/ssl/certs/ca-certificates.crt \
+      https://github.com/Icinga/icingaweb2/archive/v${ICINGAWEB_VERSION}.tar.gz \
+      | gunzip \
+      | tar x -C /usr/share/webapps/ && \
+    ln -s /usr/share/webapps/icingaweb2-${ICINGAWEB_VERSION} /usr/share/webapps/icingaweb2 ; \
+  else \
+    echo "install icingaweb2 from git " && \
+    cd /tmp && \
+    git clone https://github.com/Icinga/icingaweb2.git && \
+    cd icingaweb2 && \
+    version=$(git describe --tags --always | sed 's/^v//') && \
+    echo "  version: ${version}" && \
+    rm -rf /tmp/icingaweb2/.git* && \
+    rm -rf /tmp/icingaweb2/.puppet && \
+    mv /tmp/icingaweb2 /usr/share/webapps/ ; \
+  fi
+
+RUN \
+  ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
+  mkdir -p /var/log/icingaweb2 && \
+  mkdir -p /etc/icingaweb2/modules && \
+  mkdir -p /etc/icingaweb2/enabledModules && \
+  /build/install_modules.sh && \
+  /build/install_themes.sh
+
+# ---------------------------------------------------------------------------------------
+
+FROM alpine:3.8 as final
+
+ARG VCS_REF
+ARG BUILD_DATE
+ARG BUILD_VERSION
+ARG BUILD_TYPE
+ARG ICINGAWEB_VERSION
+ARG INSTALL_THEMES
+ARG INSTALL_MODULES
+
+COPY --from=stage1 /usr/lib/php7/modules/yaml.so   /usr/lib/php7/modules/
+COPY --from=stage1 /usr/lib/php7/modules/xdebug.so /usr/lib/php7/modules/
+COPY --from=stage2 /usr/share/webapps              /usr/share/webapps
 
 RUN \
   apk update  --quiet && \
   apk upgrade --quiet && \
-  apk add     --quiet --virtual .build-deps \
-    git shadow tzdata && \
   apk add     --quiet \
     bash \
     bind-tools \
@@ -112,50 +160,29 @@ RUN \
     php7-sockets \
     php7-posix \
     php7-pcntl \
+    shadow \
+    tzdata \
     pwgen \
     yaml \
     yajl-tools && \
   cp /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
-  echo "extension=yaml.so" > /etc/php7/conf.d/ext-yaml.ini && \
+  echo "extension=yaml.so"        > /etc/php7/conf.d/ext-yaml.ini && \
+  echo "zend_extension=xdebug.so" > /etc/php7/conf.d/ext-xdebug.ini && \
   [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
   [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
   sed -i -e '/^#/ d' -e '/^;/ d'  -e '/^ *$/ d' /etc/php7/php.ini && \
-  mkdir /usr/share/webapps && \
-  if ( [ -z ${BUILD_TYPE} ] || [ "${BUILD_TYPE}" == "stable" ] ) ; then \
-    echo "install icingaweb2 v${ICINGAWEB_VERSION}" && \
-    curl \
-      --silent \
-      --location \
-      --retry 3 \
-      --cacert /etc/ssl/certs/ca-certificates.crt \
-      https://github.com/Icinga/icingaweb2/archive/v${ICINGAWEB_VERSION}.tar.gz \
-      | gunzip \
-      | tar x -C /usr/share/webapps/ && \
-    ln -s /usr/share/webapps/icingaweb2-${ICINGAWEB_VERSION} /usr/share/webapps/icingaweb2 ; \
-  else \
-    echo "install icingaweb2 from git " && \
-    cd /tmp && \
-    git clone https://github.com/Icinga/icingaweb2.git && \
-    cd icingaweb2 && \
-    version=$(git describe --tags --always | sed 's/^v//') && \
-    echo "  version: ${version}" && \
-    rm -rf /tmp/icingaweb2/.git* && \
-    rm -rf /tmp/icingaweb2/.puppet && \
-    mv /tmp/icingaweb2 /usr/share/webapps/ ; \
-  fi && \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
   mkdir -p /var/log/icingaweb2 && \
   mkdir -p /etc/icingaweb2/modules && \
   mkdir -p /etc/icingaweb2/enabledModules && \
-  /build/install_modules.sh && \
-  /build/install_themes.sh && \
-  /usr/bin/icingacli module disable setup      2> /dev/null && \
+  /usr/bin/icingacli module disable setup && \
   /usr/bin/icingacli module enable monitoring  2> /dev/null && \
   /usr/bin/icingacli module enable translation 2> /dev/null && \
   /usr/bin/icingacli module enable doc         2> /dev/null && \
   mkdir /run/nginx && \
   mkdir /var/log/php-fpm && \
-  apk del --quiet .build-deps && \
+  apk del --quiet \
+    tzdata && \
   rm -rf \
     /build \
     /tmp/* \

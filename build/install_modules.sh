@@ -90,12 +90,25 @@ then
       fi
 
     else
+
       [[ -d icingaweb2-module-${project_name} ]] && rm -rf icingaweb2-module-${project_name}
       git clone \
         --quiet \
         https://github.com/${project_maintainer}/icingaweb2-module-${project_name} > /dev/null
 
       [[ -d ${MODULE_DIRECTORY} ]] || continue
+
+      # install PHP dependency
+      #
+      if [[ -e "icingaweb2-module-${project_name}/composer.json" ]]
+      then
+#        echo "found composer.json"
+        pushd icingaweb2-module-${project_name} > /dev/null
+
+        /usr/bin/composer install > /dev/null 2> /dev/null
+
+        popd > /dev/null
+      fi
 
       mv icingaweb2-module-${project_name} ${MODULE_DIRECTORY}/${project_name}
     fi
