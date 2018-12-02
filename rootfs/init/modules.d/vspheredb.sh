@@ -58,7 +58,7 @@ create_database() {
 
       if [[ $? -gt 0 ]]
       then
-        log_error "    can't insert the director Database Schema"
+        log_error "    can't insert the Database Schema"
         exit 1
       fi
     else

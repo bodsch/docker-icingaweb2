@@ -127,6 +127,7 @@ ARG INSTALL_MODULES
 COPY --from=stage1 /usr/lib/php7/modules/yaml.so   /usr/lib/php7/modules/
 COPY --from=stage1 /usr/lib/php7/modules/xdebug.so /usr/lib/php7/modules/
 COPY --from=stage2 /usr/share/webapps              /usr/share/webapps
+COPY --from=stage2 /etc/icingaweb2                 /etc/icingaweb2
 
 RUN \
   apk update  --quiet && \
@@ -160,6 +161,7 @@ RUN \
     php7-sockets \
     php7-posix \
     php7-pcntl \
+    php7-gmp \
     shadow \
     tzdata \
     pwgen \
@@ -173,8 +175,8 @@ RUN \
   sed -i -e '/^#/ d' -e '/^;/ d'  -e '/^ *$/ d' /etc/php7/php.ini && \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
   mkdir -p /var/log/icingaweb2 && \
-  mkdir -p /etc/icingaweb2/modules && \
-  mkdir -p /etc/icingaweb2/enabledModules && \
+  # mkdir -p /etc/icingaweb2/modules && \
+  # mkdir -p /etc/icingaweb2/enabledModules && \
   /usr/bin/icingacli module disable setup && \
   /usr/bin/icingacli module enable monitoring  2> /dev/null && \
   /usr/bin/icingacli module enable translation 2> /dev/null && \
@@ -192,7 +194,7 @@ COPY rootfs/ /
 
 WORKDIR /etc/icingaweb2
 
-VOLUME [ "/etc/icingaweb2" "/usr/share/webapps/icingaweb2" ]
+VOLUME [ "/etc/icingaweb2" "/usr/share/webapps/icingaweb2" "/init/custom.d" ]
 
 HEALTHCHECK \
   --interval=5s \
