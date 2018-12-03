@@ -137,6 +137,7 @@ RUN \
     bind-tools \
     ca-certificates \
     curl \
+    inotify-tools \
     jq \
     mysql-client \
     nginx \

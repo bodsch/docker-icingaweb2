@@ -55,28 +55,25 @@ resource = "x509"
 EOF
     fi
 
-    if [[ -d /init/custom.d ]] && [[ -f /init/custom.d/x509_jobs.ini ]]
-    then
-      touch /etc/icingaweb2/modules/x509/jobs.ini
-
-      cat /init/custom.d/x509_jobs.ini >> /etc/icingaweb2/modules/x509/jobs.ini
-    fi
-
-    log_info "      - enable module"
-    /usr/bin/icingacli module enable x509
-
     if [[ -f ${CERTS_FILE} ]]
     then
       log_info "      - import ca-certificates.crt"
       /usr/bin/icingacli x509 import --file ${CERTS_FILE}
     fi
 
-    for i in $(grep "\[" /etc/icingaweb2/modules/x509/jobs.ini)
-    do
-      job=$(echo $i | sed -e 's|\[||' -e 's|\]||')
-      log_info "        ${job}"
-      /usr/bin/icingacli x509 scan --job ${job}
-    done
+    log_info "      - enable module"
+    /usr/bin/icingacli module enable x509
+
+    touch /etc/icingaweb2/modules/x509/jobs.ini
+
+    nohup /init/runtime/watch_x509.sh > /dev/stdout 2>&1 &
+
+    sleep 2s
+
+    if [[ -d /init/custom.d/x509 ]] && [[ -f /init/custom.d/x509/jobs.ini ]]
+    then
+      cat /init/custom.d/x509/jobs.ini >> /etc/icingaweb2/modules/x509/jobs.ini
+    fi
 
     log_info "      - run background deamon"
     nohup /usr/bin/icingacli \

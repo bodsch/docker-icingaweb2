@@ -45,15 +45,26 @@ For this we check the availability of the API port (5665) and wait until the Ici
  - [businessprocess](https://github.com/Icinga/icingaweb2-module-businessprocess)
  - [elasticsearch](https://github.com/Icinga/icingaweb2-module-elasticsearch)
  - [cube](https://github.com/Icinga/icingaweb2-module-cube)
- - [vsphere](https://github.com/Icinga/icingaweb2-module-vsphere)
  - [aws](https://github.com/Icinga/icingaweb2-module-aws)
  - [fileshipper](https://github.com/Icinga/icingaweb2-module-fileshipper)
  - [grafana](https://github.com/Mikesch-mp/icingaweb2-module-grafana)
  - [globe](https://github.com/Mikesch-mp/icingaweb2-module-globe)
  - [map](https://github.com/nbuchwitz/icingaweb2-module-map)
  - [boxydash](https://github.com/morgajel/icingaweb2-module-boxydash)
- - [vspheredb](https://github.com/Thomas-Gelf/icingaweb2-module-vspheredb) (currently disabled, alpha status, not functional)
+ - [vspheredb](https://github.com/Thomas-Gelf/icingaweb2-module-vspheredb)
  - [toplevelview](https://github.com/Icinga/icingaweb2-module-toplevelview)
+ - [x509](https://github.com/Icinga/icingaweb2-module-x509d)
+
+You can add an customized configuration for the `x509` module by adding an directory `/init/custom.d/x509` and drop a `jobs.ini` file:
+
+Example file
+```bash
+[google]
+cidrs = "172.217.21.227/32"
+ports = "443"
+schedule = "0 0 * * *"
+```
+For mor information read the module [documentation](https://github.com/Icinga/icingaweb2-module-x509/blob/master/doc/03-Configuration.md)!
 
 # Themes
 
@@ -62,11 +73,14 @@ For this we check the availability of the API port (5665) and wait until the Ici
  - [april](https://github.com/Mikesch-mp/icingaweb2-theme-april)
  - [company](https://github.com/Icinga/icingaweb2-theme-company)
  - [batman](https://github.com/jschanz/icingaweb2-theme-batman)
+ - [batman-dark](https://github.com/jschanz/icingaweb2-theme-batman-dark)
  - [nordlicht](https://github.com/sysadmama/icingaweb2-theme-nordlicht)
  - [spring](https://github.com/dnsmichi/icingaweb2-theme-spring)
  - [dark](https://github.com/vita2/icingaweb2-module-theme-dark)
  - [beyondthepines](https://github.com/Wintermute2k6/icingaweb2-module-beyondthepines)
  - [always-green](https://github.com/xam-stephan/icingaweb2-module-theme-always-green)
+ - [colourblind](https://github.com/sol1/icingaweb2-theme-colourblind)
+ - [particles](https://github.com/Mikesch-mp/icingaweb2-theme-particles)
 
 
 # Docker Hub
