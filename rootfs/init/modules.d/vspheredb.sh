@@ -132,6 +132,11 @@ EOF
   log_info "      - enable module"
   /usr/bin/icingacli module enable vspheredb
 
+  # icingacli vspheredb task initialize --serverId 1
+  # icingacli vspheredb daemon run --trace --debug
+  # icingacli vspheredb task sync --trace --debug --vCenterId 1
+
+
   # TODO check running process and restart them if needed
   #
   log_info "      - run background deamon"

@@ -133,11 +133,11 @@ EOF
 
       code=$(icingacli director migration pending --verbose)
       migration_status="${?}"
-      log_info "  - migration pending '${code}' (${migration_status})"
+      log_info "      - migration pending '${code}' (${migration_status})"
 
       if [[ ${migration_status} -eq 0 ]]
       then
-        log_info "  - icingacli director migration run"
+        log_info "      - icingacli director migration run"
         status=$(icingacli director migration run --verbose)
         #log_info "    ${status}"
       fi
@@ -145,7 +145,7 @@ EOF
       code=$(icingacli director kickstart required --verbose)
       kickstart_status="${?}"
 
-      log_info "  - kickstart required '${code}' (${kickstart_status})"
+      log_info "      - kickstart required '${code}' (${kickstart_status})"
 
       if [[ ${kickstart_status} -eq 1 ]]
       then
@@ -154,7 +154,7 @@ EOF
 
       if [[ ${kickstart_status} -eq 0 ]]
       then
-        log_info "  - icingacli director kickstart run"
+        log_info "      - icingacli director kickstart run"
         status=$(icingacli director kickstart run --verbose)
         #log_info "    ${status}"
       fi

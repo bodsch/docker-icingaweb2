@@ -14,31 +14,28 @@ hostname_f=$(hostname -f)
 
 log_info "start the x509 monitor"
 
+CNT=0
 
-inotifywait \
+while read path action file
+do
+  [[ -z "${file}" ]] && continue
+  [[ ${path} =~ backup ]] && continue
+
+  log_debug "x509 monitor - The file '$file' appeared in directory '$path' via '$action' (${CNT})"
+
+  if [[ "${action}" = "CLOSE_WRITE,CLOSE" ]] && [[ "${file}" = "jobs.ini" ]]
+  then
+    ((CNT++))
+    for i in $(grep "\[" ${monitored_directory}/jobs.ini)
+    do
+      job=$(echo $i | sed -e 's|\[||' -e 's|\]||')
+      log_info "      - scan x509 job ${job}"
+      /usr/bin/icingacli x509 scan --job ${job}
+    done
+  fi
+
+done < <(inotifywait \
   --monitor \
   --event close_write \
-  --event close_nowrite \
-  --event moved_to \
-  --event move_self \
-  --event attrib \
-  ${monitored_directory} |
-  while read path action file
-  do
-    [[ -z "${file}" ]] && continue
-    [[ ${path} =~ backup ]] && continue
-
-    # log_debug "x509 monitor - The file '$file' appeared in directory '$path' via '$action'"
-
-    if [[ "${action}" = "ATTRIB" ]] && [[ "${file}" = "jobs.ini" ]]
-    then
-
-      for i in $(grep "\[" ${monitored_directory}/jobs.ini)
-      do
-        job=$(echo $i | sed -e 's|\[||' -e 's|\]||')
-        log_info "      - scan x509 job ${job}"
-        /usr/bin/icingacli x509 scan --job ${job}
-      done
-    fi
-
-  done
+  --event modify \
+  ${monitored_directory})
