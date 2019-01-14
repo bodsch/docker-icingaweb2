@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+#
+
+. /init/output.sh
+
+
+check() {
+  log_info "check"
+}
+
+configure() {
+  log_info "check"
+}
+
+create_database() {
+  log_info "create_database"
+}

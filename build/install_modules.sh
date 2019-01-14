@@ -20,6 +20,7 @@ then
 
   for file in $(ls -1 github_*.json)
   do
+
     published_at=$(jq --raw-output ".published_at" ${file})
     project_name=$(jq --raw-output ".project_name" ${file})
     project_maintainer=$(jq --raw-output ".project_maintainer" ${file})
@@ -28,6 +29,9 @@ then
     url=$(jq --raw-output ".tarball_url" ${file})
     enable=$(jq --raw-output ".enable" ${file})
     use_git=$(jq --raw-output ".use_git" ${file})
+    destination=$(jq --raw-output ".destination" ${file})
+
+    [[ "${destination}" == null ]] && destination=
 
     if [[ ${published_at} != null ]]
     then
@@ -50,7 +54,7 @@ then
       release="never released, use git"
     fi
 
-    echo " - ${project_maintainer} :: ${project_name} ${version} (${release})"
+    echo " - ${project_name} ${version} (${release}) (${project_maintainer})"
 
     if [[ ${url} != null ]] && [[ "${use_git}" = "false" ]]
     then
@@ -69,13 +73,24 @@ then
         [[ -d ${MODULE_DIRECTORY} ]] || continue
 
         tar -xzf ${project_name}.tgz
-        find . -mindepth 1 -maxdepth 1 -type d -name "*${project_name}*" -exec mv {} ${MODULE_DIRECTORY}/${project_name} \;
 
-        rm -f ${project_name}.tgz
-        mkdir /etc/icingaweb2/modules/${project_name}
+        if [[ ! -z ${destination} ]]
+        then
+          [[ -d ${destination} ]] || mkdir -p ${destination}
+
+          find . -mindepth 1 -maxdepth 1 -type d -name "*${project_name}*" -exec mv {} ${project_name} \;
+          mv ${project_name}/* ${destination}/
+          rm -f ${project_name}.tgz
+        else
+          find . -mindepth 1 -maxdepth 1 -type d -name "*${project_name}*" -exec mv {} ${MODULE_DIRECTORY}/${project_name} \;
+
+          rm -f ${project_name}.tgz
+          mkdir /etc/icingaweb2/modules/${project_name}
+        fi
       fi
 
     else
+
       [[ -d icingaweb2-module-${project_name} ]] && rm -rf icingaweb2-module-${project_name}
       git clone \
         --quiet \
@@ -83,13 +98,26 @@ then
 
       [[ -d ${MODULE_DIRECTORY} ]] || continue
 
+      # install PHP dependency
+      #
+      if [[ -e "icingaweb2-module-${project_name}/composer.json" ]]
+      then
+#        echo "found composer.json"
+        pushd icingaweb2-module-${project_name} > /dev/null
+
+        /usr/bin/composer install > /dev/null 2> /dev/null
+
+        popd > /dev/null
+      fi
+
       mv icingaweb2-module-${project_name} ${MODULE_DIRECTORY}/${project_name}
     fi
 
-    if [[ "${enable}" = "true" ]]
+    if [[ "${enable}" = "true" ]] && [[ -d ${MODULE_DIRECTORY}/${project_name} ]]
     then
       /usr/bin/icingacli module enable ${project_name} 2> /dev/null
     fi
+
   done
 
   find ${MODULE_DIRECTORY} -name ".git*" -exec rm -rf {} 2> /dev/null \; || true

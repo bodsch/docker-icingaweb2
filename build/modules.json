@@ -1,26 +1,29 @@
 {
-  "https://github.com/Icinga/icingaweb2-module-director": {
-    "use_git": "false"
+  "aws/aws-sdk-php": {
+    "destination": "/usr/share/webapps/icingaweb2/modules/aws/library/vendor/aws"
   },
+  "Icinga/icingaweb2-module-aws": {},
+  "https://github.com/Icinga/icingaweb2-module-director": {},
   "Icinga/icingaweb2-module-vsphere": {
-    "enable": "false"
+    "ignore": "true"
   },
   "Icinga/icingaweb2-module-vspheredb": {},
-  "Icinga/icingaweb2-module-graphite": {
-    "use_git": "true"
-  },
+  "Icinga/icingaweb2-module-graphite": {},
   "Icinga/icingaweb2-module-generictts": {},
   "Icinga/icingaweb2-module-businessprocess": {},
   "Icinga/icingaweb2-module-elasticsearch": {},
   "Icinga/icingaweb2-module-cube": {},
-  "Icinga/icingaweb2-module-aws": {},
   "Icinga/icingaweb2-module-fileshipper": {},
   "Icinga/icingaweb2-module-toplevelview": {},
+  "Icinga/icingaweb2-module-x509": {},
   "Mikesch-mp/icingaweb2-module-grafana.git": {},
   "Mikesch-mp/icingaweb2-module-globe": {},
   "nbuchwitz/icingaweb2-module-map": {},
   "morgajel/icingaweb2-module-boxydash": {},
   "Thomas-Gelf/icingaweb2-module-reporting": {
     "use_git": "true"
-  }
+  },
+  "https://github.com/Icinga/icingaweb2-module-reactbundle": {},
+  "https://github.com/Icinga/icingaweb2-module-ipl": {},
+  "https://github.com/Icinga/icingaweb2-module-incubator": {}
 }

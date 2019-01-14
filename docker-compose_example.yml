@@ -21,7 +21,7 @@ services:
   # includes a certificate service to create and provide a icinga certificate
   #
   icinga2-master:
-    image: bodsch/docker-icinga2:2.10.0-master
+    image: bodsch/docker-icinga2:2.10.1-master
     container_name: icinga2-master
     hostname: icinga2-master
     restart: always

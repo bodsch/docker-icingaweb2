@@ -20,6 +20,8 @@ wait_for_icinga_master() {
   if [[ "${ICINGAWEB_DIRECTOR}" == "true" ]]
   then
 
+    log_info "For a clean director configuration, the Icinga2 Master must run for at least ${ICINGA2_UPTIME} seconds without interruption."
+
     RETRY=50
 
     until [[ ${RETRY} -le 0 ]]
@@ -52,7 +54,7 @@ wait_for_icinga_master() {
 
     sleep 5s
 
-    log_info "icinga2 master '${ICINGA2_MASTER}' are available"
+    log_info "The icinga2 master '${ICINGA2_MASTER}' seems to be available stable"
   fi
 }
 

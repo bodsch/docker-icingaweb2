@@ -53,7 +53,7 @@ do
   project_name="$(echo "${project}" | cut -d "/" -f2 | sed -e 's|icingaweb2-||g' -e 's|module-||g' -e 's|theme-||g' | tr [:upper:] [:lower:])"
   outpath=$(echo "${project}" | tr [:upper:] [:lower:] | sed -e 's|/|_|g')
 
-  echo " - ${project_maintainer} :: ${project_name}"
+  echo " - ${project_name} (${project_maintainer})"
 
   [[ -d ${outpath} ]] || mkdir ${outpath}
   [[ -d ${MODULE_DIRECTORY}/${project_name} ]] || mkdir ${MODULE_DIRECTORY}/${project_name}
