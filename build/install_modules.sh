@@ -54,7 +54,7 @@ then
       release="never released, use git"
     fi
 
-    echo " - ${project_maintainer} :: ${project_name} ${version} (${release})"
+    echo " - ${project_name} ${version} (${release}) (${project_maintainer})"
 
     if [[ ${url} != null ]] && [[ "${use_git}" = "false" ]]
     then
