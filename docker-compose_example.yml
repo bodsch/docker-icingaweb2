@@ -13,7 +13,7 @@ services:
 
   graphite:
     restart: always
-    image: bodsch/docker-graphite:1.1.4
+    image: bodsch/docker-graphite:1.1.5
     container_name: graphite
     hostname: graphite
 
@@ -21,7 +21,7 @@ services:
   # includes a certificate service to create and provide a icinga certificate
   #
   icinga2-master:
-    image: bodsch/docker-icinga2:2.10.1-master
+    image: bodsch/docker-icinga2:2.10.2-master
     container_name: icinga2-master
     hostname: icinga2-master
     restart: always
@@ -66,7 +66,7 @@ services:
       ICINGAWEB2_USERS: 'icinga:icinga,foo:bar'
       IDO_DATABASE_NAME: icinga2core
       IDO_PASSWORD: ido.pass
-      ICINGAWEB_DIRECTOR: 'false'
+      ICINGAWEB_DIRECTOR: ${ICINGAWEB_DIRECTOR}
   #    LDAP: '{
   #      "active_directory": "true",
   #      "server":"${LDAP_SERVER}",

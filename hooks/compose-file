@@ -11,6 +11,7 @@ echo "BUILD_TYPE=${BUILD_TYPE}" >> .env
 echo "ICINGAWEB_VERSION=${ICINGAWEB_VERSION}" >> .env
 echo "INSTALL_THEMES=${INSTALL_THEMES}" >> .env
 echo "INSTALL_MODULES=${INSTALL_MODULES}" >> .env
+echo "ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-true}" >> .env
 
 docker-compose \
   --file docker-compose_example.yml \

@@ -1,5 +1,5 @@
 
-FROM alpine:3.8 as stage1
+FROM alpine:3.9 as stage1
 
 RUN \
   apk update  --quiet
@@ -49,7 +49,7 @@ RUN \
 
 # ---------------------------------------------------------------------------------------
 
-FROM alpine:3.8 as stage2
+FROM alpine:3.9 as stage2
 
 ARG VCS_REF
 ARG BUILD_DATE
@@ -114,7 +114,7 @@ RUN \
 
 # ---------------------------------------------------------------------------------------
 
-FROM alpine:3.8 as final
+FROM alpine:3.9 as final
 
 ARG VCS_REF
 ARG BUILD_DATE
@@ -176,8 +176,6 @@ RUN \
   sed -i -e '/^#/ d' -e '/^;/ d'  -e '/^ *$/ d' /etc/php7/php.ini && \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
   mkdir -p /var/log/icingaweb2 && \
-  # mkdir -p /etc/icingaweb2/modules && \
-  # mkdir -p /etc/icingaweb2/enabledModules && \
   /usr/bin/icingacli module disable setup && \
   /usr/bin/icingacli module enable monitoring  2> /dev/null && \
   /usr/bin/icingacli module enable translation 2> /dev/null && \
