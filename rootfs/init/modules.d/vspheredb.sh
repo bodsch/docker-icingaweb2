@@ -39,7 +39,7 @@ create_database() {
     #
     log_info "      - initializing databases"
     (
-      echo "--- create user 'director'@'%' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
+      echo "--- create user 'vspheredb'@'%' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
       echo "CREATE DATABASE IF NOT EXISTS ${database_name} DEFAULT CHARACTER SET 'utf8mb4' COLLATE utf8mb4_bin;"
       echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'vspheredb'@'%' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
       echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'vspheredb'@'$(hostname -i)' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
@@ -64,7 +64,7 @@ create_database() {
         do
           log_info "        apply database migration from '$(basename ${f})'"
 
-          mysql ${MYSQL_OPTS} --force ${database_name}  < ${f}
+          mysql ${MYSQL_OPTS} --force ${database_name}  < ${f} 2> /dev/null
 
           if [[ $? -gt 0 ]]
           then
