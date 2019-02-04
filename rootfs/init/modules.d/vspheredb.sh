@@ -56,8 +56,24 @@ create_database() {
 
       mysql ${MYSQL_OPTS} --force ${database_name} < ${SCHEMA_FILE}
 
-      if [[ $? -gt 0 ]]
+      if [[ $? -eq 0 ]]
       then
+
+        log_info "      - import database migrations"
+        for f in $(ls -1 ${modules_directory}/schema/mysql-migrations/*.sql)
+        do
+          log_info "        apply database migration from '$(basename ${f})'"
+
+          mysql ${MYSQL_OPTS} --force ${database_name}  < ${f}
+
+          if [[ $? -gt 0 ]]
+          then
+            log_error "        database migration failed"
+            exit 1
+          fi
+        done
+
+      else
         log_error "    can't insert the Database Schema"
         exit 1
       fi
@@ -135,6 +151,8 @@ EOF
   # icingacli vspheredb task initialize --serverId 1
   # icingacli vspheredb daemon run --trace --debug
   # icingacli vspheredb task sync --trace --debug --vCenterId 1
+
+  nohup /init/runtime/watch_vspheredb.sh > /dev/stdout 2>&1 &
 
 
   # TODO check running process and restart them if needed
