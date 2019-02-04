@@ -51,6 +51,11 @@ do
         --silent \
         --execute="select id, vcenter_id, host from vcenter_server;")
 
+  if [[ -z ${id} ]] || [[ -z ${vcenter_id} ]]
+  then
+    continue
+  fi
+
   log_debug "        vspheredb: host: '${host}' / id: '${id}' / vcenter_id:'${vcenter_id}'"
 
   if [[ "${vcenter_id}" = "NULL" ]]
