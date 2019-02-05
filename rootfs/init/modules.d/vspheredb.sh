@@ -157,11 +157,19 @@ EOF
 
   # TODO check running process and restart them if needed
   #
-  log_info "      - run background deamon"
-  nohup /usr/bin/icingacli \
-    vspheredb \
-    daemon \
-    run > /proc/self/fd/2 2>&1 &
+  #
+
+  # this produce the following 'error'
+  # S erver for vCenterID=1 failed, will try again in 30 seconds
+  #  Server for vCenterID=2 failed, will try again in 30 seconds
+  # and ist so not usable
+  # see issue https://github.com/Icinga/icingaweb2-module-vspheredb/issues/80
+  #
+  #log_info "      - run background deamon"
+  #nohup /usr/bin/icingacli \
+  #  vspheredb \
+  #  daemon \
+  #  run > /proc/self/fd/2 2>&1 &
 
 }
 
