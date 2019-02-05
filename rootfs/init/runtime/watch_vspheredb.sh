@@ -13,12 +13,66 @@ hostname_f=$(hostname -f)
 
 database_cnf="${monitored_directory}/.my.cnf"
 
-log_info "        start the vspheredb monitor"
+finish() {
 
-if [[ ! -f "${database_cnf}" ]]
-then
+  rv=$?
+  echo -e "\033[38;5;202m\033[1mexit with signal '${rv}'\033[0m"
 
-    log_info "        read database resource ..."
+  pids=$(ps aux | grep -v grep | grep "Icinga::vSphereDB::sync" | awk '{print $1}')
+
+  for p in ${pids}
+  do
+    kill -15 ${p}
+    rm -f "/tmp/vspheredb_*_sync.lock"
+  done
+
+  exit $rv
+}
+
+trap finish KILL # SIGINT SIGTERM INT TERM EXIT
+
+clean_sync_tasks() {
+
+  local pids=${1}
+  local db_data=${2}
+
+  arr_pids=($pids)
+  arr_dba=($db_data)
+
+  for i in ${arr_dba[@]}
+  do
+    # log_debug "search ${i}"
+
+    pid=$(ps aux | grep -v grep | grep $i | awk '{print $1}')
+
+    if [[ " ${arr_pids[@]} " =~ " ${pid} " ]]
+    then
+      for x in ${!arr_pids[@]}
+      do
+        if [ "${arr_pids[$x]}" == "${pid}" ]
+        then
+          unset arr_pids[$x]
+        fi
+      done
+    fi
+  done
+
+  for i in ${arr_pids[@]}
+  do
+    missing=$(ps ax -o pid,args | grep -v grep | grep ${i} | cut -d "(" -f2 | cut -d ")" -f1)
+    log_info "remove sync task for ${missing} (pid: ${i})"
+    kill -15 ${i}
+  done
+
+#set +x
+}
+
+
+create_secrets_file() {
+
+  if [[ ! -f "${database_cnf}" ]]
+  then
+    # log_info "        read database resource ..."
     cfg_parser '/etc/icingaweb2/resources.ini'
     cfg_section_vspheredb
 
@@ -35,59 +89,86 @@ user=${dba_username}
 password=${dba_password}
 EOF
 
-fi
+  fi
+}
 
-while true
-do
-  while read -r line; do
-    id=$(echo "${line}" | awk '{print $1}')
-    vcenter_id=$(echo "${line}" | awk '{print $2}')
-    host=$(echo "${line}" | awk '{print $3}')
 
-    if [[ -z ${id} ]] || [[ -z ${vcenter_id} ]]
+vspheredb_handler() {
+
+  while true
+  do
+    # clean up old sync tasks
+    #
+    pids=$(ps aux | grep -v grep | grep "Icinga::vSphereDB::sync" | awk '{print $1}')
+
+    data=$(mysql \
+          --defaults-file=${database_cnf} \
+          --skip-column-names \
+          --silent \
+          "--execute=SELECT JSON_OBJECT( 'host', host ) from vcenter_server;")
+
+    if ( [[ ! -z "${pids}" ]] || [[ ! -z "${data}" ]] ) && ( [[ $(echo "${pids}" | wc -l) -gt $(echo "${data}" | jq '.host' | wc -l) ]] )
     then
-      log_debug "no vcenter configured"
-      pids=$(ps aux | grep -v grep | grep "Icinga::vSphereDB::sync" | awk '{print $1}' | wc -l)
+      # log_debug "data: '${data}' $(echo "${data}" | jq '.host' | wc -l) "
 
-      if [[ ${pids} -gt 0 ]]
-      then
-        log_debug "found ${pids} vSphereDB::sync tasks"
-        for p in ${pids}
-        do
-          kill -15 ${p}
-        done
-      fi
-
-      continue
+      clean_sync_tasks "${pids}" "${data}"
     fi
 
-    # log_debug "        vspheredb: host: '${host}' / id: '${id}' / vcenter_id: '${vcenter_id}'"
+    # get data from database
+    #
+    while read -r line
+    do
+      id=$(echo "${line}" | awk '{print $1}')
+      vcenter_id=$(echo "${line}" | awk '{print $2}')
+      host=$(echo "${line}" | awk '{print $3}')
 
-    if [[ "${vcenter_id}" = "NULL" ]]
-    then
-      log_info "          - run initialize task for ${host}"
-      /usr/bin/icingacli vspheredb task initialize --serverId ${id}
-    else
-
-      lockfile="/tmp/vspheredb_vcenter_id_${vcenter_id}.lock"
-      pid=$(ps aux | grep -v grep | grep "Icinga::vSphereDB::sync" | grep ${host} | awk '{print $1}')
-
-      if [[ ! -e "${lockfile}" ]]&& [[ -z ${pid} ]]
+      if [[ -z ${id} ]] || [[ -z ${vcenter_id} ]]
       then
-        (
-          log_info "          - run sync task for ${host}"
-          touch ${lockfile}
-          /usr/bin/icingacli vspheredb task sync --vCenterId ${vcenter_id}
-          rm -f ${lockfile}
-        ) &
+        continue
       fi
-    fi
 
-  done< <(mysql \
-        --defaults-file=${database_cnf} \
-        --skip-column-names \
-        --silent \
-        --execute="select id, vcenter_id, host from vcenter_server order by id;")
+      # log_debug "        vspheredb: host: '${host}' / id: '${id}' / vcenter_id: '${vcenter_id}'"
 
-  sleep 1m
-done
+      if [[ "${vcenter_id}" = "NULL" ]]
+      then
+        log_info "          - run initialize task for ${host}"
+        /usr/bin/icingacli vspheredb task initialize --serverId ${id}
+      else
+
+        lockfile="/tmp/vspheredb_${host}_sync.lock"
+        pid=$(ps aux | grep -v grep | grep "Icinga::vSphereDB::sync" | grep ${host} | awk '{print $1}')
+
+        if [[ ! -e "${lockfile}" ]] && [[ -z ${pid} ]]
+        then
+          (
+            log_info "          - run sync task for ${host}"
+            touch ${lockfile}
+            /usr/bin/icingacli vspheredb task sync --vCenterId ${vcenter_id}
+
+            # log_debug "          - remove lockfile ${lockfile}"
+            rm -f ${lockfile}
+          ) &
+        fi
+      fi
+
+    done< <(mysql \
+          --defaults-file=${database_cnf} \
+          --skip-column-names \
+          --silent \
+          --execute="select id, vcenter_id, host from vcenter_server order by id;")
+
+    sleep 1m
+  done
+}
+
+
+run() {
+
+  log_info "        start the vspheredb monitor"
+
+  create_secrets_file
+
+  vspheredb_handler
+}
+
+run
