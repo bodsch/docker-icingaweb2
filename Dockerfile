@@ -2,12 +2,14 @@
 FROM alpine:3.9 as stage1
 
 RUN \
-  apk update  --quiet
+  apk update
 
 RUN \
-  apk add     --quiet \
+  apk add \
+    build-base \
     ca-certificates \
     curl \
+    php7-dev \
     php7-fpm \
     php7-ctype \
     php7-curl \
@@ -28,12 +30,7 @@ RUN \
     php7-simplexml \
     php7-tokenizer \
     php7-xml \
-    yaml
-
-RUN \
-  apk add     --quiet \
-    build-base \
-    php7-dev \
+    yaml \
     yaml-dev
 
 # patch fucking pecl to read php.ini

@@ -39,7 +39,7 @@ create_database() {
     #
     log_info "      - initializing databases"
     (
-      echo "--- create user 'director'@'%' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
+      echo "--- create user 'vspheredb'@'%' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
       echo "CREATE DATABASE IF NOT EXISTS ${database_name} DEFAULT CHARACTER SET 'utf8mb4' COLLATE utf8mb4_bin;"
       echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'vspheredb'@'%' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
       echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'vspheredb'@'$(hostname -i)' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
@@ -56,8 +56,24 @@ create_database() {
 
       mysql ${MYSQL_OPTS} --force ${database_name} < ${SCHEMA_FILE}
 
-      if [[ $? -gt 0 ]]
+      if [[ $? -eq 0 ]]
       then
+
+        log_info "      - import database migrations"
+        for f in $(ls -1 ${modules_directory}/schema/mysql-migrations/*.sql)
+        do
+          log_info "        apply database migration from '$(basename ${f})'"
+
+          mysql ${MYSQL_OPTS} --force ${database_name}  < ${f} 2> /dev/null
+
+          if [[ $? -gt 0 ]]
+          then
+            log_error "        database migration failed"
+            exit 1
+          fi
+        done
+
+      else
         log_error "    can't insert the Database Schema"
         exit 1
       fi
@@ -136,14 +152,24 @@ EOF
   # icingacli vspheredb daemon run --trace --debug
   # icingacli vspheredb task sync --trace --debug --vCenterId 1
 
+  nohup /init/runtime/watch_vspheredb.sh > /dev/stdout 2>&1 &
+
 
   # TODO check running process and restart them if needed
   #
-  log_info "      - run background deamon"
-  nohup /usr/bin/icingacli \
-    vspheredb \
-    daemon \
-    run > /proc/self/fd/2 2>&1 &
+  #
+
+  # this produce the following 'error'
+  # S erver for vCenterID=1 failed, will try again in 30 seconds
+  #  Server for vCenterID=2 failed, will try again in 30 seconds
+  # and ist so not usable
+  # see issue https://github.com/Icinga/icingaweb2-module-vspheredb/issues/80
+  #
+  #log_info "      - run background deamon"
+  #nohup /usr/bin/icingacli \
+  #  vspheredb \
+  #  daemon \
+  #  run > /proc/self/fd/2 2>&1 &
 
 }
 
