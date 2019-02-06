@@ -134,12 +134,12 @@ extract_vars() {
 
     if [[ $? -gt 0 ]]
     then
-      log_debug "    the LDAP Environment is not an json"
+#      log_debug "    the LDAP Environment is not an json"
 #       log_info "use fallback strategy."
       USE_JSON="false"
     fi
   else
-    log_debug "    the LDAP Environment is not an json"
+#    log_debug "    the LDAP Environment is not an json"
 #     log_info "use fallback strategy."
     USE_JSON="false"
   fi

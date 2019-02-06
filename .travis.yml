@@ -27,6 +27,7 @@ jobs:
         - docker-compose down
 
     - stage: push latest docker image
+      if: branch = master
       script:
         - make build
         - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
@@ -35,6 +36,7 @@ jobs:
         - docker logout
 
     - stage: push version docker image
+      if: branch = master
       script:
         - make build
         - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"

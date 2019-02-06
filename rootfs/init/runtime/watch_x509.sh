@@ -21,7 +21,7 @@ do
   [[ -z "${file}" ]] && continue
   [[ ${path} =~ backup ]] && continue
 
-  log_debug "x509 monitor - The file '$file' appeared in directory '$path' via '$action' (${CNT})"
+  # log_debug "x509 monitor - The file '$file' appeared in directory '$path' via '$action' (${CNT})"
 
   if [[ "${action}" = "CLOSE_WRITE,CLOSE" ]] && [[ "${file}" = "jobs.ini" ]]
   then

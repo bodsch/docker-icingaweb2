@@ -58,7 +58,7 @@ EOF
     if [[ -f ${CERTS_FILE} ]]
     then
       log_info "      - import ca-certificates.crt"
-      /usr/bin/icingacli x509 import --file ${CERTS_FILE}
+      /usr/bin/icingacli x509 import --file ${CERTS_FILE} > /dev/null
     fi
 
     log_info "      - enable module"

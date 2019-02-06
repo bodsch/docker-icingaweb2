@@ -39,21 +39,35 @@ For this we check the availability of the API port (5665) and wait until the Ici
 
 # Modules
 
- - [director](https://github.com/Icinga/icingaweb2-module-director)
- - [graphite](https://github.com/Icinga/icingaweb2-module-graphite)
- - [genericTTS](https://github.com/Icinga/icingaweb2-module-generictts)
- - [businessprocess](https://github.com/Icinga/icingaweb2-module-businessprocess)
- - [elasticsearch](https://github.com/Icinga/icingaweb2-module-elasticsearch)
- - [cube](https://github.com/Icinga/icingaweb2-module-cube)
- - [aws](https://github.com/Icinga/icingaweb2-module-aws)
- - [fileshipper](https://github.com/Icinga/icingaweb2-module-fileshipper)
- - [grafana](https://github.com/Mikesch-mp/icingaweb2-module-grafana)
- - [globe](https://github.com/Mikesch-mp/icingaweb2-module-globe)
- - [map](https://github.com/nbuchwitz/icingaweb2-module-map)
- - [boxydash](https://github.com/morgajel/icingaweb2-module-boxydash)
- - [vspheredb](https://github.com/Thomas-Gelf/icingaweb2-module-vspheredb)
- - [toplevelview](https://github.com/Icinga/icingaweb2-module-toplevelview)
- - [x509](https://github.com/Icinga/icingaweb2-module-x509d)
+- [director](https://github.com/Icinga/icingaweb2-module-director)
+- [graphite](https://github.com/Icinga/icingaweb2-module-graphite)
+- [genericTTS](https://github.com/Icinga/icingaweb2-module-generictts)
+- [businessprocess](https://github.com/Icinga/icingaweb2-module-businessprocess)
+- [elasticsearch](https://github.com/Icinga/icingaweb2-module-elasticsearch)
+- [cube](https://github.com/Icinga/icingaweb2-module-cube)
+- [aws](https://github.com/Icinga/icingaweb2-module-aws)
+- [fileshipper](https://github.com/Icinga/icingaweb2-module-fileshipper)
+- [grafana](https://github.com/Mikesch-mp/icingaweb2-module-grafana)
+- [globe](https://github.com/Mikesch-mp/icingaweb2-module-globe)
+- [map](https://github.com/nbuchwitz/icingaweb2-module-map)
+- [boxydash](https://github.com/morgajel/icingaweb2-module-boxydash)
+- [toplevelview](https://github.com/Icinga/icingaweb2-module-toplevelview)
+- [vspheredb](https://github.com/Thomas-Gelf/icingaweb2-module-vspheredb)
+- [x509](https://github.com/Icinga/icingaweb2-module-x509d)
+
+
+
+## vspheredb
+
+The implementation of the plugin used here does not use the integrated daemon, because it is
+currently causing problems.<br>
+Instead, the commandline tools are integrated via a separate process.
+
+### known bus / problems
+
+After deleting a vcenter, fragments of VMs, datastores, etc. remain in the database and can still be displayed.
+
+## x509
 
 You can add an customized configuration for the `x509` module by adding an directory `/init/custom.d/x509` and drop a `jobs.ini` file:
 
@@ -64,7 +78,8 @@ cidrs = "172.217.21.227/32"
 ports = "443"
 schedule = "0 0 * * *"
 ```
-For mor information read the module [documentation](https://github.com/Icinga/icingaweb2-module-x509/blob/master/doc/03-Configuration.md)!
+For more information read the module [documentation](https://github.com/Icinga/icingaweb2-module-x509/blob/master/doc/03-Configuration.md)!
+
 
 # Themes
 
@@ -99,8 +114,8 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 | `IDO_DATABASE_NAME`                | `icinga2core`        | Schema Name for IDO                                             |
 | `IDO_PASSWORD`                     | -                    | IDO password                                                    |
 |                                    |                      |                                                                 |
-| `GRAPHITE_HOST`                    | -                    |                                                                 |
-| `GRAPHITE_HTTP_PORT`               | `8080`               |                                                                 |
+| `GRAPHITE_HOST`                    | -                    | Hostname for the graphite service<br>If no hostname is specified, the module is automatically deactivated.                                                                |
+| `GRAPHITE_HTTP_PORT`               | `8080`               | graphite port                                                   |
 |                                    |                      |                                                                 |
 | `ICINGA2_MASTER`                   | `icinga2-master`     | Icinga2 Host for Command Transport over API                     |
 | `ICINGA2_API_PORT`                 | `5665`               | Icinga2 API Port                                                |
@@ -109,9 +124,11 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 |                                    |                      |                                                                 |
 | `ICINGAWEB_ADMIN_USER`             | `icinga`             |                                                                 |
 | `ICINGAWEB_ADMIN_PASS`             | `icinga`             |                                                                 |
-| `ICINGAWEB2_USERS`                 | -                    | comma separated List to create Icingaweb2 Users. The Format are `username:password` |
-|                                    |                      | (e.g. `admin:admin,dashing:dashing` and so on)                  |
+| `ICINGAWEB2_USERS`                 | -                    | comma separated list to create Icingaweb2 Users. The format are `username:password`<br>(e.g. `admin:admin,dashing:dashing` and so on)      |
 |                                    |                      |                                                                 |
+| `ICINGAWEB_DIRECTOR`               | `true`               | switch the Director configuration `on` / `off`<br>Disabling the Director automatically disables the following modules: *x509*, *vspheredb* |
+| `ICINGA2_UPTIME`                   | `125`                | Waits (in seconds) for a stable running Icinga2 instance.<br>Otherwise the Director cannot be configured automatically.                    |
+
 
 
 
