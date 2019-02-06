@@ -167,9 +167,9 @@ RUN \
     yajl-tools && \
   cp /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
   echo "extension=yaml.so"        > /etc/php7/conf.d/ext-yaml.ini && \
-  echo "zend_extension=xdebug.so" > /etc/php7/conf.d/ext-xdebug.ini && \
-  [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
-  [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
+  echo "zend_extension=xdebug.so" > /etc/php7/conf.d/ext-xdebug.ini.disabled && \
+  # [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
+  # [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
   sed -i -e '/^#/ d' -e '/^;/ d'  -e '/^ *$/ d' /etc/php7/php.ini && \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
   mkdir -p /var/log/icingaweb2 && \

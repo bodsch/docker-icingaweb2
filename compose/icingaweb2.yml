@@ -1,0 +1,38 @@
+---
+version: '3.3'
+
+services:
+  # icingaweb2
+  #
+  icingaweb2:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        - BUILD_TYPE=${BUILD_TYPE}
+        - ICINGAWEB_VERSION=${ICINGAWEB_VERSION}
+        - INSTALL_THEMES=${INSTALL_THEMES}
+        - INSTALL_MODULES=${INSTALL_MODULES}
+    container_name: icingaweb2
+    hostname: icingaweb2.matrix.lan
+    ports:
+      - 80
+    environment:
+      - MYSQL_HOST=database
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASS=${MARIADB_ROOT_PASSWORD}
+      - IDO_DATABASE_NAME=icinga2core
+      - IDO_PASSWORD=${IDO_PASSWORD}
+      - ICINGA2_MASTER=icinga2-master.matrix.lan
+      - ICINGA2_CMD_API_USER=root
+      - ICINGA2_CMD_API_PASS=icinga
+      - ICINGAWEB2_USERS=icinga:icinga,foo:bar
+      - ICINGAWEB_DIRECTOR
+      - GRAPHITE_HOST=graphite
+    links:
+      - icinga2-master:icinga2-master.matrix.lan
+      - database
+    networks:
+      - database
+      - frontend
+      - backend

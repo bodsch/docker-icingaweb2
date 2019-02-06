@@ -8,6 +8,8 @@ MYSQL_ROOT_USER=${MYSQL_ROOT_USER:-"root"}
 MYSQL_ROOT_PASS=${MYSQL_ROOT_PASS:-""}
 MYSQL_OPTS=
 
+XDEBUG_ENABLED=${XDEBUG_ENABLED:-""}
+
 ICINGA2_API_PORT=${ICINGA2_API_PORT:-5665}
 ICINGA2_UPTIME=${ICINGA2_UPTIME:-125}
 
@@ -42,11 +44,25 @@ prepare() {
   touch /etc/icingaweb2/resources.ini
   touch /etc/icingaweb2/roles.ini
 
-  [[ -e /etc/php/php.ini ]] || cp /etc/php7/php.ini /etc/php/php.ini
+  if [[ -n "$XDEBUG_ENABLED" ]] && [[ -f /usr/lib/php7/modules/xdebug.so ]]
+  then
+    log_info "Enabling xdebug"
+    cp /etc/php7/conf.d/ext-xdebug.ini.disabled /etc/php7/conf.d/xdebug.ini
+
+    cat << EOF >> /etc/php7/conf.d/xdebug.ini
+
+[Xdebug]
+xdebug.remote_enable=true
+xdebug.remote_connect_back=true
+xdebug.profiler_enable=0
+xdebug.profiler_output_dir=/tmp/profile
+xdebug.profiler_enable_trigger=1
+EOF
+  fi
 }
 
 
-correctRights() {
+correct_rights() {
 
   chmod 1777 /tmp
   chmod 2770 /etc/icingaweb2
@@ -74,7 +90,7 @@ custom_scripts() {
           log_WARN "RUN SCRIPT: ${f}"
           log_WARN "YOU SHOULD KNOW WHAT YOU'RE DOING."
           log_WARN "THIS CAN BREAK THE COMPLETE ICINGA2 CONFIGURATION!"
-          nohup "${f}" > /dev/stdout 2>&1 &
+          nohup "${f}" > /proc/self/fd/2 2>&1 &
           log_WARN "------------------------------------------------------"
           ;;
         *)
@@ -123,24 +139,17 @@ run() {
   . /init/create_login_users.sh
 
   configure_modules
+  correct_rights
 
-#  . /init/configure_modules/commandtransport.sh
-#  . /init/configure_modules/graphite.sh
-#  . /init/configure_modules/director.sh
-#
-#  . /init/configure_modules/authentication.sh
-#  # . /init/database/fix_latin1_db_statements.sh
-
-  correctRights
-
-  nohup /usr/bin/php-fpm \
-    --fpm-config /etc/php/php-fpm.conf \
+  /usr/sbin/php-fpm7 \
+    --fpm-config /etc/php7/php-fpm.conf \
     --pid /run/php-fpm.pid \
     --allow-to-run-as-root \
-    --nodaemonize > /proc/self/fd/2 2>&1 &
-  /usr/sbin/nginx > /proc/self/fd/2 2>&1
-}
+    --force-stderr \
+    --nodaemonize > /proc/self/fd/1 2>&1 &
 
+  /usr/sbin/nginx > /proc/self/fd/1 2>&1
+}
 
 run
 
