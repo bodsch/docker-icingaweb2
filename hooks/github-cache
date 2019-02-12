@@ -55,7 +55,7 @@ github_ratelimit() {
     --silent \
     --include \
     ${curl_opts} \
-    https://api.github.com/users/bodsch | grep "X-RateLimit-Remaining: " | awk -F 'X-RateLimit-Remaining: ' '{print $2}')
+    "https://api.github.com/users/${GITHUB_USER}" | grep "X-RateLimit-Remaining: " | awk -F 'X-RateLimit-Remaining: ' '{print $2}')
 
   echo "RateLimit Remaining: ${remaining}"
 
