@@ -67,6 +67,7 @@ services:
       IDO_DATABASE_NAME: icinga2core
       IDO_PASSWORD: ido.pass
       ICINGAWEB_DIRECTOR: ${ICINGAWEB_DIRECTOR}
+      XDEBUG_ENABLED: ${XDEBUG_ENABLED}
   #    LDAP: '{
   #      "active_directory": "true",
   #      "server":"${LDAP_SERVER}",

@@ -5,13 +5,46 @@
 
 [[ -e hooks/environment ]] && . hooks/environment
 
+cat << EOF > .env
+
+BUILD_DATE=${BUILD_DATE}
+BUILD_VERSION=${BUILD_VERSION}
+
+ICINGAWEB_VERSION=${ICINGAWEB_VERSION}
+INSTALL_THEMES=${INSTALL_THEMES}
+INSTALL_MODULES=${INSTALL_MODULES}
+
+MARIADB_SYSTEM_USER=root
+MARIADB_ROOT_PASSWORD=vYUQ14SGVrJRi69PsujC
+MYSQL_ROOT_PASS=vYUQ14SGVrJRi69PsujC
+IDO_PASSWORD=qUVuLTk9oEDUV0A
+ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-false}
+
+XDEBUG_ENABLED=true
+
+EOF
+
+docker-compose \
+  --file compose/head.yml \
+  --file compose/nginx.yml \
+  --file compose/database.yml \
+  --file compose/graphite.yml \
+  --file compose/icingaweb2.yml \
+  --file compose/master.yml \
+  --file compose/satellite.yml \
+  config > docker-compose.yml
+
+exit 0
+
+
 echo "BUILD_DATE=${BUILD_DATE}" > .env
 echo "BUILD_VERSION=${BUILD_VERSION}" >> .env
 echo "BUILD_TYPE=${BUILD_TYPE}" >> .env
 echo "ICINGAWEB_VERSION=${ICINGAWEB_VERSION}" >> .env
 echo "INSTALL_THEMES=${INSTALL_THEMES}" >> .env
 echo "INSTALL_MODULES=${INSTALL_MODULES}" >> .env
-echo "ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-true}" >> .env
+echo "ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-false}" >> .env
+echo "XDEBUG_ENABLED=true" >> .env
 
 docker-compose \
   --file docker-compose_example.yml \

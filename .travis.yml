@@ -14,22 +14,22 @@ jobs:
   include:
     - stage: build
       script:
-        - make build
+        - make
 
     - stage: build and test
       script:
-        - make build
         - make compose-file
         - docker-compose build
         - docker-compose up -d
-        - docker ps | grep -q icingaweb2
+        - sleep 2m
+        - make test
         - docker-compose kill
         - docker-compose down
 
     - stage: push latest docker image
       if: branch = master
       script:
-        - make build
+        - make
         - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
         - docker tag ${USER}/icingaweb2:latest ${DOCKER_USERNAME}/docker-icingaweb2:latest
         - docker push ${DOCKER_USERNAME}/docker-icingaweb2:latest
@@ -38,7 +38,7 @@ jobs:
     - stage: push version docker image
       if: branch = master
       script:
-        - make build
+        - make
         - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
         - docker tag ${USER}/icingaweb2:latest ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
         - docker push ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
