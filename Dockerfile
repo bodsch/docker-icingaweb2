@@ -86,7 +86,7 @@ WORKDIR /tmp
 # hadolint ignore=DL3003,DL4006
 RUN \
   mkdir /usr/share/webapps && \
-  if [ -z "${BUILD_TYPE}" ] || [ "${BUILD_TYPE}" == "stable" ] ; then \
+  if [ -z "${BUILD_TYPE}" ] || [ "${BUILD_TYPE}" = "stable" ] ; then \
     echo "install icingaweb2 v${ICINGAWEB_VERSION}" && \
     curl \
       --silent \
