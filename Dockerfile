@@ -1,11 +1,13 @@
 
 FROM alpine:3.9 as stage1
 
+# hadolint ignore=DL3018
 RUN \
-  apk update
+  apk update  --quiet --no-cache
 
+# hadolint ignore=DL3018
 RUN \
-  apk add \
+  apk add     --quiet --no-cache \
     build-base \
     ca-certificates \
     curl \
@@ -35,11 +37,12 @@ RUN \
 
 # patch fucking pecl to read php.ini
 RUN \
-  sed -i 's|$PHP -C -n -q |$PHP -C -q |' /usr/bin/pecl
+  sed -i "s|$PHP -C -n -q |$PHP -C -q |" /usr/bin/pecl
 
 RUN \
   pecl channel-update pecl.php.net
 
+# hadolint ignore=DL4006
 RUN \
   (yes '' | pecl install yaml) && \
   (yes '' | pecl install xdebug)
@@ -56,9 +59,10 @@ ARG ICINGAWEB_VERSION
 ARG INSTALL_THEMES
 ARG INSTALL_MODULES
 
+# hadolint ignore=DL3018
 RUN \
-  apk update  --quiet && \
-  apk add     --quiet \
+  apk update  --quiet --no-cache && \
+  apk add     --quiet --no-cache \
     bash \
     ca-certificates \
     curl \
@@ -66,8 +70,9 @@ RUN \
     jq \
     git
 
+# hadolint ignore=DL3018
 RUN \
-  apk add     --quiet \
+  apk add     --quiet --no-cache \
     php7 \
     php7-ctype \
     php7-openssl \
@@ -76,22 +81,24 @@ RUN \
 
 COPY build /build
 
+WORKDIR /tmp
+
+# hadolint ignore=DL3003,DL4006
 RUN \
   mkdir /usr/share/webapps && \
-  if ( [ -z ${BUILD_TYPE} ] || [ "${BUILD_TYPE}" == "stable" ] ) ; then \
+  if [ -z "${BUILD_TYPE}" ] || [ "${BUILD_TYPE}" == "stable" ] ; then \
     echo "install icingaweb2 v${ICINGAWEB_VERSION}" && \
     curl \
       --silent \
       --location \
       --retry 3 \
       --cacert /etc/ssl/certs/ca-certificates.crt \
-      https://github.com/Icinga/icingaweb2/archive/v${ICINGAWEB_VERSION}.tar.gz \
+      "https://github.com/Icinga/icingaweb2/archive/v${ICINGAWEB_VERSION}.tar.gz" \
       | gunzip \
       | tar x -C /usr/share/webapps/ && \
-    ln -s /usr/share/webapps/icingaweb2-${ICINGAWEB_VERSION} /usr/share/webapps/icingaweb2 ; \
+    ln -s "/usr/share/webapps/icingaweb2-${ICINGAWEB_VERSION}" /usr/share/webapps/icingaweb2 ; \
   else \
     echo "install icingaweb2 from git " && \
-    cd /tmp && \
     git clone https://github.com/Icinga/icingaweb2.git && \
     cd icingaweb2 && \
     version=$(git describe --tags --always | sed 's/^v//') && \
@@ -126,10 +133,11 @@ COPY --from=stage1 /usr/lib/php7/modules/xdebug.so /usr/lib/php7/modules/
 COPY --from=stage2 /usr/share/webapps              /usr/share/webapps
 COPY --from=stage2 /etc/icingaweb2                 /etc/icingaweb2
 
+# hadolint ignore=DL3017,DL3018
 RUN \
-  apk update  --quiet && \
-  apk upgrade --quiet && \
-  apk add     --quiet \
+  apk update  --quiet --no-cache && \
+  apk upgrade --quiet --no-cache && \
+  apk add     --quiet --no-cache \
     bash \
     bind-tools \
     ca-certificates \
@@ -168,8 +176,6 @@ RUN \
   cp /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
   echo "extension=yaml.so"        > /etc/php7/conf.d/ext-yaml.ini && \
   echo "zend_extension=xdebug.so" > /etc/php7/conf.d/ext-xdebug.ini.disabled && \
-  # [ -e /usr/bin/php ]     || ln -s /usr/bin/php7      /usr/bin/php && \
-  # [ -e /usr/bin/php-fpm ] || ln -s /usr/sbin/php-fpm7 /usr/bin/php-fpm && \
   sed -i -e '/^#/ d' -e '/^;/ d'  -e '/^ *$/ d' /etc/php7/php.ini && \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
   mkdir -p /var/log/icingaweb2 && \
@@ -190,7 +196,7 @@ COPY rootfs/ /
 
 WORKDIR /etc/icingaweb2
 
-VOLUME [ "/etc/icingaweb2" "/usr/share/webapps/icingaweb2" "/init/custom.d" ]
+VOLUME ["/etc/icingaweb2", "/usr/share/webapps/icingaweb2", "/init/custom.d"]
 
 HEALTHCHECK \
   --interval=5s \
@@ -198,7 +204,7 @@ HEALTHCHECK \
   --retries=12 \
   CMD curl --silent --fail http://localhost/health || exit 1
 
-CMD [ "/init/run.sh" ]
+CMD ["/init/run.sh"]
 
 # ---------------------------------------------------------------------------------------
 

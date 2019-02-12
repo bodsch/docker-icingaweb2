@@ -22,4 +22,8 @@ fi
 #fi
 
 hadolint Dockerfile
-# shellcheck docker-entrypoint.sh -x
+shellcheck \
+  --external-sources \
+  --shell=bash \
+  --exclude=SC1091,SC2034 \
+  rootfs/init/run.sh
