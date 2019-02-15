@@ -4,7 +4,7 @@ version: '3.3'
 services:
 
   database:
-    image: bodsch/docker-mariadb
+    image: bodsch/docker-mariadb:10.3.12
     container_name: database
     hostname: database
     environment:
