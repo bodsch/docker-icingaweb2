@@ -66,7 +66,8 @@ EOF
 
     touch /etc/icingaweb2/modules/x509/jobs.ini
 
-    nohup /init/runtime/watch_x509.sh > /dev/stdout 2>&1 &
+    #log_info "      - run background deamon"
+    /init/runtime/watch_x509.sh > /dev/stdout 2>&1 &
 
     sleep 2s
 
@@ -76,10 +77,11 @@ EOF
     fi
 
     log_info "      - run background deamon"
-    nohup /usr/bin/icingacli \
+    /usr/bin/icingacli \
       x509 \
       jobs \
-      run > /proc/self/fd/2 2>&1 &
+      run &
+
   fi
 }
 

@@ -117,6 +117,7 @@ configure_modules() {
           then
             # log_debug "execute file: $(basename ${f})"
             ${f}  # > /proc/self/fd/2 2>&1
+            sleep 1s
           else
             log_warn "file '${f}' is not executable"
           fi
