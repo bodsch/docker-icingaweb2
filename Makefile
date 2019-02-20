@@ -17,6 +17,12 @@ default: build
 github-cache:
 	@hooks/github-cache
 
+offline_themes:
+	@hooks/offline_themes
+
+offline_modules:
+	@hooks/offline_modules
+
 build:
 	@hooks/build
 

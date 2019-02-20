@@ -1,0 +1,136 @@
+#!/bin/bash
+
+set -e
+
+GITHUB_USER=${GITHUB_USER:-bodsch}
+WORK_DIR=$(dirname $(readlink --canonicalize "${0}"))
+JSON_DIR=$(dirname $(readlink --canonicalize "${0%/*}"))/build
+TEMP_DIR=$(mktemp --directory)
+
+# pushd ${TEMP_DIR} > /dev/null
+
+echo "current directory: ${PWD}"
+echo "json directory   : ${JSON_DIR}"
+
+# check github rate limits
+# we consume for each REST API call a credit
+#
+github_ratelimit() {
+
+  local -n VAR=$1
+
+  curl_opts=
+  [[ -z ${GITHUB_OAUTH_TOKEN} ]] || curl_opts="--user ${GITHUB_USER}:${GITHUB_OAUTH_TOKEN}"
+
+  remaining=$(curl \
+    --silent \
+    --include \
+    ${curl_opts} \
+    "https://api.github.com/users/${GITHUB_USER}" | grep "X-RateLimit-Remaining: " | awk -F 'X-RateLimit-Remaining: ' '{print $2}')
+
+  echo "RateLimit Remaining: ${remaining}"
+
+  VAR=${remaining}
+}
+
+
+default_themes() {
+
+  if [[ -f ${JSON_DIR}/themes.json ]]
+  then
+    THEMES_JSON=$(cat ${JSON_DIR}/themes.json)
+  else
+    THEMES_JSON='{
+      "Mikesch-mp/icingaweb2-theme-unicorn" : {
+        "image": [{
+          "name": "unicorn.png",
+          "url": "http://i.imgur.com/SCfMd.png"
+        }]
+      },
+      "Icinga/icingaweb2-theme-company": {},
+      "sysadmama/icingaweb2-theme-nordlicht": {},
+      "vita2/icingaweb2-module-theme-dark": {},
+      "xam-stephan/icingaweb2-module-theme-always-green": {}
+    }'
+  fi
+
+}
+
+
+download_themes() {
+
+  [[ -d ${TEMP_DIR}/icingaweb2-themes ]] || mkdir -p ${TEMP_DIR}/icingaweb2-themes
+  [[ -d ${TEMP_DIR}/tmp ]] || mkdir -p ${TEMP_DIR}/tmp
+
+  pushd ${TEMP_DIR}/tmp > /dev/null
+
+  for k in $(echo ${THEMES_JSON} | jq -r '. | to_entries | .[] | .key')
+  do
+    enable="$(echo "${THEMES_JSON}" | jq -r ".[\"$k\"].enable")"
+    [[ "${enable}" == null ]] && enable=true
+
+    project="$(echo "${k}" | sed -e 's|\.git||g' -e 's/https\?:\/\///' -e 's|github.com/||g')"
+    project_maintainer="$(echo "${project}" | cut -d "/" -f1)"
+    project_name="$(echo "${project}" | cut -d "/" -f2 | sed -e 's|icingaweb2-||g' -e 's|module-||g' -e 's|theme-||g' | tr [:upper:] [:lower:])"
+    outpath=$(echo "${project}" | tr [:upper:] [:lower:] | sed -e 's|/|_|g')
+
+    echo " - ${project_name} (${project_maintainer})"
+
+    [[ -d ${outpath} ]] || mkdir ${outpath}
+    [[ -d ${TEMP_DIR}/icingaweb2-themes/${project_name} ]] || mkdir ${TEMP_DIR}/icingaweb2-themes/${project_name}
+
+    pushd ${outpath} > /dev/null
+
+    git clone "https://github.com/${k}" 2> /dev/null
+
+    images=$(echo "${THEMES_JSON}" | jq -r ".[\"$k\"].image")
+
+    if [[ $images != null ]]
+    then
+      data=$(echo "${THEMES_JSON}" | jq -r ".[\"$k\"].image")
+
+      for row in $(echo "${data}" | jq -r '.[] | @base64'); do
+        _jq() {
+          echo ${row} | base64 -d | jq -r ${1}
+        }
+
+        name=$(_jq '.name')
+        url=$(_jq '.url')
+
+        echo "   download external image: ${name}"
+
+        curl \
+          --silent \
+          --location \
+          --retry 3 \
+          --output ${name} \
+          ${url}
+
+        cp -a ${name} */public/img/
+      done
+    fi
+
+    cp -ar */public ${TEMP_DIR}/icingaweb2-themes/${project_name}/
+
+    popd > /dev/null
+  done
+
+  rm -rf ${TEMP_DIR}/tmp
+
+  popd > /dev/null
+}
+
+
+github_ratelimit remaining
+
+if [[ "${remaining/$'\r'/}" -gt 20 ]]
+then
+  default_themes
+  download_themes
+else
+  echo "sorry, API rate limit fot github exceeded. (only ${remaining} left)"
+fi
+
+#popd > /dev/null
+
+# rm -rfv ${TEMP_DIR}
