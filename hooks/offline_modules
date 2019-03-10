@@ -5,11 +5,12 @@ set -e
 GITHUB_USER=${GITHUB_USER:-bodsch}
 WORK_DIR=$(dirname $(readlink --canonicalize "${0}"))
 JSON_DIR=$(dirname $(readlink --canonicalize "${0%/*}"))/build
-TEMP_DIR=/tmp/tmp.e22Kqxsxx0  # $(mktemp --directory)
+TEMP_DIR=$(mktemp --directory)
 
-pushd ${TEMP_DIR}
+pushd ${TEMP_DIR} > /dev/null
 
 echo "current directory: ${PWD}"
+echo "json directory   : ${JSON_DIR}"
 
 # check github rate limits
 # we consume for each REST API call a credit
@@ -210,7 +211,7 @@ download_modules() {
   [[ -d ${TEMP_DIR}/icingaweb2-modules ]] || mkdir -p ${TEMP_DIR}/icingaweb2-modules
 
   cd cache
-set -x
+
   for file in $(ls -1 github_*.json)
   do
 
@@ -320,10 +321,8 @@ set -x
     #fi
 
   done
-set +x
 
   find ${TEMP_DIR}/icingaweb2-modules -name ".git*" -exec rm -rf {} 2> /dev/null \; || true
-
 }
 
 
@@ -332,19 +331,16 @@ github_ratelimit remaining
 if [[ "${remaining/$'\r'/}" -gt 20 ]]
 then
   default_modules
-  # build_cache
-  # module_informations
+  build_cache
+  module_informations
 
   download_modules
 
-  #if [[ -f cache.tgz ]]
-  #then
-  #  cp -v cache.tgz ${JSON_DIR}/
-  #fi
+  mv ${TEMP_DIR}/icingaweb2-modules ${JSON_DIR}
 else
   echo "sorry, API rate limit fot github exceeded. (only ${remaining} left)"
 fi
 
-popd
+popd > /dev/null
 
-#rm -rfv ${TEMP_DIR}
+rm -rfv ${TEMP_DIR}

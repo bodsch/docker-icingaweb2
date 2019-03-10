@@ -127,10 +127,12 @@ if [[ "${remaining/$'\r'/}" -gt 20 ]]
 then
   default_themes
   download_themes
+
+  mv ${TEMP_DIR}/icingaweb2-themes ${JSON_DIR}
 else
   echo "sorry, API rate limit fot github exceeded. (only ${remaining} left)"
 fi
 
-#popd > /dev/null
+popd > /dev/null
 
 # rm -rfv ${TEMP_DIR}
