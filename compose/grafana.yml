@@ -16,6 +16,11 @@ services:
     volumes:
       - ${PWD}/import/provisioning:/etc/grafana/provisioning:ro
       - ${PWD}/import/dashboards:/var/lib/grafana/dashboards:ro
+    links:
+      - influxdb
+    depends_on:
+      - influxdb
     networks:
       - frontend
       - backend
+      - database

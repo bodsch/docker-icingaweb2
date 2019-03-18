@@ -16,11 +16,48 @@ INSTALL_MODULES=${INSTALL_MODULES}
 
 MARIADB_SYSTEM_USER=root
 MARIADB_ROOT_PASSWORD=vYUQ14SGVrJRi69PsujC
+
+MYSQL_HOST=database
+
 MYSQL_ROOT_PASS=vYUQ14SGVrJRi69PsujC
 IDO_PASSWORD=qUVuLTk9oEDUV0A
 ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-false}
 
 XDEBUG_ENABLED=true
+
+ICINGA2_MASTER=icinga2-master.matrix.lan
+
+ICINGA2_CMD_API_USER=root
+ICINGA2_CMD_API_PASS=icinga
+
+BASIC_AUTH_USER=admin
+BASIC_AUTH_PASS=admin
+
+CERT_SERVICE_BA_USER=admin
+CERT_SERVICE_BA_PASSWORD=admin
+CERT_SERVICE_API_USER=root
+CERT_SERVICE_API_PASSWORD=icinga
+CERT_SERVICE_SERVER=nginx
+CERT_SERVICE_PORT=443
+CERT_SERVICE_PATH=/cert-service/
+
+CARBON_HOST=
+CARBON_PORT=2003
+
+DEMO_DATA=false
+
+# influx
+INFLUXDB_DB=icinga2
+INFLUXDB_HTTP_AUTH_ENABLED=true
+INFLUXDB_ADMIN_USER=admin
+INFLUXDB_ADMIN_PASSWORD=hqkBGSQW34iDRpbU
+INFLUXDB_USER=icinga2
+INFLUXDB_USER_PASSWORD=w7uK6nfcxR6ZBtZC
+
+# influx integration
+INFLUXDB_HOST=influxdb
+INFLUXDB_PASS=w7uK6nfcxR6ZBtZC
+
 
 # grafana
 URL_PATH=/grafana
@@ -31,15 +68,14 @@ GRAFANA_HOST=grafana
 GRAFANA_PORT=3000
 GRAFANA_AUTHENTICATION=token
 GRAFANA_TOKEN=
-GRAFANA_ENABLE_LINK="yes"
-GRAFANA_SHOW_DEBUG="0"
-GRAFANA_PUBLIC="yes"
+GRAFANA_ENABLE_LINK=yes
+GRAFANA_SHOW_DEBUG=0
+GRAFANA_PUBLIC=yes
 GRAFANA_PUBLIC_HOST=localhost/grafana
 GRAFANA_PUBLIC_PROTOCOL=https
 GRAFANA_THEME=light
 
 GRAFANA_DASHBOARD_UID=icinga2-default
-
 
 GRAFANA_PUBLIC_HTTP_PATH=/grafana
 
@@ -50,7 +86,8 @@ docker-compose \
   --file compose/nginx.yml \
   --file compose/grafana.yml \
   --file compose/database.yml \
-  --file compose/graphite.yml \
+  --file compose/influxdb.yml \
   --file compose/icingaweb2.yml \
   --file compose/master.yml \
+  --file compose/satellite.yml \
   config > docker-compose.yml

@@ -1,25 +1,29 @@
 #!/bin/bash
 #
 
-GRAFANA_HOST=${GRAFANA_HOST:-"grafana"}
-GRAFANA_PORT=${GRAFANA_PORT:-"3000"}
+GRAFANA_HOST=${GRAFANA_HOST:-grafana}
+GRAFANA_PORT=${GRAFANA_PORT:-3000}
+
+GRAFANA_TIMERANGE=${GRAFANA_TIMERANGE:-12h}
+GRAFANA_TIMERANGE_ALL=${GRAFANA_TIMERANGE_ALL:-7d}
+
 GRAFANA_DASHBOARD=${GRAFANA_DASHBOARD:-icinga2-default}
 GRAFANA_DASHBOARD_UID=${GRAFANA_DASHBOARD_UID:-}
 GRAFANA_PROTOCOL=${GRAFANA_PROTOCOL:-http}
 GRAFANA_ACCESS=${GRAFANA_ACCESS:-proxy}
 
 GRAFANA_AUTHENTICATION=${GRAFANA_AUTHENTICATION:-token}
-GRAFANA_AUTHENTICATION_TOKEN=${GRAFANA_AUTHENTICATION_TOKEN:-""}
-GRAFANA_AUTHENTICATION_USERNAME=${GRAFANA_AUTHENTICATION_USERNAME:-"admin"}
-GRAFANA_AUTHENTICATION_PASSWORD=${GRAFANA_AUTHENTICATION_PASSWORD:-"admin"}
+GRAFANA_AUTHENTICATION_TOKEN=${GRAFANA_AUTHENTICATION_TOKEN:-}
+GRAFANA_AUTHENTICATION_USERNAME=${GRAFANA_AUTHENTICATION_USERNAME:-admin}
+GRAFANA_AUTHENTICATION_PASSWORD=${GRAFANA_AUTHENTICATION_PASSWORD:-admin}
 
 GRAFANA_DATASOURCE=${GRAFANA_DATASOURCE:-influxdb}
 
 GRAFANA_ENABLE_LINK=${GRAFANA_ENABLE_LINK:-no}
 GRAFANA_SHOW_DEBUG=${GRAFANA_SHOW_DEBUG:-0}
 GRAFANA_PUBLIC=${GRAFANA_PUBLIC:-no}
-GRAFANA_PUBLIC_HOST=${GRAFANA_PUBLIC_HOST:-}
-GRAFANA_PUBLIC_PROTOCOL=${GRAFANA_PUBLIC_PROTOCOL:-https}
+GRAFANA_PUBLIC_HOST=${GRAFANA_PUBLIC_HOST:-localhost/grafana/}
+GRAFANA_PUBLIC_PROTOCOL=${GRAFANA_PUBLIC_PROTOCOL:-http}
 GRAFANA_THEME=${GRAFANA_THEME:-light}
 
 GRAFANA_PROXY_TIMEOUT=${GRAFANA_PROXY_TIMEOUT:-5}
@@ -108,28 +112,28 @@ configure() {
   cat << EOF > /etc/icingaweb2/modules/grafana/config.ini
 
 [grafana]
-version                 = "1"
+version                 = 1
 host                    = "${GRAFANA_HOST}:${GRAFANA_PORT}"
 protocol                = "${GRAFANA_PROTOCOL}"
-# timerangeAll            = "7d"
-# timerange               = "24h"
-timerangeAll            = "1w/w"
+timerangeAll            = "${GRAFANA_TIMERANGE_ALL}"
+timerange               = "${GRAFANA_TIMERANGE}"
+# timerangeAll            = "1w/w"
 defaultdashboard        = "${GRAFANA_DASHBOARD}"
 defaultdashboarduid     = "${GRAFANA_DASHBOARD_UID}"
-defaultdashboardpanelid = "1"
-defaultorgid            = "1"
-shadows                 = "0"
+defaultdashboardpanelid = 1
+defaultorgid            = 1
+shadows                 = 0
 theme                   = "${GRAFANA_THEME}"
 datasource              = "${GRAFANA_DATASOURCE}"
 accessmode              = "${GRAFANA_ACCESS}"
-height                  = "280"
-width                   = "640"
-enableLink              = "${GRAFANA_ENABLE_LINK}"
-debug                   = "${GRAFANA_SHOW_DEBUG}"
-usepublic               = "${GRAFANA_PUBLIC}"
-publichost              = "${GRAFANA_PUBLIC_HOST}"
-publicprotocol          = "${GRAFANA_PUBLIC_PROTOCOL}"
-proxytimeout            = "${GRAFANA_PROXY_TIMEOUT}"
+height                  = 280
+width                   = 640
+enableLink              = ${GRAFANA_ENABLE_LINK}
+debug                   = ${GRAFANA_SHOW_DEBUG}
+usepublic               = ${GRAFANA_PUBLIC}
+publichost              = ${GRAFANA_PUBLIC_HOST}
+publicprotocol          = ${GRAFANA_PUBLIC_PROTOCOL}
+proxytimeout            = ${GRAFANA_PROXY_TIMEOUT}
 EOF
 
   if [[ "${GRAFANA_AUTHENTICATION}" = "token" ]] && [[ -z "${GRAFANA_AUTHENTICATION_TOKEN}" ]]
