@@ -114,7 +114,7 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 | `IDO_DATABASE_NAME`                | `icinga2core`        | Schema Name for IDO                                             |
 | `IDO_PASSWORD`                     | -                    | IDO password                                                    |
 |                                    |                      |                                                                 |
-| `GRAPHITE_HOST`                    | -                    | Hostname for the graphite service<br>If no hostname is specified, the module is automatically deactivated.                                                                |
+| `GRAPHITE_HOST`                    | -                    | Hostname for the graphite service<br>If no hostname is specified, the module is automatically deactivated.  |
 | `GRAPHITE_HTTP_PORT`               | `8080`               | graphite port                                                   |
 |                                    |                      |                                                                 |
 | `ICINGA2_MASTER`                   | `icinga2-master`     | Icinga2 Host for Command Transport over API                     |
@@ -129,7 +129,30 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 | `ICINGAWEB_DIRECTOR`               | `true`               | switch the Director configuration `on` / `off`<br>Disabling the Director automatically disables the following modules: *x509*, *vspheredb* |
 | `ICINGA2_UPTIME`                   | `125`                | Waits (in seconds) for a stable running Icinga2 instance.<br>Otherwise the Director cannot be configured automatically.                    |
 
+## Grafana Support
 
+| Environmental Variable             | Default Value        | Description               |
+| :--------------------------------- | :-------------       | :-----------              |
+| `GRAFANA_HOST`                     | `grafana`            |                           |
+| `GRAFANA_PORT`                     | `3000`               |                           |
+| `GRAFANA_TIMERANGE`                | `12h`                |                           |
+| `GRAFANA_TIMERANGE_ALL`            | `7d`                 |                           |
+| `GRAFANA_DASHBOARD`                | `icinga2-default`    |                           |
+| `GRAFANA_DASHBOARD_UID`            | ``                   |                           |
+| `GRAFANA_PROTOCOL`                 | `http`               |                           |
+| `GRAFANA_ACCESS`                   | `proxy`              |                           |
+| `GRAFANA_AUTHENTICATION`           | `token`              |                           |
+| `GRAFANA_AUTHENTICATION_TOKEN`     | ``                   |                           |
+| `GRAFANA_AUTHENTICATION_USERNAME`  | `admin`              |                           |
+| `GRAFANA_AUTHENTICATION_PASSWORD`  | `admin`              |                           |
+| `GRAFANA_DATASOURCE`               | `influxdb`           |                           |
+| `GRAFANA_ENABLE_LINK`              | `no`                 |                           |
+| `GRAFANA_SHOW_DEBUG`               | `0`                  |                           |
+| `GRAFANA_PUBLIC`                   | `no`                 |                           |
+| `GRAFANA_PUBLIC_HOST`              | `localhost/grafana/` |                           |
+| `GRAFANA_PUBLIC_PROTOCOL`          | `http`               |                           |
+| `GRAFANA_THEME`                    | `light`              |                           |
+| `GRAFANA_PROXY_TIMEOUT`            | `5`                  |                           |
 
 
 ## LDAP support
