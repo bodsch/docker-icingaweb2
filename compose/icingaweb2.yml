@@ -17,33 +17,33 @@ services:
     hostname: icingaweb2.matrix.lan
     ports:
       - 80
-#    environment:
-#      - MYSQL_HOST=database
-#      - MYSQL_ROOT_USER=root
-#      - MYSQL_ROOT_PASS=${MARIADB_ROOT_PASSWORD}
-#      #
-#      - IDO_DATABASE_NAME=icinga2core
-#      - IDO_PASSWORD=${IDO_PASSWORD}
-#      #
-#      - ICINGA2_MASTER=icinga2-master.matrix.lan
-#      - ICINGA2_CMD_API_USER=root
-#      - ICINGA2_CMD_API_PASS=icinga
-#      #
-#      - ICINGAWEB2_USERS=icinga:icinga,foo:bar
-#      - ICINGAWEB_DIRECTOR
-#      #
-#      - GRAPHITE_HOST=graphite
-#      #
-#      - GRAFANA_HOST # This is for swarm, url is: stackname_servicename
-#      - GRAFANA_PORT
-#      - GRAFANA_AUTHENTICATION
-#      - GRAFANA_TOKEN
-#      - GRAFANA_ENABLE_LINK
-#      - GRAFANA_SHOW_DEBUG
-#      - GRAFANA_PUBLIC
-#      - GRAFANA_PUBLIC_HOST
-#      - GRAFANA_PUBLIC_PROTOCOL
-#      - GRAFANA_THEME
+    environment:
+      - MYSQL_HOST=database
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASS=${MARIADB_ROOT_PASSWORD}
+      #
+      - IDO_DATABASE_NAME=icinga2core
+      - IDO_PASSWORD=${IDO_PASSWORD}
+      #
+      - ICINGA2_MASTER=icinga2-master.matrix.lan
+      - ICINGA2_CMD_API_USER=root
+      - ICINGA2_CMD_API_PASS=icinga
+      #
+      - ICINGAWEB2_USERS=icinga:icinga,foo:bar
+      - ICINGAWEB_DIRECTOR
+      #
+      - GRAPHITE_HOST=graphite
+      #
+      - GRAFANA_HOST # This is for swarm, url is: stackname_servicename
+      - GRAFANA_PORT
+      - GRAFANA_AUTHENTICATION
+      - GRAFANA_TOKEN
+      - GRAFANA_ENABLE_LINK
+      - GRAFANA_SHOW_DEBUG
+      - GRAFANA_PUBLIC
+      - GRAFANA_PUBLIC_HOST
+      - GRAFANA_PUBLIC_PROTOCOL
+      - GRAFANA_THEME
     env_file:
       - ${PWD}/.env
     links:
