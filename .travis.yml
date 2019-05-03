@@ -14,7 +14,7 @@ jobs:
   include:
     - stage: build
       script:
-        - make
+        - travis_wait 40 make
 
     - stage: build and test
       script:
@@ -29,7 +29,7 @@ jobs:
     - stage: push latest docker image
       if: branch = master
       script:
-        - make
+        - travis_wait 40 make
         - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
         - docker tag ${USER}/icingaweb2:latest ${DOCKER_USERNAME}/docker-icingaweb2:latest
         - docker push ${DOCKER_USERNAME}/docker-icingaweb2:latest
@@ -38,7 +38,7 @@ jobs:
     - stage: push version docker image
       if: branch = master
       script:
-        - make
+        - travis_wait 40 make
         - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
         - docker tag ${USER}/icingaweb2:latest ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
         - docker push ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
