@@ -1,45 +1,40 @@
 sudo: required
-
 services:
-  - docker
-
+- docker
 env:
   global:
-    - ICINGAWEB_VERSION=${ICINGAWEB_VERSION:-2.6.3}
-    - BUILD_DATE=$(date +"%Y-%m-%d")
-    - BUILD_TYPE=${ICINGAWEB_VERSION:-stable}
-    - ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-false}
-
+  - ICINGAWEB_VERSION=${ICINGAWEB_VERSION:-2.6.3}
+  - BUILD_DATE=$(date +"%Y-%m-%d")
+  - BUILD_TYPE=${ICINGAWEB_VERSION:-stable}
+  - ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-false}
+  - secure: hyPBzfOysnyHSvtZx02W6Bp8AGLBPTH2kabS6AAloXffNz6rT2VexiNuEYO2DYSAIFBRRqLdaHIImKb+jJqJ/G9EPuUKjUzX/V/E6wGhU7hqx4/vUis9rTB3xtJedfT63a7t5T14uVv4rnkMBWANGwXmzDrtPK+Ay2rnENE6MQ2Neg4VmJO69b7IV6I1pqe23wdaNAWR+intSu0C3/n2daygr9N78sGoqZD/Fy3mfc6+ubY6f5A9/EDVZTpaCvAi3iaSEkHu+bRPEmykS/MZQXb7jDlQ4VntlmNvrVyf9srF6Pcd+Hgc/9nixtpF1WnpE4PjXSAqgUdvoYRRW5Ng+zZWGPQ5MY8MUqW6CzTTNhc0iMsR72qb96oGRjDIOleLc7V71EZMXK/puQ/i9+z+2l3GxK0MyYB/9+CPcXLdPq3eOou3ujCj+NBzezQysp909AuGKbBwWxfvLBrATq9hGwJe71zQOPE1pjOkQqTDcY7rQVocem8OeH2iYfKkZZNxEwrx5q52oED7xoHxME+Hwt/z1lUZJC452EUaWjsvUREppryjqJDtn4LrTh7hOq5Cm+NwB5ZugyniIbdhPy9/OJVM5pyGK9SQXxZVd0F+XK1SM1LYKYFvfkMWTh5AnyhLIgwvs3W8vYYkiCj09pv/CRBIkSPnMHrikcxIzkMzDLo=
 jobs:
   include:
-    - stage: build
-      script:
-        - travis_wait 40 make
-
-    - stage: build and test
-      script:
-        - make compose-file
-        - docker-compose build
-        - docker-compose up -d
-        - sleep 2m
-        - make test
-        - docker-compose kill
-        - docker-compose down
-
-    - stage: push latest docker image
-      if: branch = master
-      script:
-        - travis_wait 40 make
-        - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
-        - docker tag ${USER}/icingaweb2:latest ${DOCKER_USERNAME}/docker-icingaweb2:latest
-        - docker push ${DOCKER_USERNAME}/docker-icingaweb2:latest
-        - docker logout
-
-    - stage: push version docker image
-      if: branch = master
-      script:
-        - travis_wait 40 make
-        - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
-        - docker tag ${USER}/icingaweb2:latest ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
-        - docker push ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
-        - docker logout
+  - stage: build
+    script:
+    - travis_wait 40 make
+  - stage: build and test
+    script:
+    - make compose-file
+    - docker-compose build
+    - docker-compose up -d
+    - sleep 2m
+    - make test
+    - docker-compose kill
+    - docker-compose down
+  - stage: push latest docker image
+    if: branch = master
+    script:
+    - travis_wait 40 make
+    - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+    - docker tag ${USER}/icingaweb2:latest ${DOCKER_USERNAME}/docker-icingaweb2:latest
+    - docker push ${DOCKER_USERNAME}/docker-icingaweb2:latest
+    - docker logout
+  - stage: push version docker image
+    if: branch = master
+    script:
+    - travis_wait 40 make
+    - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+    - docker tag ${USER}/icingaweb2:latest ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
+    - docker push ${DOCKER_USERNAME}/docker-icingaweb2:${ICINGAWEB_VERSION}
+    - docker logout
