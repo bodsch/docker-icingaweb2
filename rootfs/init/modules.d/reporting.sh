@@ -25,33 +25,33 @@ configure() {
 
     [[ -d /etc/icingaweb2/modules/reporting ]] || mkdir -p /etc/icingaweb2/modules/reporting
 
-#    log_info "      - create config files for icingaweb"
-#
-#    if [[ $(grep -c "reporting" /etc/icingaweb2/resources.ini) -eq 0 ]]
-#    then
-#      cat << EOF >> /etc/icingaweb2/resources.ini
-#
-#[reporting]
-#type       = "db"
-#db         = "mysql"
-#host       = "${MYSQL_HOST}"
-#port       = 3306
-#dbname     = "reporting"
-#username   = "reporting"
-#password   = "${DATABASE_REPORTING_PASSWORD}"
-#charset    = "utf8mb4"
-#
-#EOF
-#    fi
+    log_info "      - create config files for icingaweb"
 
-#    if [[ ! -f /etc/icingaweb2/modules/reporting/config.ini ]]
-#    then
-#      cat << EOF > /etc/icingaweb2/modules/reporting/config.ini
-#
-#[backend]
-#resource = "reporting"
-#EOF
-#    fi
+    if [[ $(grep -c "reporting" /etc/icingaweb2/resources.ini) -eq 0 ]]
+    then
+      cat << EOF >> /etc/icingaweb2/resources.ini
+
+[reporting]
+type       = "db"
+db         = "mysql"
+host       = "${MYSQL_HOST}"
+port       = 3306
+dbname     = "reporting"
+username   = "reporting"
+password   = "${DATABASE_REPORTING_PASSWORD}"
+charset    = "utf8mb4"
+
+EOF
+    fi
+
+    if [[ ! -f /etc/icingaweb2/modules/reporting/config.ini ]]
+    then
+      cat << EOF > /etc/icingaweb2/modules/reporting/config.ini
+
+[backend]
+resource = "reporting"
+EOF
+    fi
 
     log_info "      - enable module"
     /usr/bin/icingacli module enable reporting
