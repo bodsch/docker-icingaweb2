@@ -16,8 +16,11 @@
   "Icinga/icingaweb2-module-fileshipper": {},
   "Icinga/icingaweb2-module-toplevelview": {},
   "Icinga/icingaweb2-module-x509": {},
-  "Icinga/icingaweb2-module-reporting": {},
-  "Mikesch-mp/icingaweb2-module-grafana.git": {},
+  "Icinga/icingaweb2-module-reporting": {
+    "ignore": "true",
+    "use_git": "true"
+  },
+  "Mikesch-mp/icingaweb2-module-grafana": {},
   "Mikesch-mp/icingaweb2-module-globe": {},
   "nbuchwitz/icingaweb2-module-map": {},
   "morgajel/icingaweb2-module-boxydash": {},
@@ -27,5 +30,6 @@
   },
   "https://github.com/Icinga/icingaweb2-module-reactbundle": {},
   "https://github.com/Icinga/icingaweb2-module-ipl": {},
-  "https://github.com/Icinga/icingaweb2-module-incubator": {}
+  "https://github.com/Icinga/icingaweb2-module-incubator": {},
+  "https://github.com/Icinga/icingaweb2-module-pdfexport": {}
 }
