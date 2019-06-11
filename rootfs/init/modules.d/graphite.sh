@@ -30,7 +30,7 @@ configure() {
     exit 0
   fi
 
-  log_info "     create config files for icingaweb"
+  log_info "    create config files for icingaweb"
 
   [[ -d /etc/icingaweb2/modules/graphite ]] || mkdir -p /etc/icingaweb2/modules/graphite
 
@@ -52,7 +52,7 @@ disable_no_graphs_found = "0"
 
 EOF
 
-  log_info "     enable module"
+  log_info "    enable module"
   /usr/bin/icingacli module enable graphite
 }
 

@@ -46,7 +46,7 @@ check() {
 
 create_token() {
 
-  log_info "     create API token"
+  log_info "    create API token"
 
   API_TOKEN_FILE="/tmp/grafana.test"
   api_key="icingaweb2"
@@ -64,7 +64,7 @@ create_token() {
 
   if [[ -n ${existing_api_key} ]] && [[ -f ${API_TOKEN_FILE} ]]
   then
-    log_debug "       reuse token"
+    #log_debug "reuse token"
 
     GRAFANA_AUTHENTICATION_TOKEN=$(jq --raw-output .key ${API_TOKEN_FILE})
     API_NAME=$(jq --raw-output .name ${API_TOKEN_FILE})
@@ -83,15 +83,13 @@ create_token() {
 
     if [[ ${result} -eq 0 ]] && [[ ${code} = 200 ]]
     then
-      log_debug "     token request are successfull"
+      #log_debug "token request are successfull"
 
       GRAFANA_AUTHENTICATION_TOKEN=$(jq --raw-output .key ${API_TOKEN_FILE})
 
       export GRAFANA_AUTHENTICATION_TOKEN
     else
-      echo ${code}
-      log_error "     token request failed"
-      #exit 1
+      log_error "token request failed"
     fi
   fi
 }
@@ -105,7 +103,7 @@ configure() {
     exit 0
   fi
 
-  log_info "     create config files for icingaweb"
+  log_info "    create config files for icingaweb"
 
   [[ -d /etc/icingaweb2/modules/grafana ]] || mkdir -p /etc/icingaweb2/modules/grafana
 
@@ -194,7 +192,7 @@ EOF
 
   fi
 
-  log_info "     enable module"
+  log_info "    enable module"
   /usr/bin/icingacli module enable grafana
 
 }

@@ -2,47 +2,94 @@
 
 set -e
 
-WORK_DIR=$(dirname $(readlink --canonicalize "${0}"))
-PARENT_DIR=$(dirname $(readlink --canonicalize "${0%/*}"))
 
-DOCKER_COMPOSE=(docker-compose --file "${PARENT_DIR}/docker-compose.yml")
+CURL=$(which curl 2> /dev/null)
+NC=$(which nc 2> /dev/null)
+NC_OPTS="-z"
 
-[[ -f "${PARENT_DIR}/docker-compose.yml" ]] || make compose-file
+inspect() {
 
-# Check docker-compose configuration and start services
-${DOCKER_COMPOSE[@]} config --quiet
-${DOCKER_COMPOSE[@]} up -d
+  echo ""
+  echo "inspect needed containers"
+  for d in $(docker ps | tail -n +2 | awk  '{print($1)}')
+  do
+    # docker inspect --format "{{lower .Name}}" ${d}
+    c=$(docker inspect --format '{{with .State}} {{$.Name}} has pid {{.Pid}} {{end}}' ${d})
+    s=$(docker inspect --format '{{json .State.Health }}' ${d} | jq --raw-output .Status)
 
-sleep 10s
+    printf "%-40s - %s\n"  "${c}" "${s}"
+  done
+}
 
-echo 'Waiting until Icingaweb2 has been started'
 
-max_retry=30
-retry=0
+wait_for_icingaweb() {
 
-until [[ ${max_retry} -lt ${retry} ]]
-do
-  # -v              Verbose
-  # -w secs         Timeout for connects and final net reads
-  # -X proto        Proxy protocol: "4", "5" (SOCKS) or "connect"
-  #
-  status=$(nc -v -w1 -X connect localhost 80 2>&1 > /dev/null)
+  echo -e "\nwait for icingaweb"
+  RETRY=35
 
-  if [[ $(echo "${status}" | grep -c succeeded) -eq 1 ]]
+  until [[ ${RETRY} -le 0 ]]
+  do
+    timeout 1 bash -c "cat < /dev/null > /dev/tcp/localhost/443" 2> /dev/null
+    if [ $? -eq 0 ]
+    then
+      break
+    else
+      sleep 10s
+      RETRY=$(expr ${RETRY} - 1)
+    fi
+  done
+
+#  until [[ ${RETRY} -le 0 ]]
+#  do
+#    ${NC} ${NC_OPTS} localhost 80 < /dev/null > /dev/null
+#
+#    [[ $? -eq 0 ]] && break
+#
+#    sleep 10s
+#    RETRY=$((expr RETRY - 1))
+#  done
+
+  if [[ $RETRY -le 0 ]]
   then
-    break
-  else
-    retry=$(expr ${retry} + 1)
-    echo "  wait for an open port (${retry}/${max_retry})"
-    sleep 5s
+    echo "could not connect to icingaweb"
+    exit 1
   fi
-done
+  echo ""
+#   sleep 2s
+}
 
-if [[ ${retry} -eq ${max_retry} ]] || [[ ${retry} -gt ${max_retry} ]]
+
+head() {
+
+  curl \
+    --insecure \
+    --location \
+    https://localhost/icinga/authentication/login?_checkCookie=1
+}
+
+
+
+running_containers=$(docker ps | tail -n +2  | wc -l)
+
+if [[ ${running_containers} -eq 5 ]] || [[ ${running_containers} -gt 4 ]]
 then
-  echo "ERROR: Couldn't reach Icingaweb2 via network"
+  inspect
+
+  wait_for_icingaweb
+
+  head
+
+  exit 0
+else
+  echo "the test setup needs 4 containers"
+  echo "only ${running_containers} running"
+  echo "please run "
+  echo " make compose-file"
+  echo " docker-compose up -d"
+  echo "before"
+  echo "or check your system"
+
   exit 1
 fi
 
-# Shutdown
-${DOCKER_COMPOSE[@]} down
+

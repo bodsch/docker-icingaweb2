@@ -12,7 +12,7 @@
 monitored_directory="/etc/icingaweb2/modules/x509"
 hostname_f=$(hostname -f)
 
-log_info "        start the x509 monitor"
+log_info "    start the x509 monitor"
 
 CNT=0
 
@@ -29,7 +29,7 @@ do
     for i in $(grep "\[" ${monitored_directory}/jobs.ini)
     do
       job=$(echo $i | sed -e 's|\[||' -e 's|\]||')
-      log_info "      - scan x509 job ${job}"
+      log_info "      scan x509 job ${job}"
       /usr/bin/icingacli x509 scan --job ${job}
 
       if [[ $(ps -ef | grep -v grep | grep -c "icingacli x509 jobs run") -eq 0 ]]

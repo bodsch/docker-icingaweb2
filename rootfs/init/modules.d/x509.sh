@@ -27,7 +27,7 @@ configure() {
 
     [[ -d /etc/icingaweb2/modules/x509 ]] || mkdir -p /etc/icingaweb2/modules/x509
 
-    log_info "      - create config files for icingaweb"
+    log_info "    create config files for icingaweb"
 
     if [[ $(grep -c "x509" /etc/icingaweb2/resources.ini) -eq 0 ]]
     then
@@ -57,16 +57,16 @@ EOF
 
     if [[ -f ${CERTS_FILE} ]]
     then
-      log_info "      - import ca-certificates.crt"
+      log_info "    import ca-certificates.crt"
       /usr/bin/icingacli x509 import --file ${CERTS_FILE} > /dev/null
     fi
 
-    log_info "      - enable module"
+    log_info "    enable module"
     /usr/bin/icingacli module enable x509
 
     touch /etc/icingaweb2/modules/x509/jobs.ini
 
-    #log_info "      - run background deamon"
+    #log_info "    run background deamon"
     /init/runtime/watch_x509.sh > /dev/stdout 2>&1 &
 
     sleep 2s
@@ -76,7 +76,7 @@ EOF
       cat /init/custom.d/x509/jobs.ini >> /etc/icingaweb2/modules/x509/jobs.ini
     fi
 
-    log_info "      - run background deamon"
+    log_info "    run background deamon"
     /usr/bin/icingacli \
       x509 \
       jobs \
@@ -101,7 +101,7 @@ create_database() {
     # Database isn't created
     # well, i do my job ...
     #
-    log_info "      - initializing databases"
+    log_info "    initializing databases"
     (
       echo "--- create user 'x509'@'%' IDENTIFIED BY '${DATABASE_X509_PASSWORD}';"
       echo "CREATE DATABASE IF NOT EXISTS ${database_name} DEFAULT CHARACTER SET 'utf8mb4' COLLATE utf8mb4_bin;"
@@ -116,7 +116,7 @@ create_database() {
 
     if [[ -f ${SCHEMA_FILE} ]]
     then
-      log_info "      - import database schema"
+      log_info "    import database schema"
 
       mysql ${MYSQL_OPTS} --force ${database_name} < ${SCHEMA_FILE}
 

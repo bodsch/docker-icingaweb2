@@ -24,7 +24,7 @@ wait_for_port() {
     else
       retry=$(expr ${retry} + 1)
       log_info "  wait for an open port (${retry}/${max_retry})"
-      sleep 5s
+      sleep 10s
     fi
   done
 
