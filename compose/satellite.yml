@@ -4,7 +4,7 @@ version: '3.3'
 services:
 
   icinga2-satellite-1:
-    image: bodsch/docker-icinga2:2.10.2-satellite
+    image: bodsch/docker-icinga2:2.10.4-satellite
     container_name: icinga2-satellite-1
     hostname: icinga2-satellite-1.matrix.lan
     restart: always
@@ -32,7 +32,7 @@ services:
       - satellite
 
   icinga2-satellite-2:
-    image: bodsch/docker-icinga2:2.10.2-satellite
+    image: bodsch/docker-icinga2:2.10.4-satellite
     container_name: icinga2-satellite-2
     hostname: icinga2-satellite-2.matrix.lan
     restart: always

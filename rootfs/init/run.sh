@@ -39,6 +39,11 @@ fi
 
 prepare() {
 
+  for p in HTTP_PROXY HTTPS_PROXY NO_PROXY http_proxy https_proxy no_proxy
+  do
+    unset "${p}"
+  done
+
   MYSQL_ICINGAWEB2_PASSWORD=icingaweb2
 
   touch /etc/icingaweb2/resources.ini
@@ -117,6 +122,7 @@ configure_modules() {
           then
             # log_debug "execute file: $(basename ${f})"
             ${f}  # > /proc/self/fd/2 2>&1
+            sleep 1s
           else
             log_warn "file '${f}' is not executable"
           fi
