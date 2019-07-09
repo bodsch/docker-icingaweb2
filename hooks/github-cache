@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -x
 
 GITHUB_USER=${GITHUB_USER:-bodsch}
 WORK_DIR=$(dirname $(readlink --canonicalize "${0}"))
@@ -206,7 +207,9 @@ set +x
 
 github_ratelimit remaining
 
-if [[ "${remaining/$'\r'/}" -gt 20 ]]
+remaining="${remaining/$'\r'/}"
+
+if [[ "${remaining}" -gt 20 ]]
 then
   default_modules
   download_modules

@@ -26,8 +26,8 @@ else
     "Icinga/icingaweb2-theme-company": {},
     "jschanz/icingaweb2-theme-batman": {
       "image": [{
-        "url": "https://www.shareicon.net/download/2015/09/24/106444_man.svg",
-        "name": "batman.svg"
+        "url": "https://www.shareicon.net/download/256x256/2015/10/27/140095_logo_256x256.png",
+        "name": "batman.png"
       },{
         "url": "https://unsplash.com/photos/meqVd5zwylI",
         "name": "batman.jpg"

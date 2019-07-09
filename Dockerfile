@@ -112,8 +112,12 @@ RUN \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
   mkdir -p /var/log/icingaweb2 && \
   mkdir -p /etc/icingaweb2/modules && \
-  mkdir -p /etc/icingaweb2/enabledModules && \
-  /build/install_modules.sh && \
+  mkdir -p /etc/icingaweb2/enabledModules
+
+RUN \
+  /build/install_modules.sh
+
+RUN \
   /build/install_themes.sh
 
 # ---------------------------------------------------------------------------------------
