@@ -328,7 +328,9 @@ download_modules() {
 
 github_ratelimit remaining
 
-if [[ "${remaining/$'\r'/}" -gt 20 ]]
+remaining="${remaining/$'\r'/}"
+
+if [[ "${remaining}" -gt 20 ]]
 then
   default_modules
   build_cache
@@ -336,11 +338,18 @@ then
 
   download_modules
 
-  mv ${TEMP_DIR}/icingaweb2-modules ${JSON_DIR}
+  find ${TEMP_DIR}/icingaweb2-modules -type f -name "*.md" -delete
+  find ${TEMP_DIR}/icingaweb2-modules -type d -name "doc" -exec rm -rf {} \;
+
+  rsync -ar \
+    --exclude ".changes" \
+    ${TEMP_DIR}/icingaweb2-modules ${JSON_DIR}
+
+  echo "you can find all offline modules in the directory '${JSON_DIR}/icingaweb2-modules'"
 else
   echo "sorry, API rate limit fot github exceeded. (only ${remaining} left)"
 fi
 
 popd > /dev/null
 
-rm -rfv ${TEMP_DIR}
+rm -rf ${TEMP_DIR}

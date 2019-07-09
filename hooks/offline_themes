@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+# set -e
 
 GITHUB_USER=${GITHUB_USER:-bodsch}
 WORK_DIR=$(dirname $(readlink --canonicalize "${0}"))
@@ -58,6 +58,8 @@ default_themes() {
 
 
 download_themes() {
+
+  echo " download themes ..."
 
   [[ -d ${TEMP_DIR}/icingaweb2-themes ]] || mkdir -p ${TEMP_DIR}/icingaweb2-themes
   [[ -d ${TEMP_DIR}/tmp ]] || mkdir -p ${TEMP_DIR}/tmp
@@ -123,16 +125,20 @@ download_themes() {
 
 github_ratelimit remaining
 
-if [[ "${remaining/$'\r'/}" -gt 20 ]]
+remaining="${remaining/$'\r'/}"
+
+if [[ "${remaining}" -gt 20 ]]
 then
   default_themes
   download_themes
 
-  mv ${TEMP_DIR}/icingaweb2-themes ${JSON_DIR}
+  rsync -ar ${TEMP_DIR}/icingaweb2-themes ${JSON_DIR}
+
+  echo "you can find all offline themes in the directory '${JSON_DIR}/icingaweb2-themes'"
 else
   echo "sorry, API rate limit fot github exceeded. (only ${remaining} left)"
 fi
 
-popd > /dev/null
+# popd > /dev/null
 
 # rm -rfv ${TEMP_DIR}

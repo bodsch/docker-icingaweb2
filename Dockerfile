@@ -114,8 +114,14 @@ RUN \
   mkdir -p /etc/icingaweb2/modules && \
   mkdir -p /etc/icingaweb2/enabledModules
 
-RUN \
-  /build/install_modules.sh
+#RUN \
+#  /build/install_modules.sh
+
+#RUN \
+#  /build/install_themes.sh
+
+COPY build/icingaweb2-modules /usr/share/webapps/icingaweb2/modules/
+COPY build/icingaweb2-themes  /usr/share/webapps/icingaweb2/modules/
 
 RUN \
   /build/install_themes.sh

@@ -23,7 +23,7 @@ offline_themes:
 offline_modules:
 	@hooks/offline_modules
 
-build:
+build:	offline_themes	offline_modules
 	@hooks/build
 
 shell:
