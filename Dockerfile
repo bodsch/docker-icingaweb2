@@ -1,5 +1,5 @@
 
-FROM alpine:3.9 as stage1
+FROM alpine:3.10 as stage1
 
 # hadolint ignore=DL3018
 RUN \
@@ -49,7 +49,7 @@ RUN \
 
 # ---------------------------------------------------------------------------------------
 
-FROM alpine:3.9 as stage2
+FROM alpine:3.10 as stage2
 
 ARG VCS_REF
 ARG BUILD_DATE
@@ -128,7 +128,7 @@ RUN \
 
 # ---------------------------------------------------------------------------------------
 
-FROM alpine:3.9 as final
+FROM alpine:3.10 as final
 
 ARG VCS_REF
 ARG BUILD_DATE

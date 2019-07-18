@@ -67,7 +67,7 @@ default_modules() {
 
 module_informations() {
 
-  cd cache
+  pushd cache > /dev/null
 
   for file in $(ls -1 github_*.json)
   do
@@ -105,13 +105,18 @@ module_informations() {
     echo " - ${project_maintainer} :: ${project_name} ${version} (${release})"
   done
 
-  cd ..
+  popd > /dev/null
 }
 
 
 build_cache() {
 
-  echo " - get latest published versions"
+  echo " get latest published versions:"
+
+  if [[ -d "${JSON_DIR}/icingaweb2-modules/cache" ]]
+  then
+    cp -ar "${JSON_DIR}/icingaweb2-modules/cache" .
+  fi
 
   [[ -d cache ]] || mkdir -p cache
 
@@ -166,7 +171,7 @@ build_cache() {
     #
     if [[ ! -f "cache/github_${outfile}.json" ]]
     then
-      echo "https://api.github.com/repos/${project}/releases/latest"
+      # echo "https://api.github.com/repos/${project}/releases/latest"
 
       code=$(curl \
         ${curl_opts} \
@@ -200,9 +205,11 @@ build_cache() {
     # cat cache/github_${outfile}.json
   done
 
-  # module_informations
-
-  # tar -czf cache.tgz cache
+  # save the cache
+#  if [[ ! -d "${JSON_DIR}/icingaweb2-modules/cache" ]]
+#  then
+    cp -ar cache "${JSON_DIR}/icingaweb2-modules/"
+#  fi
 }
 
 
@@ -210,11 +217,13 @@ download_modules() {
 
   [[ -d ${TEMP_DIR}/icingaweb2-modules ]] || mkdir -p ${TEMP_DIR}/icingaweb2-modules
 
-  cd cache
+  pushd cache > /dev/null
+
+  echo ""
+  echo " download modules:"
 
   for file in $(ls -1 github_*.json)
   do
-
     published_at=$(jq --raw-output ".published_at" ${file})
     project_name=$(jq --raw-output ".project_name" ${file})
     project_maintainer=$(jq --raw-output ".project_maintainer" ${file})
@@ -228,9 +237,9 @@ download_modules() {
     [[ $destination =~ /usr/share/webapps/icingaweb2/modules/ ]] && destination=$(echo "${destination}" | sed "s|/usr/share/webapps/icingaweb2/modules/|${TEMP_DIR}/icingaweb2-modules/|")
     [[ "${destination}" == null ]] && destination=
 
-    echo ${destination}
+#     echo ${destination}
 
-    #continue
+    # continue
 
     if [[ ${published_at} != null ]]
     then
@@ -259,12 +268,12 @@ download_modules() {
     then
       if [[ ! -f "${project_name}.tgz" ]]
       then
-      curl \
-        --silent \
-        --location \
-        --retry 3 \
-        --output "${project_name}.tgz" \
-        ${url}
+        curl \
+          --silent \
+          --location \
+          --retry 3 \
+          --output "${project_name}.tgz" \
+          ${url}
       fi
 
       if [[ -f "${project_name}.tgz" ]]
@@ -277,7 +286,7 @@ download_modules() {
         then
           [[ -d ${destination} ]] || mkdir -p ${destination}
 
-          find . -mindepth 1 -maxdepth 1 -type d -name "*${project_name}*" -exec mv {} ${project_name} \;
+          find . -mindepth 1 -maxdepth 1 -type d -name "*${project_name}*" -exec mv {} ${project_name} 2> /dev/null \;
           mv ${project_name}/* ${destination}/
           rm -f ${project_name}.tgz
         else
@@ -291,6 +300,7 @@ download_modules() {
     else
 
       [[ -d icingaweb2-module-${project_name} ]] && rm -rf icingaweb2-module-${project_name}
+
       git clone \
         --quiet \
         https://github.com/${project_maintainer}/icingaweb2-module-${project_name} > /dev/null
@@ -323,6 +333,8 @@ download_modules() {
   done
 
   find ${TEMP_DIR}/icingaweb2-modules -name ".git*" -exec rm -rf {} 2> /dev/null \; || true
+
+  popd > /dev/null
 }
 
 
@@ -339,9 +351,10 @@ then
   download_modules
 
   find ${TEMP_DIR}/icingaweb2-modules -type f -name "*.md" -delete
-  find ${TEMP_DIR}/icingaweb2-modules -type d -name "doc" -exec rm -rf {} \;
+  find ${TEMP_DIR}/icingaweb2-modules -type d -name "doc" -exec rm -rf {} 2> /dev/null \; || true
 
-  rsync -ar \
+  rsync \
+    -ar \
     --exclude ".changes" \
     ${TEMP_DIR}/icingaweb2-modules ${JSON_DIR}
 
