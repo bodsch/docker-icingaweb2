@@ -5,7 +5,17 @@
 
 images=$(docker images -q ${DOCKER_NAME_SPACE}/${DOCKER_IMAGE_NAME} | uniq)
 
-[[ -z "${images}" ]] && exit 0
+# [[ -z "${images}" ]] && exit 0
 
-docker rmi \
-  --force ${images}
+if [[ ! -z "${images}" ]]
+then
+  docker rmi \
+    --force ${images}
+fi
+
+pushd build > /dev/null
+
+[[ -d icingaweb2-modules ]] && rm -rf icingaweb2-modules
+[[ -d icingaweb2-themes ]] && rm -rf icingaweb2-themes
+
+popd > /dev/null
