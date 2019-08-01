@@ -3,8 +3,9 @@
 #
 
 . /init/output.sh
+. /init/common.sh
 
-log_info "  - reporting"
+log_info "  reporting"
 
 DATABASE_REPORTING_PASSWORD="reporting"
 
@@ -15,7 +16,7 @@ check() {
 
 configure() {
 
-  local module_directory="/usr/share/webapps/icingaweb2/modules/reporting"
+  local module_directory="${ICINGAWEB_MODULES_DIRECTORY}/reporting"
 
   # icingaweb module_directory
   #
@@ -25,7 +26,7 @@ configure() {
 
     [[ -d /etc/icingaweb2/modules/reporting ]] || mkdir -p /etc/icingaweb2/modules/reporting
 
-    log_info "      - create config files for icingaweb"
+    log_info "    create config files for icingaweb"
 
     if [[ $(grep -c "reporting" /etc/icingaweb2/resources.ini) -eq 0 ]]
     then
@@ -53,10 +54,9 @@ resource = "reporting"
 EOF
     fi
 
-    log_info "      - enable module"
-    /usr/bin/icingacli module enable reporting
+    enable_module reporting
 
-    log_info "      - run background deamon"
+    log_info "    run background deamon"
     /usr/bin/icingacli \
       reporting \
       schedule \
@@ -68,7 +68,7 @@ EOF
 create_database() {
 
   local database_name='reporting'
-  local modules_directory="/usr/share/webapps/icingaweb2/modules/reporting"
+  local modules_directory="${ICINGAWEB_MODULES_DIRECTORY}/reporting"
 
   # check if database already created ...
   #

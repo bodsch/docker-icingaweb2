@@ -18,6 +18,8 @@ ICINGAWEB_ADMIN_PASS=${ICINGAWEB_ADMIN_PASS:-"icinga"}
 
 export ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-"true"}
 
+export ICINGAWEB_MODULES_DIRECTORY=/usr/share/webapps/icingaweb2/modules
+
 . /init/output.sh
 
 # -------------------------------------------------------------------------------------------------
@@ -111,6 +113,10 @@ custom_scripts() {
 configure_modules() {
 
   log_info "configure modules"
+
+  [[ -e /etc/icingaweb2/enabledModules/reactbundle ]] || ln -s /usr/share/webapps/icingaweb2/modules/reactbundle /etc/icingaweb2/enabledModules/
+  [[ -e /etc/icingaweb2/enabledModules/incubator ]]   || ln -s /usr/share/webapps/icingaweb2/modules/incubator /etc/icingaweb2/enabledModules/
+  [[ -e /etc/icingaweb2/enabledModules/ipl ]]         || ln -s /usr/share/webapps/icingaweb2/modules/ipl /etc/icingaweb2/enabledModules/
 
   if [[ -d /init/modules.d ]]
   then

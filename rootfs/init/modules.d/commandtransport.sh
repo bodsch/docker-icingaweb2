@@ -4,7 +4,7 @@
 
 . /init/output.sh
 
-log_info "  - command transport"
+log_info "  command transport"
 
 ICINGA2_MASTER=${ICINGA2_MASTER:-"icinga2-master"}
 ICINGA2_PORT=${ICINGA2_PORT:-5665}
@@ -17,7 +17,7 @@ ICINGA2_CMD_API_PASS=${ICINGA2_CMD_API_PASS:-""}
 check() {
   if ( [[ -z ${ICINGA2_MASTER} ]] || [[ -z ${ICINGA2_CMD_API_USER} ]] || [[ -z ${ICINGA2_CMD_API_PASS} ]] )
   then
-    log_warn "no valid information for command transport over API"
+    log_warn "   no valid information for command transport over API"
     exit 0
   fi
 }

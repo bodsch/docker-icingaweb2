@@ -6,8 +6,9 @@ GRAPHITE_HOST=${GRAPHITE_HOST:-""}
 GRAPHITE_HTTP_PORT=${GRAPHITE_HTTP_PORT:-8080}
 
 . /init/output.sh
+. /init/common.sh
 
-log_info "  - graphite"
+log_info "  graphite"
 
 check() {
 
@@ -15,7 +16,7 @@ check() {
   then
     log_info "    disable graphite support while missing GRAPHITE_HOST or GRAPHITE_HTTP_PORT"
 
-    /usr/bin/icingacli module disable graphite
+    disable_module graphite
     exit 0
   fi
 
@@ -23,10 +24,9 @@ check() {
 
 configure() {
 
-
-  if [[ $(/usr/bin/icingacli module list | grep -c graphite) -eq 0 ]]
+  if [[ $(list_module graphite) -eq 0 ]]
   then
-    log_warn "    graphite module is not installed"
+    log_warn "graphite module is not installed"
     exit 0
   fi
 
@@ -52,8 +52,7 @@ disable_no_graphs_found = "0"
 
 EOF
 
-  log_info "    enable module"
-  /usr/bin/icingacli module enable graphite
+  enable_module graphite
 }
 
 check

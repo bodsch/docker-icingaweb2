@@ -29,8 +29,9 @@ GRAFANA_THEME=${GRAFANA_THEME:-light}
 GRAFANA_PROXY_TIMEOUT=${GRAFANA_PROXY_TIMEOUT:-5}
 
 . /init/output.sh
+. /init/common.sh
 
-log_info "  - grafana"
+log_info "  grafana"
 
 check() {
 
@@ -38,7 +39,7 @@ check() {
   then
     log_info "    disable grafana support while missing GRAFANA_HOST or GRAFANA_PORT"
 
-    /usr/bin/icingacli module disable grafana
+    disable_module grafana
     exit 0
   fi
 }
@@ -97,11 +98,17 @@ create_token() {
 
 configure() {
 
-  if [[ $(/usr/bin/icingacli module list | grep -c grafana) -eq 0 ]]
+  if [[ $(list_module grafana) -eq 0 ]]
   then
-    log_warn "    grafana module is not installed"
+    log_warn "grafana module is not installed"
     exit 0
   fi
+
+#  if [[ $(/usr/bin/icingacli module list | grep -c grafana) -eq 0 ]]
+#  then
+#    log_warn "grafana module is not installed"
+#    exit 0
+#  fi
 
   log_info "    create config files for icingaweb"
 
@@ -192,9 +199,7 @@ EOF
 
   fi
 
-  log_info "    enable module"
-  /usr/bin/icingacli module enable grafana
-
+  enable_module grafana
 }
 
 check

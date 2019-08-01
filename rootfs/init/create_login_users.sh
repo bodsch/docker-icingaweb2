@@ -74,7 +74,7 @@ create_login_user() {
 
       [[ -z ${pass} ]] && pass=${user}
 
-      log_info "  - '${user}'"
+      log_info "  ${user}"
 
       insert_user_into_database ${user} ${pass}
 

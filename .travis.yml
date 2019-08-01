@@ -12,7 +12,9 @@ jobs:
   include:
   - stage: build
     script:
-    - travis_wait 40 make
+    - make offline_themes
+    - make offline_modules
+    - make
   - stage: build and test
     script:
     - make offline_themes
