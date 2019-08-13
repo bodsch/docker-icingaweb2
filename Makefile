@@ -5,7 +5,7 @@ export DOCKER_VERSION    ?= latest
 export BUILD_DATE        := $(shell date +%Y-%m-%d)
 export BUILD_VERSION     := $(shell date +%y%m)
 export BUILD_TYPE        ?= stable
-export ICINGAWEB_VERSION ?= 2.6.3
+export ICINGAWEB_VERSION ?= 2.7.0
 export INSTALL_THEMES    ?= true
 export INSTALL_MODULES   ?= true
 
@@ -17,7 +17,13 @@ default: build
 github-cache:
 	@hooks/github-cache
 
-build:
+offline_themes:
+	@hooks/offline_themes
+
+offline_modules:
+	@hooks/offline_modules
+
+build:	offline_themes	offline_modules
 	@hooks/build
 
 shell:

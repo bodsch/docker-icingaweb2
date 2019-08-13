@@ -3,7 +3,7 @@ services:
 - docker
 env:
   global:
-  - ICINGAWEB_VERSION=${ICINGAWEB_VERSION:-2.6.3}
+  - ICINGAWEB_VERSION=${ICINGAWEB_VERSION:-2.7.0}
   - BUILD_DATE=$(date +"%Y-%m-%d")
   - BUILD_TYPE=${ICINGAWEB_VERSION:-stable}
   - ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-false}
@@ -12,9 +12,11 @@ jobs:
   include:
   - stage: build
     script:
-    - travis_wait 40 make
+    - make
   - stage: build and test
     script:
+    - make offline_themes
+    - make offline_modules
     - make compose-file
     - docker-compose build
     - docker-compose up -d

@@ -29,8 +29,9 @@ GRAFANA_THEME=${GRAFANA_THEME:-light}
 GRAFANA_PROXY_TIMEOUT=${GRAFANA_PROXY_TIMEOUT:-5}
 
 . /init/output.sh
+. /init/common.sh
 
-log_info "  - grafana"
+log_info "  grafana"
 
 check() {
 
@@ -38,7 +39,7 @@ check() {
   then
     log_info "    disable grafana support while missing GRAFANA_HOST or GRAFANA_PORT"
 
-    /usr/bin/icingacli module disable grafana
+    disable_module grafana
     exit 0
   fi
 }
@@ -46,7 +47,7 @@ check() {
 
 create_token() {
 
-  log_info "     create API token"
+  log_info "    create API token"
 
   API_TOKEN_FILE="/tmp/grafana.test"
   api_key="icingaweb2"
@@ -64,7 +65,7 @@ create_token() {
 
   if [[ -n ${existing_api_key} ]] && [[ -f ${API_TOKEN_FILE} ]]
   then
-    log_debug "       reuse token"
+    #log_debug "reuse token"
 
     GRAFANA_AUTHENTICATION_TOKEN=$(jq --raw-output .key ${API_TOKEN_FILE})
     API_NAME=$(jq --raw-output .name ${API_TOKEN_FILE})
@@ -83,15 +84,13 @@ create_token() {
 
     if [[ ${result} -eq 0 ]] && [[ ${code} = 200 ]]
     then
-      log_debug "     token request are successfull"
+      #log_debug "token request are successfull"
 
       GRAFANA_AUTHENTICATION_TOKEN=$(jq --raw-output .key ${API_TOKEN_FILE})
 
       export GRAFANA_AUTHENTICATION_TOKEN
     else
-      echo ${code}
-      log_error "     token request failed"
-      #exit 1
+      log_error "token request failed"
     fi
   fi
 }
@@ -99,13 +98,19 @@ create_token() {
 
 configure() {
 
-  if [[ $(/usr/bin/icingacli module list | grep -c grafana) -eq 0 ]]
+  if [[ $(list_module grafana) -eq 0 ]]
   then
-    log_warn "    grafana module is not installed"
+    log_warn "grafana module is not installed"
     exit 0
   fi
 
-  log_info "     create config files for icingaweb"
+#  if [[ $(/usr/bin/icingacli module list | grep -c grafana) -eq 0 ]]
+#  then
+#    log_warn "grafana module is not installed"
+#    exit 0
+#  fi
+
+  log_info "    create config files for icingaweb"
 
   [[ -d /etc/icingaweb2/modules/grafana ]] || mkdir -p /etc/icingaweb2/modules/grafana
 
@@ -194,9 +199,7 @@ EOF
 
   fi
 
-  log_info "     enable module"
-  /usr/bin/icingacli module enable grafana
-
+  enable_module grafana
 }
 
 check

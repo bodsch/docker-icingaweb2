@@ -5,8 +5,9 @@
 CERTS_FILE=${CERTS_FILE:-"/etc/ssl/certs/ca-certificates.crt"}
 
 . /init/output.sh
+. /init/common.sh
 
-log_info "  - x509"
+log_info "  x509"
 
 DATABASE_X509_PASSWORD="x509"
 
@@ -17,7 +18,7 @@ check() {
 
 configure() {
 
-  local module_directory="/usr/share/webapps/icingaweb2/modules/x509"
+  local module_directory="${ICINGAWEB_MODULES_DIRECTORY}/x509"
 
   # icingaweb module_directory
   #
@@ -27,7 +28,7 @@ configure() {
 
     [[ -d /etc/icingaweb2/modules/x509 ]] || mkdir -p /etc/icingaweb2/modules/x509
 
-    log_info "      - create config files for icingaweb"
+    log_info "    create config files for icingaweb"
 
     if [[ $(grep -c "x509" /etc/icingaweb2/resources.ini) -eq 0 ]]
     then
@@ -55,28 +56,32 @@ resource = "x509"
 EOF
     fi
 
+    enable_module x509
+
     if [[ -f ${CERTS_FILE} ]]
     then
-      log_info "      - import ca-certificates.crt"
-      /usr/bin/icingacli x509 import --file ${CERTS_FILE} > /dev/null
+      log_info "    import ca-certificates.crt"
+      /usr/bin/icingacli x509 import --verbose --file ${CERTS_FILE}
+    else
+      log_error "    no certificate file found"
     fi
 
-    log_info "      - enable module"
-    /usr/bin/icingacli module enable x509
+    #log_info "    enable module"
+    #/usr/bin/icingacli module enable x509
 
     touch /etc/icingaweb2/modules/x509/jobs.ini
-
-    #log_info "      - run background deamon"
-    /init/runtime/watch_x509.sh > /dev/stdout 2>&1 &
-
-    sleep 2s
 
     if [[ -d /init/custom.d/x509 ]] && [[ -f /init/custom.d/x509/jobs.ini ]]
     then
       cat /init/custom.d/x509/jobs.ini >> /etc/icingaweb2/modules/x509/jobs.ini
     fi
 
-    log_info "      - run background deamon"
+    #log_info "    run background deamon"
+    /init/runtime/watch_x509.sh > /dev/stdout 2>&1 &
+
+    sleep 2s
+
+    log_info "    run background deamon"
     /usr/bin/icingacli \
       x509 \
       jobs \
@@ -101,7 +106,7 @@ create_database() {
     # Database isn't created
     # well, i do my job ...
     #
-    log_info "      - initializing databases"
+    log_info "    initializing databases"
     (
       echo "--- create user 'x509'@'%' IDENTIFIED BY '${DATABASE_X509_PASSWORD}';"
       echo "CREATE DATABASE IF NOT EXISTS ${database_name} DEFAULT CHARACTER SET 'utf8mb4' COLLATE utf8mb4_bin;"
@@ -116,7 +121,7 @@ create_database() {
 
     if [[ -f ${SCHEMA_FILE} ]]
     then
-      log_info "      - import database schema"
+      log_info "    import database schema"
 
       mysql ${MYSQL_OPTS} --force ${database_name} < ${SCHEMA_FILE}
 

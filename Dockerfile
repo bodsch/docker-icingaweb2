@@ -1,5 +1,5 @@
 
-FROM alpine:3.9 as stage1
+FROM alpine:3.10 as stage1
 
 # hadolint ignore=DL3018
 RUN \
@@ -49,7 +49,7 @@ RUN \
 
 # ---------------------------------------------------------------------------------------
 
-FROM alpine:3.9 as stage2
+FROM alpine:3.10 as stage2
 
 ARG VCS_REF
 ARG BUILD_DATE
@@ -112,13 +112,23 @@ RUN \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
   mkdir -p /var/log/icingaweb2 && \
   mkdir -p /etc/icingaweb2/modules && \
-  mkdir -p /etc/icingaweb2/enabledModules && \
-  /build/install_modules.sh && \
+  mkdir -p /etc/icingaweb2/enabledModules
+
+#RUN \
+#  /build/install_modules.sh
+
+#RUN \
+#  /build/install_themes.sh
+
+COPY build/icingaweb2-modules /usr/share/webapps/icingaweb2/modules/
+COPY build/icingaweb2-themes  /usr/share/webapps/icingaweb2/modules/
+
+RUN \
   /build/install_themes.sh
 
 # ---------------------------------------------------------------------------------------
 
-FROM alpine:3.9 as final
+FROM alpine:3.10 as final
 
 ARG VCS_REF
 ARG BUILD_DATE

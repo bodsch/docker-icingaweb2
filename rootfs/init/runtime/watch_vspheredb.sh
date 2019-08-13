@@ -164,7 +164,7 @@ vspheredb_handler() {
 
 run() {
 
-  log_info "        start the vspheredb monitor"
+  log_info "    start the vspheredb monitor"
 
   create_secrets_file
 

@@ -3,8 +3,9 @@
 #
 
 . /init/output.sh
+. /init/common.sh
 
-log_info "  - vspheredb"
+log_info "  vspheredb"
 
 DATABASE_VSPHEREDB_PASSWORD="vspheredb"
 
@@ -16,7 +17,7 @@ check() {
   then
     log_info "    director support is disabled"
 
-    /usr/bin/icingacli module disable vspheredb
+    disable_module vspheredb
     exit 0
   fi
 }
@@ -24,7 +25,7 @@ check() {
 create_database() {
 
   local database_name='vspheredb'
-  local modules_directory="/usr/share/webapps/icingaweb2/modules/vspheredb"
+  local modules_directory="${ICINGAWEB_MODULES_DIRECTORY}/vspheredb"
 
   # check if database already created ...
   #
@@ -37,7 +38,7 @@ create_database() {
     # Database isn't created
     # well, i do my job ...
     #
-    log_info "      - initializing databases"
+    log_info "    initializing databases"
     (
       echo "--- create user 'vspheredb'@'%' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
       echo "CREATE DATABASE IF NOT EXISTS ${database_name} DEFAULT CHARACTER SET 'utf8mb4' COLLATE utf8mb4_bin;"
@@ -52,33 +53,33 @@ create_database() {
 
     if [[ -f ${SCHEMA_FILE} ]]
     then
-      log_info "      - import database schema"
+      log_info "      import database schema"
 
       mysql ${MYSQL_OPTS} --force ${database_name} < ${SCHEMA_FILE}
 
       if [[ $? -eq 0 ]]
       then
 
-        log_info "      - import database migrations"
+        log_info "      import database migrations"
         for f in $(ls -1 ${modules_directory}/schema/mysql-migrations/*.sql)
         do
-          log_info "        apply database migration from '$(basename ${f})'"
+          log_info "      apply database migration from '$(basename ${f})'"
 
           mysql ${MYSQL_OPTS} --force ${database_name}  < ${f} 2> /dev/null
 
           if [[ $? -gt 0 ]]
           then
-            log_error "        database migration failed"
+            log_error "      database migration failed"
             exit 1
           fi
         done
 
       else
-        log_error "    can't insert the Database Schema"
+        log_error "can't insert the Database Schema"
         exit 1
       fi
     else
-      log_warn "    missing schema file"
+      log_warn "missing schema file"
     fi
   fi
 }
@@ -101,7 +102,7 @@ configure() {
   #  /usr/bin/composer install
   #fi
 
-  local vspheredb="/usr/share/webapps/icingaweb2/modules/vspheredb"
+  local vspheredb="${ICINGAWEB_MODULES_DIRECTORY}/vspheredb"
 
   # icingaweb vspheredb
   #
@@ -111,7 +112,7 @@ configure() {
 
     create_database
 
-    log_info "      - create config files for icingaweb"
+    log_info "    create config files for icingaweb"
 
     if [[ $(grep -c "vspheredb]" /etc/icingaweb2/resources.ini) -eq 0 ]]
     then
@@ -145,8 +146,7 @@ EOF
 
   # enable module
   #
-  log_info "      - enable module"
-  /usr/bin/icingacli module enable vspheredb
+  enable_module vspheredb
 
   # icingacli vspheredb task initialize --serverId 1
   # icingacli vspheredb daemon run --trace --debug

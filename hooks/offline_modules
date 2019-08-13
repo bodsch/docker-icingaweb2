@@ -1,16 +1,38 @@
 #!/bin/bash
 
 set -e
-set -x
 
 GITHUB_USER=${GITHUB_USER:-bodsch}
 WORK_DIR=$(dirname $(readlink --canonicalize "${0}"))
 JSON_DIR=$(dirname $(readlink --canonicalize "${0%/*}"))/build
 TEMP_DIR=$(mktemp --directory)
 
-pushd ${TEMP_DIR}
+pushd ${TEMP_DIR} > /dev/null
 
 echo "current directory: ${PWD}"
+echo "json directory   : ${JSON_DIR}"
+
+# check github rate limits
+# we consume for each REST API call a credit
+#
+github_ratelimit() {
+
+  local -n VAR=$1
+
+  curl_opts=
+  [[ -z ${GITHUB_OAUTH_TOKEN} ]] || curl_opts="--user ${GITHUB_USER}:${GITHUB_OAUTH_TOKEN}"
+
+  remaining=$(curl \
+    --silent \
+    --include \
+    ${curl_opts} \
+    "https://api.github.com/users/${GITHUB_USER}" | grep "X-RateLimit-Remaining: " | awk -F 'X-RateLimit-Remaining: ' '{print $2}')
+
+  echo "RateLimit Remaining: ${remaining}"
+
+  VAR=${remaining}
+}
+
 
 default_modules() {
 
@@ -42,31 +64,10 @@ default_modules() {
 
 }
 
-# check github rate limits
-# we consume for each REST API call a credit
-#
-github_ratelimit() {
 
-  local -n VAR=$1
+module_informations() {
 
-  curl_opts=
-  [[ -z ${GITHUB_OAUTH_TOKEN} ]] || curl_opts="--user ${GITHUB_USER}:${GITHUB_OAUTH_TOKEN}"
-
-  remaining=$(curl \
-    --silent \
-    --include \
-    ${curl_opts} \
-    "https://api.github.com/users/${GITHUB_USER}" | grep "X-RateLimit-Remaining: " | awk -F 'X-RateLimit-Remaining: ' '{print $2}')
-
-  echo "RateLimit Remaining: ${remaining}"
-
-  VAR=${remaining}
-}
-
-
-check_downloads() {
-
-  cd cache
+  pushd cache > /dev/null
 
   for file in $(ls -1 github_*.json)
   do
@@ -104,13 +105,18 @@ check_downloads() {
     echo " - ${project_maintainer} :: ${project_name} ${version} (${release})"
   done
 
-  cd ..
+  popd > /dev/null
 }
 
 
-download_modules() {
+build_cache() {
 
-  echo " - get latest published versions"
+  echo " get latest published versions:"
+
+  if [[ -d "${JSON_DIR}/icingaweb2-modules/cache" ]]
+  then
+    cp -ar "${JSON_DIR}/icingaweb2-modules/cache" .
+  fi
 
   [[ -d cache ]] || mkdir -p cache
 
@@ -165,7 +171,7 @@ download_modules() {
     #
     if [[ ! -f "cache/github_${outfile}.json" ]]
     then
-      echo "https://api.github.com/repos/${project}/releases/latest"
+      # echo "https://api.github.com/repos/${project}/releases/latest"
 
       code=$(curl \
         ${curl_opts} \
@@ -175,7 +181,7 @@ download_modules() {
         --out "cache/github_${outfile}.json" \
         https://api.github.com/repos/${project}/releases/latest)
     fi
-set -x
+
     # remove some unneeded parts
     # and add our things
     #
@@ -192,16 +198,143 @@ set -x
 
         mv cache/github_${outfile}.json_TMP2 cache/github_${outfile}.json_TMP
       fi
-set +x
+
       mv cache/github_${outfile}.json_TMP cache/github_${outfile}.json
     fi
 
-    cat cache/github_${outfile}.json
+    # cat cache/github_${outfile}.json
   done
 
-  check_downloads
+  # save the cache
+#  if [[ ! -d "${JSON_DIR}/icingaweb2-modules/cache" ]]
+#  then
+    cp -ar cache "${JSON_DIR}/icingaweb2-modules/"
+#  fi
+}
 
-  tar -czf cache.tgz cache
+
+download_modules() {
+
+  [[ -d ${TEMP_DIR}/icingaweb2-modules ]] || mkdir -p ${TEMP_DIR}/icingaweb2-modules
+
+  pushd cache > /dev/null
+
+  echo ""
+  echo " download modules:"
+
+  for file in $(ls -1 github_*.json)
+  do
+    published_at=$(jq --raw-output ".published_at" ${file})
+    project_name=$(jq --raw-output ".project_name" ${file})
+    project_maintainer=$(jq --raw-output ".project_maintainer" ${file})
+    author=$(jq --raw-output ".author.login" ${file})
+    version=$(jq --raw-output ".tag_name" ${file})
+    url=$(jq --raw-output ".tarball_url" ${file})
+    enable=$(jq --raw-output ".enable" ${file})
+    use_git=$(jq --raw-output ".use_git" ${file})
+    destination=$(jq --raw-output ".destination" ${file})
+
+    [[ $destination =~ /usr/share/webapps/icingaweb2/modules/ ]] && destination=$(echo "${destination}" | sed "s|/usr/share/webapps/icingaweb2/modules/|${TEMP_DIR}/icingaweb2-modules/|")
+    [[ "${destination}" == null ]] && destination=
+
+#     echo ${destination}
+
+    # continue
+
+    if [[ ${published_at} != null ]]
+    then
+      if [[ -e /etc/alpine-release ]]
+      then
+        release_date=$(date -d @$(date -u -D %Y-%m-%dT%TZ -d "${published_at}" +%s) +%d.%m.%Y)
+      else
+        release_date=$(date -d ${published_at} +%d.%m.%Y)
+      fi
+
+      release="released at ${release_date}"
+
+      if [[ "${use_git}" == "true" ]]
+      then
+        release="${release} but use git"
+      fi
+
+    else
+      version=""
+      release="never released, use git"
+    fi
+
+    echo " - ${project_name} ${version} (${release}) (${project_maintainer})"
+
+    if [[ ${url} != null ]] && [[ "${use_git}" = "false" ]]
+    then
+      if [[ ! -f "${project_name}.tgz" ]]
+      then
+        curl \
+          --silent \
+          --location \
+          --retry 3 \
+          --output "${project_name}.tgz" \
+          ${url}
+      fi
+
+      if [[ -f "${project_name}.tgz" ]]
+      then
+        # [[ -d ${MODULE_DIRECTORY} ]] || continue
+
+        tar -xzf ${project_name}.tgz
+
+        if [[ ! -z ${destination} ]]
+        then
+          [[ -d ${destination} ]] || mkdir -p ${destination}
+
+          find . -mindepth 1 -maxdepth 1 -type d -name "*${project_name}*" -exec mv {} ${project_name} 2> /dev/null \;
+          mv ${project_name}/* ${destination}/
+          rm -f ${project_name}.tgz
+        else
+          find . -mindepth 1 -maxdepth 1 -type d -name "*${project_name}*" -exec mv {} ${TEMP_DIR}/icingaweb2-modules/${project_name} \;
+
+          #rm -f ${project_name}.tgz
+          #mkdir /etc/icingaweb2/modules/${project_name}
+        fi
+      fi
+
+    else
+
+      [[ -d icingaweb2-module-${project_name} ]] && rm -rf icingaweb2-module-${project_name}
+
+      git clone \
+        --quiet \
+        https://github.com/${project_maintainer}/icingaweb2-module-${project_name} > /dev/null
+
+      #[[ -d ${MODULE_DIRECTORY} ]] || continue
+
+      # install PHP dependency
+      #
+      if [[ -e "icingaweb2-module-${project_name}/composer.json" ]]
+      then
+#        echo "found composer.json"
+        pushd icingaweb2-module-${project_name} > /dev/null
+
+        set +e
+        composer=$(command -v composer)
+
+        [[ -z "${composer}" ]] || ${composer} install > /dev/null 2> /dev/null
+        set -e
+        popd > /dev/null
+      fi
+
+      mv icingaweb2-module-${project_name} ${TEMP_DIR}/icingaweb2-modules/${project_name}
+    fi
+
+    #if [[ "${enable}" = "true" ]] && [[ -d ${TEMP_DIR}/icingaweb2-modules/${project_name} ]]
+    #then
+    #  /usr/bin/icingacli module enable ${project_name} 2> /dev/null
+    #fi
+
+  done
+
+  find ${TEMP_DIR}/icingaweb2-modules -name ".git*" -exec rm -rf {} 2> /dev/null \; || true
+
+  popd > /dev/null
 }
 
 
@@ -212,16 +345,26 @@ remaining="${remaining/$'\r'/}"
 if [[ "${remaining}" -gt 20 ]]
 then
   default_modules
+  build_cache
+  module_informations
+
   download_modules
 
-  if [[ -f cache.tgz ]]
-  then
-    cp -v cache.tgz ${JSON_DIR}/
-  fi
+  find ${TEMP_DIR}/icingaweb2-modules -type f -name "*.md" -delete
+  find ${TEMP_DIR}/icingaweb2-modules -type d -name "doc" -exec rm -rf {} 2> /dev/null \; || true
+
+  rsync \
+    -ar \
+    --exclude ".changes" \
+    ${TEMP_DIR}/icingaweb2-modules ${JSON_DIR}
+
+  echo "you can find all offline modules in the directory '${JSON_DIR}/icingaweb2-modules'"
 else
-  echo "sorry, API rate limit fot github exceeded. (only ${remaining} left)"
+  echo "sorry, API rate limit for github exceeded. (only ${remaining} left)"
+
+  exit 1
 fi
 
-popd
+popd > /dev/null
 
-rm -rfv ${TEMP_DIR}
+rm -rf ${TEMP_DIR}

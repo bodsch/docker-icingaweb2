@@ -4,7 +4,7 @@
 
 . /init/output.sh
 
-log_info "  - authentication"
+log_info "  authentication"
 
 # configure the LDAP resources
 #
