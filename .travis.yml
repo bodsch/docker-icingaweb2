@@ -12,8 +12,6 @@ jobs:
   include:
   - stage: build
     script:
-    - make offline_themes
-    - make offline_modules
     - make
   - stage: build and test
     script:
