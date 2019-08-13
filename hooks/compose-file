@@ -28,6 +28,7 @@ ICINGAWEB_DIRECTOR=${ICINGAWEB_DIRECTOR:-false}
 XDEBUG_ENABLED=true
 
 ICINGA2_MASTER=icinga2-master.matrix.lan
+ICINGA2_PARENT=icinga2-master.matrix.lan
 
 ICINGA2_CMD_API_USER=root
 ICINGA2_CMD_API_PASS=icinga

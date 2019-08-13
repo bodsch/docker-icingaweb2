@@ -136,7 +136,9 @@ then
 
   echo "you can find all offline themes in the directory '${JSON_DIR}/icingaweb2-themes'"
 else
-  echo "sorry, API rate limit fot github exceeded. (only ${remaining} left)"
+  echo "sorry, API rate limit for github exceeded. (only ${remaining} left)"
+
+  exit 1
 fi
 
 # popd > /dev/null
