@@ -42,12 +42,13 @@ create_database() {
     (
       echo "--- create user 'director'@'%' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
       echo "CREATE DATABASE IF NOT EXISTS ${database_name} DEFAULT CHARACTER SET 'utf8';"
-      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'director'@'%' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
-      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'director'@'$(hostname -i)' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
-      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'director'@'$(hostname -s)' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
-      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'director'@'$(hostname -f)' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
+      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE, ALTER ON ${database_name}.* TO 'director'@'%' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
+      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE, ALTER ON ${database_name}.* TO 'director'@'$(hostname -i)' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
+      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE, ALTER ON ${database_name}.* TO 'director'@'$(hostname -s)' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
+      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE, ALTER ON ${database_name}.* TO 'director'@'$(hostname -f)' IDENTIFIED BY '${MYSQL_ICINGAWEB2_PASSWORD}';"
       echo "quit"
     ) | mysql ${MYSQL_OPTS}
+
 
     SCHEMA_FILE="${director}/schema/mysql.sql"
 

@@ -57,6 +57,8 @@ services:
       - 80:80
     environment:
       ICINGA2_MASTER: icinga2-master
+      ### Set only if you have Multi Master Icinga2!
+      # ICINGA2_MASTER2: icinga2-master2
       ICINGA2_CMD_API_USER: root
       ICINGA2_CMD_API_PASS: icinga
       MYSQL_HOST: database
@@ -85,4 +87,3 @@ services:
       - icinga2-master
       - database
       - graphite
-
