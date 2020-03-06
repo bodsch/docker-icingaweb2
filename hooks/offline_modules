@@ -83,12 +83,14 @@ module_informations() {
 
     if [[ ${published_at} != null ]]
     then
-      if [[ -e /etc/alpine-release ]]
-      then
-        release_date=$(date -d @$(date -u -D %Y-%m-%dT%TZ -d "${published_at}" +%s) +%d.%m.%Y)
-      else
-        release_date=$(date -d ${published_at} +%d.%m.%Y)
-      fi
+      release_date=$(date -d ${published_at} +%d.%m.%Y)
+      # installed coreutils package to replace busybox date impl
+      #if [[ -e /etc/alpine-release ]]
+      #then
+      #  release_date=$(date -d @$(date -u -D %Y-%m-%dT%TZ -d "${published_at}" +%s) +%d.%m.%Y)
+      #else
+      #  release_date=$(date -d ${published_at} +%d.%m.%Y)
+      #fi
 
       release="released at ${release_date}"
 
@@ -243,12 +245,14 @@ download_modules() {
 
     if [[ ${published_at} != null ]]
     then
-      if [[ -e /etc/alpine-release ]]
-      then
-        release_date=$(date -d @$(date -u -D %Y-%m-%dT%TZ -d "${published_at}" +%s) +%d.%m.%Y)
-      else
-        release_date=$(date -d ${published_at} +%d.%m.%Y)
-      fi
+      release_date=$(date -d ${published_at} +%d.%m.%Y)
+      # installed coreutils package to replace busybox date impl
+      #if [[ -e /etc/alpine-release ]]
+      #then
+      #  release_date=$(date -d @$(date -u -D %Y-%m-%dT%TZ -d "${published_at}" +%s) +%d.%m.%Y)
+      #else
+      #  release_date=$(date -d ${published_at} +%d.%m.%Y)
+      #fi
 
       release="released at ${release_date}"
 

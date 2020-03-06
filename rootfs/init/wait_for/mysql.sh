@@ -17,7 +17,9 @@ wait_for_database() {
   #
   until [[ ${RETRY} -le 0 ]]
   do
-    mysql ${MYSQL_OPTS} --execute="select 1 from mysql.user limit 1" > /dev/null
+    #  mysql ${MYSQL_OPTS} --execute="select 1 from mysql.user limit 1" > /dev/null
+    mysql ${MYSQL_OPTS} --execute="SELECT USER(),CURRENT_USER();" > /dev/null
+
 
     [[ $? -eq 0 ]] && break
 

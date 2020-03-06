@@ -9,7 +9,10 @@ CERTS_FILE=${CERTS_FILE:-"/etc/ssl/certs/ca-certificates.crt"}
 
 log_info "  x509"
 
-DATABASE_X509_PASSWORD="x509"
+X509_DATABASE_USER=${X509_DATABASE_USER:-"x509"}
+X509_DATABASE_PASS=${X509_DATABASE_PASS:-"x509"}
+X509_DATABASE_NAME=${X509_DATABASE_NAME:-"x509"}
+MYSQL_UOPTS="--host=${MYSQL_HOST} --user=${X509_DATABASE_USER} --password=${X509_DATABASE_PASS} --port=${MYSQL_PORT}"
 
 check() {
 
@@ -24,7 +27,11 @@ configure() {
   #
   if [[ -d ${module_directory} ]]
   then
+    create_user
+
     create_database
+
+    create_schema
 
     [[ -d /etc/icingaweb2/modules/x509 ]] || mkdir -p /etc/icingaweb2/modules/x509
 
@@ -38,10 +45,10 @@ configure() {
 type       = "db"
 db         = "mysql"
 host       = "${MYSQL_HOST}"
-port       = 3306
-dbname     = "x509"
-username   = "x509"
-password   = "${DATABASE_X509_PASSWORD}"
+port       = "${MYSQL_PORT}"
+dbname     = "${X509_DATABASE_NAME}"
+username   = "${X509_DATABASE_USER}"
+password   = "${X509_DATABASE_PASS}"
 charset    = "utf8mb4"
 
 EOF
@@ -90,32 +97,90 @@ EOF
   fi
 }
 
+# create database user
+#
+create_user() {
+
+  # check if user is already created ...
+  #
+  query="SHOW DATABASES;"
+
+  status=$(mysql ${MYSQL_UOPTS} --batch --execute="${query}")
+
+  if [[ $(echo "${status}" | wc -w) -eq 0 ]]
+  then
+    # user isn't created
+    # well, i do my job ...
+    #
+
+    log_info "    initializing x509 db user"
+    (
+      echo "CREATE USER '${X509_DATABASE_USER}'@'%' IDENTIFIED BY '${X509_DATABASE_PASS}';"
+      echo "FLUSH PRIVILEGES;"
+      echo "quit"
+    ) | mysql ${MYSQL_OPTS}
+
+    if [[ $? -eq 1 ]]
+    then
+      log_error "failed to create user: '${X509_DATABASE_USER}'"
+      exit 1
+    fi
+  fi
+}
+
+# create database
+#
 create_database() {
 
-  local database_name='x509'
+
+  local database_name="${X509_DATABASE_NAME}"
   local modules_directory="/usr/share/webapps/icingaweb2/modules/x509"
 
   # check if database already created ...
   #
-  query="SELECT TABLE_SCHEMA FROM information_schema.tables WHERE table_schema = '${database_name}' limit 1;"
+  query="SHOW DATABASES LIKE '${database_name}'"
 
-  database_status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | wc -w )
+  status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}")
 
-  if [[ ${database_status} -eq 0 ]]
+  if [[ $(echo "${status}" | wc -w) -eq 0 ]]
   then
     # Database isn't created
     # well, i do my job ...
     #
-    log_info "    initializing databases"
+
+    log_info "    initializing x509 databases"
     (
-      echo "--- create user 'x509'@'%' IDENTIFIED BY '${DATABASE_X509_PASSWORD}';"
       echo "CREATE DATABASE IF NOT EXISTS ${database_name} DEFAULT CHARACTER SET 'utf8mb4' COLLATE utf8mb4_bin;"
-      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'x509'@'%' IDENTIFIED BY '${DATABASE_X509_PASSWORD}';"
-      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'x509'@'$(hostname -i)' IDENTIFIED BY '${DATABASE_X509_PASSWORD}';"
-      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'x509'@'$(hostname -s)' IDENTIFIED BY '${DATABASE_X509_PASSWORD}';"
-      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'x509'@'$(hostname -f)' IDENTIFIED BY '${DATABASE_X509_PASSWORD}';"
+      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO '${X509_DATABASE_USER}'@'%' IDENTIFIED BY '${X509_DATABASE_PASS}';"
+      echo "FLUSH PRIVILEGES;"
       echo "quit"
     ) | mysql ${MYSQL_OPTS}
+
+    if [[ $? -eq 1 ]]
+    then
+      log_error "can't create database '${database_name}'"
+      exit 1
+    fi
+  fi
+}
+
+# create web database schema
+#
+create_schema() {
+
+
+  local database_name="${X509_DATABASE_NAME}"
+  local modules_directory="/usr/share/webapps/icingaweb2/modules/x509"
+
+
+  # check if database scheme is already created ...
+  #
+  query="SELECT TABLE_SCHEMA FROM information_schema.tables WHERE table_schema = \"${database_name}\" limit 1;"
+
+  status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}")
+
+  if [[ $(echo "${status}" | wc -w) -eq 0 ]]
+  then
 
     SCHEMA_FILE="${modules_directory}/etc/schema/mysql.schema.sql"
 
@@ -133,7 +198,6 @@ create_database() {
     else
       log_warn "missing schema file"
     fi
-
   fi
 }
 

@@ -16,7 +16,7 @@ wait_for_port() {
     #
     status=$(nc -v -w1 -X connect ${server} ${port} 2>&1 > /dev/null)
 
-    #log_debug "'${status}'"
+    log_debug "'${status}'"
 
     if [[ $(echo "${status}" | grep -c succeeded) -eq 1 ]]
     then

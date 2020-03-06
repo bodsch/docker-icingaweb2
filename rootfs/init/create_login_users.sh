@@ -19,13 +19,14 @@ insert_user_into_database() {
   (
     echo "USE ${WEB_DATABASE_NAME};"
     echo "INSERT IGNORE INTO icingaweb_user (name, active, password_hash) VALUES ('${user}', 1, '${pass}');"
+    echo "FLUSH PRIVILEGES;"
     echo "quit"
   ) | mysql ${MYSQL_OPTS}
 
   if [[ $? -gt 0 ]]
   then
-    log_error "can't create the icingaweb user"
-    exit 1
+    log_error "can't create the icingaweb user the normal way"
+    log_error "maybe you've luck trying 'icinga:icinga' but it might become a liability!"
   fi
 }
 
@@ -91,4 +92,3 @@ create_login_user() {
 create_login_user
 
 # EOF
-

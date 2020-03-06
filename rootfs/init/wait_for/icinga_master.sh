@@ -42,7 +42,9 @@ wait_for_icinga_master() {
           if [[ ${utime} -gt ${ICINGA2_UPTIME} ]]
           then
             break
+            log_info "The icinga2 master '${ICINGA2_MASTER}' has uptime of ${utime}"
           else
+            log_info "The icinga2 master '${ICINGA2_MASTER}' has uptime of ${utime}"
             sleep 20s
             RETRY=$(expr ${RETRY} - 1)
           fi

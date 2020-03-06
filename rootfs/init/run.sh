@@ -74,13 +74,14 @@ correct_rights() {
   chmod 1777 /tmp
   chmod 2770 /etc/icingaweb2
 
-  chown root:nginx     /etc/icingaweb2
-  chown -R nginx:nginx /etc/icingaweb2/*
+  chown root:www-data     /etc/icingaweb2
+  chown -R www-data:www-data /etc/icingaweb2/*
+  # chown -R www-data:www-data /run/php/*
 
   find /etc/icingaweb2 -type f -name "*.ini" -exec chmod 0660 {} \;
   find /etc/icingaweb2 -type d -exec chmod 2770 {} \;
 
-  chown nginx:nginx /var/log/icingaweb2
+  chown www-data:www-data /var/log/icingaweb2
 }
 
 # side channel to inject some wild-style customized scripts
@@ -153,12 +154,16 @@ run() {
   configure_modules
   correct_rights
 
-  /usr/sbin/php-fpm7 \
+  log_info "starting php-fpm"
+
+  /usr/sbin/php-fpm7.3 \
     --fpm-config /etc/php7/php-fpm.conf \
-    --pid /run/php-fpm.pid \
+    --pid /run/php/php7.3-fpm.pid \
     --allow-to-run-as-root \
     --force-stderr \
     --nodaemonize > /proc/self/fd/1 2>&1 &
+
+  log_info "starting nginx"
 
   /usr/sbin/nginx > /proc/self/fd/1 2>&1
 }

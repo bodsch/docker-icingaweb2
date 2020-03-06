@@ -1,55 +1,4 @@
-
-FROM alpine:3.10 as stage1
-
-# hadolint ignore=DL3018
-RUN \
-  apk update  --quiet --no-cache
-
-# hadolint ignore=DL3018
-RUN \
-  apk add     --quiet --no-cache \
-    build-base \
-    ca-certificates \
-    curl \
-    php7-dev \
-    php7-fpm \
-    php7-ctype \
-    php7-curl \
-    php7-dom \
-    php7-fpm \
-    php7-gettext \
-    php7-gd \
-    php7-iconv \
-    php7-intl \
-    php7-json \
-    php7-ldap \
-    php7-mbstring \
-    php7-openssl \
-    php7-pdo_mysql \
-    php7-pear \
-    php7-phar \
-    php7-session \
-    php7-simplexml \
-    php7-tokenizer \
-    php7-xml \
-    yaml \
-    yaml-dev
-
-# patch fucking pecl to read php.ini
-RUN \
-  sed -i "s|$PHP -C -n -q |$PHP -C -q |" /usr/bin/pecl
-
-RUN \
-  pecl channel-update pecl.php.net
-
-# hadolint ignore=DL4006
-RUN \
-  (yes '' | pecl install yaml) && \
-  (yes '' | pecl install xdebug)
-
-# ---------------------------------------------------------------------------------------
-
-FROM alpine:3.10 as stage2
+FROM debian:buster-slim as stage1
 
 ARG VCS_REF
 ARG BUILD_DATE
@@ -59,25 +8,72 @@ ARG ICINGAWEB_VERSION
 ARG INSTALL_THEMES
 ARG INSTALL_MODULES
 
-# hadolint ignore=DL3018
+ENV \
+  TERM=xterm \
+  DEBIAN_FRONTEND=noninteractive \
+  TZ='Europe/Berlin'
+
+# ---------------------------------------------------------------------------------------
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 RUN \
-  apk update  --quiet --no-cache && \
-  apk add     --quiet --no-cache \
-    bash \
-    ca-certificates \
-    curl \
-    composer \
-    jq \
-    git
+  chsh -s /bin/bash && \
+  ln -sf /bin/bash /bin/sh && \
+  ln -sf "/usr/share/zoneinfo/${TZ}" /etc/localtime && \
+  ln -s  /etc/default /etc/sysconfig && \
+  apt-get remove \
+    --allow-remove-essential \
+    --assume-yes \
+    --purge \
+      e2fsprogs libext2fs2 && \
+  apt-get update && \
+  apt-get install \
+    --assume-yes \
+    --no-install-recommends \
+      apt-utils lsb-release && \
+  apt-get dist-upgrade \
+    --assume-yes && \
+  apt-get install \
+    --assume-yes \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      wget \
+      gnupg > /dev/null && \
+  curl \
+    --silent \
+    https://packages.icinga.com/icinga.key | apt-key add - && \
+  . /etc/os-release && \
+  if [ "${ID}" = "ubuntu" ]; then \
+    if [ -n "${UBUNTU_CODENAME+x}" ]; then \
+      DIST="${UBUNTU_CODENAME}"; \
+    else \
+      DIST="$(lsb_release -c | awk '{print $2}')"; \
+    fi \
+  elif [ "${ID}" = "debian" ]; then \
+    DIST=$(awk -F"[)(]+" '/VERSION=/ {print $2}' /etc/os-release) ;\
+  fi && \
+  echo " => ${ID} - ${DIST}" && \
+  echo "deb http://packages.icinga.com/${ID} icinga-${DIST} main" > "/etc/apt/sources.list.d/${DIST}-icinga.list" && \
+  curl https://packages.sury.org/php/apt.gpg | apt-key add -; \
+  echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list && \
+  apt-get update
 
 # hadolint ignore=DL3018
 RUN \
-  apk add     --quiet --no-cache \
-    php7 \
-    php7-ctype \
-    php7-openssl \
-    php7-intl \
-    php7-gettext
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
+  bash \
+  ca-certificates \
+  curl \
+  composer \
+  jq \
+  git \
+  php7.3 \
+  php7.3-ctype \
+  php7.3-intl \
+  php7.3-gettext
 
 COPY build /build
 
@@ -128,7 +124,7 @@ RUN \
 
 # ---------------------------------------------------------------------------------------
 
-FROM alpine:3.10 as final
+FROM debian:buster-slim as final
 
 ARG VCS_REF
 ARG BUILD_DATE
@@ -138,69 +134,120 @@ ARG ICINGAWEB_VERSION
 ARG INSTALL_THEMES
 ARG INSTALL_MODULES
 
-COPY --from=stage1 /usr/lib/php7/modules/yaml.so   /usr/lib/php7/modules/
-COPY --from=stage1 /usr/lib/php7/modules/xdebug.so /usr/lib/php7/modules/
-COPY --from=stage2 /usr/share/webapps              /usr/share/webapps
-COPY --from=stage2 /etc/icingaweb2                 /etc/icingaweb2
+ENV \
+  TERM=xterm \
+  DEBIAN_FRONTEND=noninteractive \
+  TZ='Europe/Berlin'
+
+COPY --from=stage1 /usr/share/webapps              /usr/share/webapps
+COPY --from=stage1 /etc/icingaweb2                 /etc/icingaweb2
+
+RUN \
+  apt-get update && apt-get install -y locales && \
+  echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && \
+  locale-gen && update-locale LANG=en_US.UTF-8
 
 # hadolint ignore=DL3017,DL3018
 RUN \
-  apk update  --quiet --no-cache && \
-  apk upgrade --quiet --no-cache && \
-  apk add     --quiet --no-cache \
+  chsh -s /bin/bash && \
+  ln -sf /bin/bash /bin/sh && \
+  ln -sf "/usr/share/zoneinfo/${TZ}" /etc/localtime && \
+  ln -s  /etc/default /etc/sysconfig && \
+  apt-get remove \
+    --allow-remove-essential \
+    --assume-yes \
+    --purge \
+      e2fsprogs libext2fs2 && \
+  apt-get update && \
+  apt-get install \
+    --assume-yes \
+    --no-install-recommends \
+      apt-utils lsb-release && \
+  apt-get dist-upgrade \
+    --assume-yes && \
+  apt-get install \
+    --assume-yes \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      wget \
+      gnupg > /dev/null && \
+  curl \
+    --silent \
+    https://packages.icinga.com/icinga.key | apt-key add - && \
+  . /etc/os-release && \
+  if [ "${ID}" = "ubuntu" ]; then \
+    if [ -n "${UBUNTU_CODENAME+x}" ]; then \
+      DIST="${UBUNTU_CODENAME}"; \
+    else \
+      DIST="$(lsb_release -c | awk '{print $2}')"; \
+    fi \
+  elif [ "${ID}" = "debian" ]; then \
+    DIST=$(awk -F"[)(]+" '/VERSION=/ {print $2}' /etc/os-release) ;\
+  fi && \
+  echo " => ${ID} - ${DIST}" && \
+  echo "deb http://packages.icinga.com/${ID} icinga-${DIST} main" > "/etc/apt/sources.list.d/${DIST}-icinga.list" && \
+  curl https://packages.sury.org/php/apt.gpg | apt-key add -; \
+  echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list && \
+  apt-get update
+
+RUN \
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
     bash \
-    bind-tools \
     ca-certificates \
     curl \
+    dnsutils \
+    dos2unix \
     inotify-tools \
     jq \
-    mysql-client \
+    locales \
+    mariadb-client \
+    nano \
     nginx \
     netcat-openbsd \
     openssl \
-    php7 \
-    php7-ctype \
-    php7-fpm \
-    php7-pdo_mysql \
-    php7-openssl \
-    php7-intl \
-    php7-ldap \
-    php7-gettext \
-    php7-json \
-    php7-mbstring \
-    php7-curl \
-    php7-iconv \
-    php7-session \
-    php7-xml \
-    php7-dom \
-    php7-soap \
-    php7-sockets \
-    php7-posix \
-    php7-pcntl \
-    php7-gmp \
-    shadow \
+    php7.3 \
+    php7.3-cli \
+    php7.3-common \
+    php7.3-ctype \
+    php7.3-fpm \
+    php7.3-mysql \
+    php7.3-intl \
+    php7.3-ldap \
+    php7.3-gettext \
+    php7.3-json \
+    php7.3-mbstring \
+    php7.3-curl \
+    php7.3-iconv \
+    php7.3-xml \
+    php7.3-dom \
+    php7.3-soap \
+    php7.3-sockets \
+    php7.3-posix \
+    php7.3-gmp \
+    php-yaml \
+    php-xdebug \
+    procps \
+    python-yaml \
     tzdata \
     pwgen \
-    yaml \
     yajl-tools && \
-  cp /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
-  echo "extension=yaml.so"        > /etc/php7/conf.d/ext-yaml.ini && \
-  echo "zend_extension=xdebug.so" > /etc/php7/conf.d/ext-xdebug.ini.disabled && \
-  sed -i -e '/^#/ d' -e '/^;/ d'  -e '/^ *$/ d' /etc/php7/php.ini && \
+  sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+  sed -i -e 's/# pl_PL.UTF-8 UTF-8/pl_PL.UTF-8 UTF-8/' /etc/locale.gen && \
+  sed -i -e 's/# de_DE.UTF-8 UTF-8/de_DE.UTF-8 UTF-8/' /etc/locale.gen && \
+  dpkg-reconfigure --frontend=noninteractive locales && \
+  locale-gen && update-locale LANG=en_US.UTF-8 && \
   ln -s /usr/share/webapps/icingaweb2/bin/icingacli /usr/bin/icingacli && \
   mkdir -p /var/log/icingaweb2 && \
   /usr/bin/icingacli module disable setup && \
   /usr/bin/icingacli module enable monitoring  2> /dev/null && \
   /usr/bin/icingacli module enable translation 2> /dev/null && \
   /usr/bin/icingacli module enable doc         2> /dev/null && \
-  mkdir /run/nginx && \
+  mkdir /run/php && \
   mkdir /var/log/php-fpm && \
-  apk del --quiet \
-    tzdata && \
-  rm -rf \
-    /build \
-    /tmp/* \
-    /var/cache/apk/*
+  rm /etc/nginx/sites-enabled/default && \
+  rm -rf /build && rm -rf /tmp/*
 
 COPY rootfs/ /
 
@@ -221,14 +268,14 @@ CMD ["/init/run.sh"]
 # Build-time metadata as defined at http://label-schema.org
 LABEL \
   version=${BUILD_VERSION} \
-  maintainer="Bodo Schulz <bodo@boone-schulz.de>" \
+  maintainer="Michael Siebertz <s_michael1@gmx.de>" \
   org.label-schema.build-date=${BUILD_DATE} \
   org.label-schema.name="IcingaWeb2 Docker Image" \
   org.label-schema.description="Inofficial IcingaWeb2 Docker Image" \
   org.label-schema.url="https://www.icinga.org/" \
   org.label-schema.vcs-ref=${VCS_REF} \
-  org.label-schema.vcs-url="https://github.com/bodsch/docker-icingaweb2" \
-  org.label-schema.vendor="Bodo Schulz" \
+  org.label-schema.vcs-url="https://gitlab.com/olemisea/icingaweb2" \
+  org.label-schema.vendor="Michael Siebertz" \
   org.label-schema.version=${ICINGAWEB_VERSION} \
   org.label-schema.schema-version="1.0" \
   com.microscaling.docker.dockerfile="/Dockerfile" \

@@ -7,24 +7,96 @@
 
 log_info "  vspheredb"
 
-DATABASE_VSPHEREDB_PASSWORD="vspheredb"
+
+VSPHEREDB_DATABASE_USER=${VSPHEREDB_DATABASE_USER:-"vspheredb"}
+VSPHEREDB_DATABASE_PASS=${VSPHEREDB_DATABASE_PASS:-"vspheredb"}
+VSPHEREDB_DATABASE_NAME=${VSPHEREDB_DATABASE_NAME:-"vspheredb"}
+MYSQL_UOPTS="--host=${MYSQL_HOST} --user=${VSPHEREDB_DATABASE_USER} --password=${VSPHEREDB_DATABASE_PASS} --port=${MYSQL_PORT}"
 
 check() {
 
   [[ -z "${MYSQL_OPTS}" ]] && exit 1
 
-  if [[ "${ICINGAWEB_DIRECTOR}" = "false" ]]
+  if [[ "${ICINGAWEB_VSPHEREDB}" = "false" ]]
   then
-    log_info "    director support is disabled"
+    log_info "    vspheredb support is disabled"
 
     disable_module vspheredb
     exit 0
   fi
 }
 
+# create database user
+#
+create_user() {
+
+  # check if user is already created ...
+  #
+  query="SHOW DATABASES;"
+
+  status=$(mysql ${MYSQL_UOPTS} --batch --execute="${query}")
+
+  if [[ $(echo "${status}" | wc -w) -eq 0 ]]
+  then
+    # user isn't created
+    # well, i do my job ...
+    #
+
+    log_info "      initializing vspheredb user"
+    (
+      echo "create user '${VSPHEREDB_DATABASE_USER}'@'%' IDENTIFIED BY '${VSPHEREDB_DATABASE_PASS}';"
+      echo "FLUSH PRIVILEGES;"
+    ) | mysql ${MYSQL_OPTS}
+
+    if [[ $? -eq 1 ]]
+    then
+      log_error "failed to create user: '${VSPHEREDB_DATABASE_USER}'"
+      exit 1
+    fi
+  fi
+}
+
+# create database
+#
 create_database() {
 
-  local database_name='vspheredb'
+  local database_name="${VSPHEREDB_DATABASE_NAME}"
+  local modules_directory="${ICINGAWEB_MODULES_DIRECTORY}/vspheredb"
+
+  # check if database already created ...
+  #
+  query="SHOW DATABASES LIKE '${VSPHEREDB_DATABASE_NAME}'"
+
+  status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}")
+
+  if [[ $(echo "${status}" | wc -w) -eq 0 ]]
+  then
+    # Database isn't created
+    # well, i do my job ...
+    #
+
+    log_info "      initializing vspheredb databases"
+    (
+      echo "CREATE DATABASE IF NOT EXISTS ${VSPHEREDB_DATABASE_NAME} DEFAULT CHARACTER SET 'utf8mb4' COLLATE utf8mb4_bin;"
+      echo "GRANT SELECT, INSERT, UPDATE, CREATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE, ALTER ON ${VSPHEREDB_DATABASE_NAME}.* TO '${VSPHEREDB_DATABASE_USER}'@'%' IDENTIFIED BY '${VSPHEREDB_DATABASE_PASS}';"
+      echo "FLUSH PRIVILEGES;"
+      echo "quit"
+    ) | mysql ${MYSQL_OPTS}
+
+    if [[ $? -eq 1 ]]
+    then
+      log_error "can't create database '${VSPHEREDB_DATABASE_NAME}'"
+      exit 1
+    fi
+  fi
+}
+
+# create database schema
+#
+
+create_schema() {
+
+  local database_name="${VSPHEREDB_DATABASE_NAME}"
   local modules_directory="${ICINGAWEB_MODULES_DIRECTORY}/vspheredb"
 
   # check if database already created ...
@@ -35,19 +107,6 @@ create_database() {
 
   if [[ ${database_status} -eq 0 ]]
   then
-    # Database isn't created
-    # well, i do my job ...
-    #
-    log_info "    initializing databases"
-    (
-      echo "--- create user 'vspheredb'@'%' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
-      echo "CREATE DATABASE IF NOT EXISTS ${database_name} DEFAULT CHARACTER SET 'utf8mb4' COLLATE utf8mb4_bin;"
-      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'vspheredb'@'%' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
-      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'vspheredb'@'$(hostname -i)' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
-      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'vspheredb'@'$(hostname -s)' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
-      echo "GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON ${database_name}.* TO 'vspheredb'@'$(hostname -f)' IDENTIFIED BY '${DATABASE_VSPHEREDB_PASSWORD}';"
-      echo "quit"
-    ) | mysql ${MYSQL_OPTS}
 
     SCHEMA_FILE="${modules_directory}/schema/mysql.sql"
 
@@ -110,7 +169,11 @@ configure() {
   then
     #log_info "configure vspheredb"
 
+    create_user
+
     create_database
+
+    create_schema
 
     log_info "    create config files for icingaweb"
 
@@ -122,10 +185,10 @@ configure() {
 type       = "db"
 db         = "mysql"
 host       = "${MYSQL_HOST}"
-port       = 3306
-dbname     = "vspheredb"
-username   = "vspheredb"
-password   = "${DATABASE_VSPHEREDB_PASSWORD}"
+port       = "${MYSQL_PORT}"
+dbname     = "${VSPHEREDB_DATABASE_NAME}"
+username   = "${VSPHEREDB_DATABASE_USER}"
+password   = "${VSPHEREDB_DATABASE_PASS}"
 charset    = "utf8mb4"
 
 EOF

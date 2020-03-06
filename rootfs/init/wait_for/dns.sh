@@ -20,6 +20,7 @@ wait_for_dns() {
       log_info "  wait for a valid dns record (${retry}/${max_retry})"
       sleep 10s
     else
+      log_info "   ${host}!"
       break
     fi
   done
