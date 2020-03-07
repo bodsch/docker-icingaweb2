@@ -112,16 +112,33 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 | `MYSQL_ROOT_USER`                  | `root`               | MySQL root User                                                 |
 | `MYSQL_ROOT_PASS`                  | -                    | MySQL root password                                             |
 | `IDO_DATABASE_NAME`                | `icinga2core`        | Schema Name for IDO                                             |
+| `IDU_USER`                         | `icinga2`            | IDO User                                                        |
 | `IDO_PASSWORD`                     | -                    | IDO password                                                    |
+| `WEB_DATABASE_NAME`                | `icingaweb2`         | Name for the Icingaweb2 DB                                      |
+| `WEB_DATABASE_USER`                | `icingaweb2`         | Username for the Icingaweb2 DB                                  |
+| `WEB_DATABASE_PASS`                | `icingaweb2`         | Password for the Icingaweb2 DB                                  |
+| `MYSQL_DIRECTOR_NAME`              | `director`           | Name for the Icinga Director DB                                 |
+| `MYSQL_DIRECTOR_USER`              | `director`           | Username for the Icinga Director DB                             |
+| `MYSQL_DIRECTOR_PASS`              | `director`           | Password for the Icinga Director DB                             |
+| `REPORTING_DATABASE_NAME`          | `reporting`          | Name for the Icinga Reporting DB                                |
+| `REPORTING_DATABASE_USER`          | `reporting`          | Username for the Icinga Reporting DB                            |
+| `REPORTING_DATABASE_PASS`          | `reporting`          | Password for the Icinga Reporting DB                            |
+| `VSPHEREDB_DATABASE_NAME`          | `vspheredb`          | Name for the Icinga Vsphere DB                                  |
+| `VSPHEREDB_DATABASE_USER`          | `vspheredb`          | Username for the Icinga Vsphere DB                              |
+| `REPORTING_DATABASE_PASS`          | `vspheredb`          | Password for the Icinga Vsphere DB                              |
+| `X509_DATABASE_NAME`               | `x509`               | Name for the Icinga x509 DB                                     |
+| `X509_DATABASE_USER`               | `x509`               | Username for the Icinga x509 DB                                 |
+| `X509_DATABASE_PASS`               | `x509`               | Password for the Icinga x509 DB                                 |
 |                                    |                      |                                                                 |
 | `GRAPHITE_HOST`                    | -                    | Hostname for the graphite service<br>If no hostname is specified, the module is automatically deactivated.  |
 | `GRAPHITE_HTTP_PORT`               | `8080`               | graphite port                                                   |
 |                                    |                      |                                                                 |
 | `ICINGA2_MASTER`                   | `icinga2-master`     | Icinga2 Host for Command Transport over API                     |
-| `ICINGA2_MASTER2`                  | -                    | configure Multi Master Icinga2 Command Transport over API       |
+| `ICINGA2_MASTER2`                  | -                    | Icinga2 Master2,  activates HA Mode                             |
 | `ICINGA2_API_PORT`                 | `5665`               | Icinga2 API Port                                                |
 | `ICINGA2_CMD_API_USER`             | -                    | API User for Command Transport                                  |
 | `ICINGA2_CMD_API_PASS`             | -                    | API Password for Command Transport                              |
+| `ICINGA2_DIRECTOR_HOST`            | ${ICINGA2_MASTER}    | Override the DNS / IP for Director Kickstart, useful for local test |
 |                                    |                      |                                                                 |
 | `ICINGAWEB_ADMIN_USER`             | `icinga`             |                                                                 |
 | `ICINGAWEB_ADMIN_PASS`             | `icinga`             |                                                                 |
