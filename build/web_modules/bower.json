@@ -1,0 +1,34 @@
+{
+  "name": "local",
+  "description": "",
+  "main": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "aws": "https://github.com/Icinga/icingaweb2-module-aws.git#^1.0.0",
+    "director": "https://github.com/Icinga/icingaweb2-module-director.git#^1.7.2",
+    "vspheredb": "https://github.com/Icinga/icingaweb2-module-vspheredb.git#^1.1.0",
+    "businessprocess": "https://github.com/Icinga/icingaweb2-module-businessprocess.git#^2.2.0",
+    "elasticsearch": "https://github.com/Icinga/icingaweb2-module-elasticsearch.git#^0.9.0",
+    "cube": "https://github.com/Icinga/icingaweb2-module-cube.git#^1.1.0",
+    "fileshipper": "https://github.com/Icinga/icingaweb2-module-fileshipper.git#^1.1.0",
+    "graphite": "https://github.com/Icinga/icingaweb2-module-graphite.git#master",
+    "toplevelview": "https://github.com/Icinga/icingaweb2-module-toplevelview.git#^0.3.1",
+    "x509": "https://github.com/Icinga/icingaweb2-module-x509.git#^1.0.0",
+    "reporting": "https://github.com/Icinga/icingaweb2-module-reporting.git#^0.9.2",
+    "grafana": "https://github.com/Mikesch-mp/icingaweb2-module-grafana.git#master",
+    "globe": "https://github.com/Mikesch-mp/icingaweb2-module-globe.git#^1.0.4",
+    "map": "https://github.com/nbuchwitz/icingaweb2-module-map.git#^1.1.0",
+    "reactbundle": "https://github.com/Icinga/icingaweb2-module-reactbundle.git#^0.7.0",
+    "ipl": "https://github.com/Icinga/icingaweb2-module-ipl.git#^0.5.0",
+    "incubator": "https://github.com/Icinga/icingaweb2-module-incubator.git#^0.5.0",
+    "idoreports": "https://github.com/Icinga/icingaweb2-module-idoreports.git#master",
+    "particles": "https://github.com/Mikesch-mp/icingaweb2-theme-particles.git#master"
+  }
+}

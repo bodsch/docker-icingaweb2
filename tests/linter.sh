@@ -16,6 +16,14 @@ fi
 
 hadolint Dockerfile
 
+if ! [[ -e "/usr/bin/shellcheck" ]]
+then
+scversion="stable" # or "v0.4.7", or "latest"
+wget -qO- "https://storage.googleapis.com/shellcheck/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv
+cp "shellcheck-${scversion}/shellcheck" /usr/bin/
+shellcheck --version
+fi
+
 shellcheck \
   --external-sources \
   --shell=bash \

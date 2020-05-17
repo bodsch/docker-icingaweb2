@@ -6,7 +6,7 @@
 
 echo "install icingaweb2 themes"
 
-MODULE_DIRECTORY="/usr/share/webapps/icingaweb2/modules"
+MODULE_DIRECTORY="/usr/share/icingaweb2/modules"
 
 cd /tmp
 

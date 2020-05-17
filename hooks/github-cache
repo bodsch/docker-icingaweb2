@@ -3,7 +3,7 @@
 set -e
 set -x
 
-GITHUB_USER=${GITHUB_USER:-bodsch}
+GITHUB_USER=${GITHUB_USER:-eifelmicha}
 WORK_DIR=$(dirname $(readlink --canonicalize "${0}"))
 JSON_DIR=$(dirname $(readlink --canonicalize "${0%/*}"))/build
 TEMP_DIR=$(mktemp --directory)
