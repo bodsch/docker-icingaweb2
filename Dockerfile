@@ -8,7 +8,6 @@ RUN     npm install --global bower \
 
 # assemble container
 FROM    debian:buster-slim
-LABEL   maintainer="David Hiendl <david.hiendl@dhswt.de>"
 
 # image config
 EXPOSE  80 8888
