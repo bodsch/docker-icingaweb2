@@ -5,30 +5,6 @@ Docker Container for icingaweb2 based on alpine-linux.
 
 Now with PHP7 (7.x) Support and many installed modules and themes (see below).
 
-# Status
-
-[![Docker Pulls](https://img.shields.io/docker/pulls/bodsch/docker-icingaweb2.svg)][hub]
-[![Image Size](https://images.microbadger.com/badges/image/bodsch/docker-icingaweb2.svg)][microbadger]
-[![Build Status](https://travis-ci.org/bodsch/docker-icingaweb2.svg)][travis]
-
-[hub]: https://hub.docker.com/r/bodsch/docker-icingaweb2/
-[microbadger]: https://microbadger.com/images/bodsch/docker-icingaweb2
-[travis]: https://travis-ci.org/bodsch/docker-icingaweb2
-
-
-# Build
-
-Your can use the included Makefile.
-
-- To build the Container: `make build`
-- To remove the builded Docker Image: `make clean`
-- Starts the Container: `make run`
-- Starts the Container with Login Shell: `make shell`
-- Entering the Container: `make exec`
-- Stop (but **not kill**): `make stop`
-- History `make history`
-
-
 # director integration in combination with a dockerized icinga2-master
 
 The Director will be automated configured.
@@ -100,7 +76,7 @@ For more information read the module [documentation](https://github.com/Icinga/i
 
 # Docker Hub
 
-You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/docker-icingaweb2/)
+
 
 
 # supported Environment Vars
@@ -114,6 +90,7 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 | `IDO_DATABASE_NAME`                | `icinga2core`        | Schema Name for IDO                                             |
 | `IDU_USER`                         | `icinga2`            | IDO User                                                        |
 | `IDO_PASSWORD`                     | -                    | IDO password                                                    |
+| `IDO_COLLATION`                    | `latin1`             | IDO collate of DB                                               |
 | `WEB_DATABASE_NAME`                | `icingaweb2`         | Name for the Icingaweb2 DB                                      |
 | `WEB_DATABASE_USER`                | `icingaweb2`         | Username for the Icingaweb2 DB                                  |
 | `WEB_DATABASE_PASS`                | `icingaweb2`         | Password for the Icingaweb2 DB                                  |
@@ -132,6 +109,8 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 |                                    |                      |                                                                 |
 | `GRAPHITE_HOST`                    | -                    | Hostname for the graphite service<br>If no hostname is specified, the module is automatically deactivated.  |
 | `GRAPHITE_HTTP_PORT`               | `8080`               | graphite port                                                   |
+| `GRAPHITE_TIMERANGE`               | `6`                  | graphite default timerange in integer                           |
+| `GRAPHITE_TIMERANGE_UNIT`          | `hours`              | graphite default timerange unit ("minutes,hours,days,weeks")    |
 |                                    |                      |                                                                 |
 | `ICINGA2_MASTER`                   | `icinga2-master`     | Icinga2 Host for Command Transport over API                     |
 | `ICINGA2_MASTER2`                  | -                    | Icinga2 Master2,  activates HA Mode                             |
@@ -143,6 +122,7 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 | `ICINGAWEB_ADMIN_USER`             | `icinga`             |                                                                 |
 | `ICINGAWEB_ADMIN_PASS`             | `icinga`             |                                                                 |
 | `ICINGAWEB2_USERS`                 | -                    | comma separated list to create Icingaweb2 Users. The format are `username:password`<br>(e.g. `admin:admin,dashing:dashing` and so on)      |
+| `ICINGAWEB2_DEPLOYERS`             | -                    | comma separated list to create Icingaweb2 Deployers. The format are `username:password`<br>(e.g. `admin:admin,dashing:dashing` and so on)      |
 |                                    |                      |                                                                 |
 | `ICINGAWEB_DIRECTOR`               | `true`               | switch the Director configuration `on` / `off`<br>Disabling the Director automatically disables the following modules: *x509*, *vspheredb* |
 | `ICINGA2_UPTIME`                   | `125`                | Waits (in seconds) for a stable running Icinga2 instance.<br>Otherwise the Director cannot be configured automatically.                    |
@@ -171,6 +151,27 @@ You can find the Container also at  [DockerHub](https://hub.docker.com/r/bodsch/
 | `GRAFANA_PUBLIC_PROTOCOL`          | `http`               |                           |
 | `GRAFANA_THEME`                    | `light`              |                           |
 | `GRAFANA_PROXY_TIMEOUT`            | `5`                  |                           |
+
+## Module Support
+
+Certain Icingaweb Modules can be disabled if not needed. By default most of them are enabled
+
+| Environmental Variable     | Default Value    | Description                                       |
+| :------------------------- | :-------------   | :-----------                                      |
+| `ICINGAWEB_AWS`            | `true`           | https://github.com/Icinga/icingaweb2-module-aws   |
+| `ICINGAWEB_BP`             | `true`           | https://github.com/Icinga/icingaweb2-module-businessprocess  |
+| `ICINGAWEB_CUBE`           | `true`           | https://github.com/Icinga/icingaweb2-module-cube  |
+| `ICINGAWEB_ES`             | `false`          | https://github.com/Icinga/icingaweb2-module-elasticsearch |
+| `ICINGAWEB_FILESHIPPER`    | `false`          | https://github.com/Icinga/icingaweb2-module-fileshipper  |
+| `ICINGAWEB_GLOBE`          | `true`           | https://github.com/Mikesch-mp/icingaweb2-module-globe  |
+| `ICINGAWEB_IDOREPORTS`     | `true`           | https://github.com/Icinga/icingaweb2-module-idoreports does not work without reporting module  |
+| `ICINGAWEB_MAP`            | `true`           | https://github.com/nbuchwitz/icingaweb2-module-map  |
+| `ICINGAWEB_PDF`            | `false`          | https://github.com/Icinga/icingaweb2-module-pdfexport requires headless chrome! |
+| `ICINGAWEB_REPORTING`      | `true`           | https://github.com/Icinga/icingaweb2-module-reporting  |
+| `ICINGAWEB_TLV`            | `true`           | https://github.com/Icinga/icingaweb2-module-toplevelview  |
+| `ICINGAWEB_VSPHEREDB`      | `true`           | https://github.com/Icinga/icingaweb2-module-vspheredb  |
+| `ICINGAWEB_X509`           | `true`           | https://github.com/Icinga/icingaweb2-module-x509  |
+| `ICINGAWEB_DIRECTOR`       | `true`           | switch the Director configuration `on` / `off`<br>Disabling the Director automatically disables the following modules: *x509*, *vspheredb* |
 
 
 ## LDAP support
