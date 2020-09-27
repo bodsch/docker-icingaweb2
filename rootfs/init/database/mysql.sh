@@ -16,7 +16,7 @@ WEB_DATABASE_NAME=${WEB_DATABASE_NAME:-"icingaweb2"}
 create_database() {
 
   # create user - when they NOT exists
-  query="select host, user, password from mysql.user where user = '${WEB_DATABASE_NAME}';"
+  query="select host, user, authentication_string from mysql.user where user = '${WEB_DATABASE_NAME}';"
   status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | wc -w)
 
   if [[ ${status} -eq 0 ]]
@@ -39,7 +39,7 @@ create_database() {
 
   # check user
   #
-  # query="select host, user, password from mysql.user where user = '${WEB_DATABASE_NAME}';"
+  # query="select host, user, authentication_string from mysql.user where user = '${WEB_DATABASE_NAME}';"
   query="SELECT TABLE_SCHEMA FROM information_schema.tables WHERE table_schema = \"${WEB_DATABASE_NAME}\";"
   status=$(mysql ${MYSQL_OPTS} --batch --execute="${query}" | grep -v host | wc -l)
 
